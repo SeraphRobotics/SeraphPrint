@@ -17,13 +17,16 @@ public:
 
 public slots:
     void preloadedFabFile();
+    void onLoadClicked();
 
 signals:
-    void loadFabFile(QString fab_path);
+    void sendAndLoadFile(QString fab_path);
 
 private:
     Ui::JobWidget *ui;
     QString fab_path;
+    void setAndSaveFile(QString file, bool save);
+    void doInitialLoad();
 
 private slots:
     void on_browseButton_clicked();

@@ -7,64 +7,110 @@
     <x>0</x>
     <y>0</y>
     <width>545</width>
-    <height>300</height>
+    <height>200</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QSplitter" name="splitter">
+  <widget class="QPushButton" name="connectButton">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>110</y>
-     <width>321</width>
-     <height>79</height>
+     <x>186</x>
+     <y>144</y>
+     <width>157</width>
+     <height>32</height>
     </rect>
    </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
+   <property name="text">
+    <string>Connect to Printer</string>
    </property>
-   <widget class="QPushButton" name="connectButton">
-    <property name="text">
-     <string>Connect to Printer</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_portL">
-         <property name="text">
-          <string>COM Port:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="portBox"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_configL">
-         <property name="text">
-          <string>Config:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="configBox"/>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QPushButton" name="configButton">
-       <property name="text">
-        <string>Load New Printer Configuration</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
+  </widget>
+  <widget class="QPushButton" name="configButton">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>79</y>
+     <width>131</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Copy the file chosen into the list of configs for future use</string>
+   </property>
+   <property name="text">
+    <string>Add other...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_portL">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>55</y>
+     <width>66</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>COM Port</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_configL">
+   <property name="geometry">
+    <rect>
+     <x>48</x>
+     <y>85</y>
+     <width>46</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Config</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="portBox">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>50</y>
+     <width>240</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>130</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>240</width>
+     <height>16777215</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="configBox">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>80</y>
+     <width>240</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>130</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>240</width>
+     <height>16777215</height>
+    </size>
+   </property>
   </widget>
  </widget>
  <resources/>

@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include "baywidget.h"
+#include <string>
+using namespace std;
 
 namespace Ui {
     class MaterialsWidget;
@@ -18,9 +20,13 @@ public:
     ~MaterialsWidget();
 
 public slots:
-    void initializeMaterials(int numBays, QVector<std::string> bayMaterials);
+    void initializeMaterials(int numBays, QVector<string> bayMaterials);
+    void setBayCommand(int bayNum, double distance, bool absolute);
+    void setBayMaterial(int bayNum, QString material);
 
-    //void initializeMaterials(int numBays);
+signals:
+    void sendBayCommand(int bayNum, double distance, bool absolute);
+    void sendBayMaterial(int bayNum, QString material);
 
 private:
     Ui::MaterialsWidget *ui;

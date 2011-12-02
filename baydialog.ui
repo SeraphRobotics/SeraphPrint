@@ -86,6 +86,12 @@
       <property name="shortcut">
        <string>Up</string>
       </property>
+      <property name="autoRepeat">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
      </widget>
     </item>
     <item row="2" column="1">
@@ -111,6 +117,12 @@
       </property>
       <property name="shortcut">
        <string>Down</string>
+      </property>
+      <property name="autoRepeat">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -257,14 +269,14 @@
   <widget class="QPushButton" name="moveButton">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>55</x>
      <y>150</y>
-     <width>194</width>
+     <width>101</width>
      <height>32</height>
     </rect>
    </property>
    <property name="text">
-    <string>Move to Command</string>
+    <string>Move</string>
    </property>
   </widget>
  </widget>

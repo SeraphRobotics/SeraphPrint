@@ -17,7 +17,8 @@ SOURCES += main.cpp\
         baywidget.cpp \
         materialswidget.cpp \
         mainwindow.cpp \
-    gamepad.cpp
+    gamepad.cpp \
+    motordialog.cpp
 
 HEADERS  += mainwindow.h \
         connectwidget.h \
@@ -26,7 +27,8 @@ HEADERS  += mainwindow.h \
         baydialog.h \
         baywidget.h \
         materialswidget.h \
-    gamepad.h
+    gamepad.h \
+    motordialog.h
 
 FORMS    += mainwindow.ui \
         connectwidget.ui \
@@ -35,23 +37,11 @@ FORMS    += mainwindow.ui \
         baydialog.ui \
         baywidget.ui \
         materialswidget.ui \
-    gamepad.ui
+    gamepad.ui \
+    motordialog.ui
 
-INCLUDEPATH += FabInterpreter
-include(FabInterpreter/Interpreter.pro)
+INCLUDEPATH += FabConLib
+include(FabConLib/FabConLib/test.pro)
 
-RESOURCES +=
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+RESOURCES += \
+    arrows/resources.qrc

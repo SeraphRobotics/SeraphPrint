@@ -16,14 +16,18 @@ public:
     ~BayDialog();
 
 signals:
-    void moveBay(int bayNum, double distance);
+    void sendBayCommand(int bayNum, double distance, bool absolute);
 
 private slots:
 
+    void on_incrementSpin_editingFinished();
+    void on_commandSpin_editingFinished();
+    void on_downButton_clicked();
+    void on_upButton_clicked();
     void on_moveButton_clicked();
     void on_acceptButton_clicked();
-    void on_upButton_released();
-    void on_downButton_released();
+    //void on_upButton_released();
+    //void on_downButton_released();
 
 private:
     Ui::BayDialog *ui;

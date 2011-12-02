@@ -6,7 +6,12 @@ PrintWidget::PrintWidget(QWidget *parent) :
     ui(new Ui::PrintWidget)
 {
     ui->setupUi(this);
+
+    isPrinting = false;
     isPaused = true;
+    //connect(ui->backButton, SIGNAL(clicked()), this, SLOT(backClicked()));
+    //connect(ui->playButton, SIGNAL(clicked()), this, SLOT(on_playButton_clicked()));
+    //connect(ui->stopButton, SIGNAL(clicked()), this, SLOT(on_stopButton_clicked()));
 }
 
 PrintWidget::~PrintWidget()
@@ -31,35 +36,53 @@ void PrintWidget::on_playButton_clicked()
 {
     ui->stopButton->setEnabled(true);
 
-    if (isPaused)
+    if (isPrinting)
     {
-        // Start/Resume print job
+        if (isPaused)
+        {
+            // Resume print job (!= Start print job)
+            emit resume();
+
+            // TODO ** Change icon to "pause"
+            ui->playButton->setText("Pause");
+        }
+        else
+        {
+            emit pause();
+
+            ui->label_info->setText("Paused.");
+
+            // TODO ** Change icon to "play"
+            ui->playButton->setText("Resume");
+        }
+        isPaused = !isPaused;
+    }
+    else
+    {
+        // Start print job
         emit go();
 
         // TODO ** Change icon to "pause"
         ui->playButton->setText("Pause");
+        isPrinting = true;
+        isPaused = false;
     }
-    else
-    {
-        emit pause();
-
-        ui->label_info->setText("Paused on path "
-                                + QString::number(currentPath)+ " of "
-                                + QString::number(totalPaths) + ".");
-
-        // TODO ** Change icon to "play"
-        ui->playButton->setText("Resume");
-    }
-    isPaused = !isPaused;
 }
 
 void PrintWidget::on_stopButton_clicked()
 {
     emit stop();
 
-    ui->label_info->setText("Printing canceled.");
+    ui->label_info->setText("Printing canceled. Please reconnect to the printer.");
 
     // TODO ** Change icon to "play"
     ui->playButton->setText("Start");
+    isPrinting = false;
     isPaused = true;
+}
+
+void PrintWidget::getPrinterProgress(int currPath, QString status)
+{
+    currentPath = currPath;
+    ui->label_progress->setText(status);
 }

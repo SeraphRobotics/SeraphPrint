@@ -8,6 +8,15 @@ int main(int argc, char *argv[])
     MainWindow w;
     //Interface i;
 
+    /*QString passed_file;
+
+    if(argc == 2)
+    {
+        passed_file = argv[1];
+        qDebug() << "Argument received " << passed_file << endl;
+        w.setFileArg(passed_file);
+        w.setUseFileArg(true);
+    }*/
     w.show();
 
     return a.exec();
