@@ -13,13 +13,14 @@ HEADERS += JrkerrElectronics/electronicsinterface.h \
     JrkerrElectronics/nmotion.h
 
 
-win32: { 
-    include("win-src.pro")
+win32: {
     INCLUDEPATH += JrkerrElectronics/Windows/
+    include("win-src.pro")
+    include("qextserial-src.pro")
 }
-unix: { 
-    include("posix-src.pro")
+unix: {
     INCLUDEPATH += JrkerrElectronics/Posix/
+    include("posix-src.pro")
     include("qextserial-src.pro")
 }
 

@@ -4,7 +4,6 @@
 DEFINES += CONFIRM_ENABLED
 QT += script \
     xml
-QT -= gui
 #TARGET = TestMotors
 CONFIG += console
 CONFIG -= app_bundle
