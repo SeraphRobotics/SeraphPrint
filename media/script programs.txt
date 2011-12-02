@@ -1,0 +1,103 @@
+
+For Pressure tool:
+
+onVoxel(voxel){
+	var path = xyz.pathTo([voxel.x,voxel.y,voxel.z],material.pathspeed);
+
+	var np = new NPath()
+	var v1 = new State()
+	v1[actuatorIDs[0]] = .25;
+	v1[0] = .1;
+	var dt = voxel.volume / material.Q;
+	var v2 = new State();
+	v2[0] = dt;
+	var v3  =new State();
+	v3[actuactorIDs[0]]=-.25;
+	v3[0] = .1;
+
+
+	path.addState(v1);
+	path.addState(v2);
+	path.addState(v3);
+	return path;
+}
+
+onPath(path){
+	var npath = xyz.pathAlong(path.points, material.speed);
+	
+	var pushState = new State();
+	var pushtime = material.compression/material.Q;
+	pushState[actuatorIDs[0]] = revolutionsPerState;
+	pushState[0] = pushtime;	
+
+	var suckState = new State();
+	suckState[0] = -revolutionsPerState;
+	
+	npath.addState(pushState,0); // append State to beginnning
+	npath.addState(suckState);
+	
+	return npath;	
+
+
+}
+	
+	
+for Displacement tool:
+
+onVoxel(voxel){
+	var path = xyz.pathTo([voxel.x,voxel.y,voxel.z],material.pathspeed);
+
+	
+	var v1 = new State();
+	v1[actuatorIDs[0]] = (voxel.volume+ material.compression)*revolutionsPerVolume ;
+	v1[0] = (voxel.volume+material.compression)/ material.Q;
+
+	var v2 = new State();
+	v2[0] =  material.compression/ material.Q;
+	v2[actuatorIDs[0]] = material.compression*revolutionsPerVolume
+		
+
+
+	
+	path.addState(v1);
+	path.addState(v2);
+	return path;
+}
+
+
+onPath(path){
+	var npath = xyz.pathAlong(path.points, material.pathspeed);	
+
+	var pushtime = material.compression/material.Q;
+	var pushpath = new State();
+	pushpath[0] = pushtime;
+	pushpath[actuatorIDs[0]] = material.compression*revolutionsPerVolume;
+	
+	var i;
+	for (i=0;i<npath.length;i++){
+		var dist = npath[i].distance;
+		npath.[i][actuatorIDs[0]] = dist*material.Q/material.pathspeed*revolutionsPerVolume;
+	}
+
+	var t=0;
+	var j=npath.length;
+	for (j=npath.length;j>0;j--){
+		if(t+npath.[j][0]<pushtime)
+		{
+			npath[j][actuatorIDs[0]] = -npath[j][actuatorIDs[0]];
+			t+=npath[j][0]
+		}
+		else
+		{
+			j=0;
+		}
+	}
+	dt = pushtime - t;
+	var suckpath = new State();
+	suckpath[0] = dt;
+	suckpath[actuatorIDs[0]] = dt*material.Q*revolutionsPerVolume;
+	npath.addState(suckpath)
+
+	npath.addState(pushpath,0);
+	return npath;
+}
