@@ -148,7 +148,7 @@ void ConnectWidget::addConfig(QString path)
         QStringList parts = str.split("/");
         QString simpleName = parts.at(parts.size()-1);
 
-        QString newPath = configFileDirectory.absolutePath() + QDir::separator() + simpleName;
+        QString newPath = configFileDirectory.absolutePath()+ "\/" + simpleName;
 
         qDebug() << newPath;
         if(!command->copy(newPath)){
