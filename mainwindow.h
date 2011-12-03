@@ -73,7 +73,7 @@ private:
     PrintWidget* printWidget;
     GamePad* gamepad_container;
     //Interface printInterface;
-    TestPrinter vm;
+    VirtualPrinter vm;
     XDFLHandler *handler;
     int current_state;
     QString file_arg;

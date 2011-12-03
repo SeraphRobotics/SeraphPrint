@@ -7,6 +7,8 @@
 #include <iostream>
 #include <QDir>
 #include <QSettings>
+#include <QFile>
+#include <QFileInfo>
 
 #define FAB_CONFIG_DIRECTORY_NAME_UNIX ".fab_configs"
 #define FAB_CONFIG_DIRECTORY_NAME_WIN "Fab Configs"
@@ -52,11 +54,9 @@ ConnectWidget::ConnectWidget(QWidget *parent) : QWidget(parent), ui(new Ui::Conn
     {
         configFileDirectory = QDir(QDir::homePath() + "/" + FAB_CONFIG_DIRECTORY_NAME_UNIX + "/");
 
-        // Create the directory if it doesn't already exist
-        verifyDirectoryExistsCommand += "mkdir -p \"";
-        verifyDirectoryExistsCommand += configFileDirectory.absolutePath();
-        verifyDirectoryExistsCommand += "\"";
-        qDebug() << "Existence confirmation: " << verifyDirectoryExistsCommand;
+        if(!configFileDirectory.exists()){
+            configFileDirectory.mkdir("child");
+        }
     }
     else
     {
@@ -139,22 +139,25 @@ ConnectWidget::~ConnectWidget()
 // Copy the config file specified in path into the config directory
 void ConnectWidget::addConfig(QString path)
 {
-    QString sysCopyCommand;
+    QFile* command = new QFile(path);
 
-    if (true /* OS is UNIX-like */)
-    {
-        sysCopyCommand = "cp \"" + path + "\" \"" + configFileDirectory.absolutePath() + "\"";
+    if(command->open(QIODevice::ReadOnly)){
+
+
+        QString str = command->fileName();
+        QStringList parts = str.split("/");
+        QString simpleName = parts.at(parts.size()-1);
+
+        QString newPath = configFileDirectory.absolutePath()+ "\/" + simpleName;
+
+        qDebug() << newPath;
+        if(!command->copy(newPath)){
+            printf("Error copying the code.");
+        }
+
     }
-    else
-    {
-        sysCopyCommand = "copy " + path + " " + configFileDirectory.absolutePath();
-    }
-
-    if (!path.isEmpty())
-    {
-        qDebug() << "Adding config file: " << sysCopyCommand;
-
-        system(sysCopyCommand.toStdString().c_str());
+    else{
+        printf("Error opening the file.");
     }
 }
 

@@ -23,8 +23,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     use_file_arg = false;
     ui->setupUi(this);
-
-    handler = new XDFLHandler();
     handler->setVM(&vm);
 
     current_state = 0;
