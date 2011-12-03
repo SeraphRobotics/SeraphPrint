@@ -1,1 +1,1 @@
-include(./JrkerrElectronics/Posix/qextserial/qextserialport.pri)
+include(./JrkerrElectronics/Posix/qextserial/common.pri)
