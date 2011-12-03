@@ -19,9 +19,12 @@ INCLUDEDIR             += ./JrkerrElectronics/Posix/qextserial/ ./JrkerrElectron
     win32:SOURCES          += ./JrkerrElectronics/Posix/qextserial/qextserialport_win.cpp \
                               ./JrkerrElectronics/Posix/qextserial/qextserialenumerator_win.cpp
 
+macx:DEFINES += Q_OS_MAC
+
     # For Windows user who doesn't have Qt's Private files
     win32{
         DEFINES            += QESP_NO_QT_PRIVATE
+        DEFINES += Q_OS_WIN
         HEADERS            += ./JrkerrElectronics/Posix/qextserial/qextwineventnotifier_p.h
         SOURCES            += ./JrkerrElectronics/Posix/qextserial/qextwineventnotifier_p.cpp
     }

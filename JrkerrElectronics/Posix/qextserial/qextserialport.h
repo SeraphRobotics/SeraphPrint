@@ -73,9 +73,9 @@ enum BaudRateType
     BAUD150 = 150,              //POSIX ONLY
     BAUD200 = 200,              //POSIX ONLY
     BAUD1800 = 1800,            //POSIX ONLY
-#  ifdef B76800
-    BAUD76800 = 76800,          //POSIX ONLY
-#  endif
+//#  ifdef B76800
+//    BAUD76800 = 76800,          //POSIX ONLY
+//#  endif
 #elif defined(Q_OS_WIN)
     BAUD14400 = 14400,          //WINDOWS ONLY
     BAUD56000 = 56000,          //WINDOWS ONLY
