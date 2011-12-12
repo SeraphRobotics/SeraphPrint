@@ -388,7 +388,6 @@ HzPath toHzPath(NPath* npath,int startIndex){
 
         dStateTime = fabs(currentState.at(0)); // time aloted to drive the system to the state specified
 
-
         if ((dStateTime < timestep)){// if the transition time is less than or equal frequency step, append the point to the buffer
             for(int k=0;k<npath->stateSize();k++){
                 statebuffer[k] = currentState.at(k) + statebuffer.at(k);
@@ -454,7 +453,7 @@ HzPath toHzPath(NPath* npath,int startIndex){
 
 
 
-    // Get the the origin of hte current npath
+    // Get the origin of the current npath
     origin = npath->origin();
     for(int j=1;j<npath->stateSize();j++){
         h_origin[j-1] = origin.at(j);//currentState->at(j);

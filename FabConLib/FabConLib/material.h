@@ -6,7 +6,9 @@
 #include <QDomNode>
 #include <QtScript>
 
-
+/**
+ * A struct for defining a material
+ */
 struct Material{
     int id;
     QString name;
@@ -16,10 +18,20 @@ struct Material{
 
 Q_DECLARE_METATYPE(Material)
 
+/**
+ * Constructs a material form a DomNode of an XDFL file
+ */
 Material materialFromDom(QDomNode node);
 
+/**
+ * Constructs a Javascript object form a material
+ */
 QScriptValue objFromMat(QScriptEngine *engine, const Material &mat);
 
+
+/**
+ * Constructs a material form a Javascipt object
+ */
 void matFromObj(const QScriptValue &obj, Material &mat);
 
 #endif // MATERIAL_H

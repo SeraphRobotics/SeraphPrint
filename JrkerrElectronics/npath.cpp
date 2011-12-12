@@ -1,9 +1,5 @@
 #include "npath.h"
 
-#include "stdio.h"
-
-#include <QString>
-
 NPath::NPath():state_size_(0),allStates_(false)
 {
 }
@@ -64,7 +60,7 @@ bool NPath::setState(int i, State new_state){
 
 QVector<double> NPath::getState(int i){
     if(i>states_.size()){
-        throw 2;
+//        throw 2;
         //return new QVector<double>(state_size_,0.0);
     }
     State newstate;

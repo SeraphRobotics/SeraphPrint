@@ -15,12 +15,26 @@ class Bay : public QObject
 {
     Q_OBJECT
 public:
+
+    /**
+     * default constructor for bays
+     */
     Bay();
 
-
+    /**
+     * Builds the bays based on a config file node
+     */
     Bay(const QDomNode& sourceDomNode);
 
+    /**
+     * sets the mapping between the motor id and the state index
+     */
     void setIdMap(QMap<int,int> map);
+
+    /**
+     * sets the size of a state to be used in the npaths returned by the bay
+     */
+    void setStateSize(int statesize);
 
     /**
      * set the bay's id
@@ -60,6 +74,10 @@ public:
      */
     void setEngine(QScriptEngine* engine);
 
+
+    /**
+     * returns the bay's errors as a string
+     */
     QString getErrors();
 
 public slots:
@@ -98,32 +116,29 @@ public slots:
      */
     NPath onVoxel(XDFLVoxel voxel);
 
-
-
+    /**
+     * moves the bays actautors by a given rotation, in a given time
+     * this is a hack to work with the current system and should be improved
+     */
+    NPath jogActuators(double amount,double time);
 
 private:
-    int id_;
+    QScriptEngine* engine_;
 
     double  max_volume_;
 
     double volume_;
 
-    QScriptEngine* engine_;
+    int id_;
 
     QVector<double> location_; //The bay systems point of contact
-
     Material material_;
-
     QMap<QString,QString> scriptSettings_;
-
     QList<int> actuatorIDs_;
-
     QMap<int,int> idToStateIndex_;
-
     QString script_;
-
     QString error_;
-
+    int statesize_;
 };
 
 #endif // BAY_H

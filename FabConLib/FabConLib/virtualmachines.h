@@ -1,10 +1,9 @@
 #ifndef VIRTUALMACHINEENVIROMENT_H
 #define VIRTUALMACHINEENVIROMENT_H
 
-#include <QThread>
-#include "motor.h"
 #include <QScriptEngine>
 #include <QDomDocument>
+#include "motor.h"
 #include "electronicsinterface.h"
 #include "bay.h"
 #include "jscmotion.h"
@@ -19,41 +18,52 @@ class VMPrototype:public QObject
 
         QScriptEngine* makeEngine();
 
-
     public slots:
         /**
-         *sets the overide comport for the VM which will be used in loadConfig
+         * Sets the override COM port for the VM which will be used in loadConfig.
          */
         void setComPort(QString comPort);
         /**
-         * @return true if initialized loadConfig succeeded
+         * @return true if loadConfig() succeeded.
          */
         bool isInitialized();
         /**
-         * used to limit the reach of the upper level code
-         * @return the size of a valize NPath
+         * Used to limit the reach of the upper level code.
+         * @return the size of a valid NPath.
          */
         int nstatesize();
 
-
-
-        /// TO be overideed by the actual VM and the test VM
+        /// These methods should be overriden by actual VM and test VM classes.
 
         /**
-         *builds a virtual machine based on the QDomDocument
-         *allows the document to be build by a handler program rather than a file
+         * Builds a virtual machine based on the QDomDocument.
+         * Allows the document to be build by a handler program rather than a file.
          */
         void loadConfig(QDomDocument document);
         /**
-         * @return a string of all objects errors
+         * @return a string of all errors.
          */
         virtual QString getErrors();
         /**
-         * used to limit the reach of the upper level code
-         * @return true if path is valid and queued
+         * Used to limit the reach of the upper level code.
+         * @return true if path is valid and queued.
          */
         virtual bool executeNPath(NPath path);
 
+        virtual void dumpstates();
+
+        virtual bool executeRelativeNPath(NPath path);
+
+        virtual State currentState();
+
+        QVector<double> currentPosition();
+
+        bool moveTo(double x, double y, double z, double speed);
+        bool move(double x, double y, double z, double speed);
+
+        bool forceStop();
+
+        virtual void resetPosition();
 
     public:
         QList<Bay*> bays;
@@ -61,14 +71,13 @@ class VMPrototype:public QObject
 
     protected:
         QString comPort_;
+        QString error_string_;
         bool initialized_;
         int statesize_;
-        QString error_string_;
         JsXYZ jsxyz_;
-
+        State laststate_;
         QMap<int,int> idtostatemap_;
         int frequency_;
-
     };
 
 
@@ -80,24 +89,20 @@ public:
     VirtualPrinter();
 
 public slots:
-    /**
-     *builds a virtual machine based on the QDomDocument
-     *allows the document to be build by a handler program rather than a file
-     */
     void loadConfig(QDomDocument document);
-    /**
-     * @return a string of all objects errors
-     */
     QString getErrors();
-
-    /**
-     * used to limit the reach of the upper level code
-     * @return true if path is valid and queued
-     */
     bool executeNPath(NPath path);
 
+    void dumpstates();
+
+    bool executeRelativeNPath(NPath path);
+    State currentState();
+    bool forceStop();
+    void resetPosition();
+
+
 public:
-    ElectronicsInterface eInterface;//TODO: this should ne private. Nothing above VM should access it.
+    ElectronicsInterface eInterface; //TODO: this should be private. Nothing above VM should access it.
 };
 
 
@@ -107,30 +112,23 @@ class TestPrinter:public VMPrototype
     Q_OBJECT
 public:
     TestPrinter();
-    void dumpstates();
+
 
 public slots:
-    /**
-     *builds a virtual machine based on the QDomDocument
-     *allows the document to be build by a handler program rather than a file
-     */
     void loadConfig(QDomDocument document);
-
-    /**
-     * used to limit the reach of the upper level code
-     * @return true if path is valid and queued
-     */
     bool executeNPath(NPath path);
+    bool executeRelativeNPath(NPath path);
+    State currentState();
+    void dumpstates();
+    void resetPosition();
 
 private:
     QList<NPath> totalprintcommands_;
 };
 
 
-
-
 /**
- * runs a script with access to motors and coordinated motion instances.
+ * Runs a script with access to motors and coordinated motion instances.
  */
 QString runScript(VirtualPrinter *vm, QString script_);
 

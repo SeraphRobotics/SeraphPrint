@@ -11,7 +11,7 @@
 
 int main(int argc, char *argv[]) {
     QCoreApplication app(argc,argv);
-    QString configFilePath="testConfig.config";  //"./testConfig.config";
+    QString configFilePath= "hobby-servo.config";   //"./testConfig.config";
     QString ComPort=""; ///dev/tty.usbserial-A400gNfH";   //"tty.usbserial-A9003UF2";
     ElectronicsInterface eInterface;
     QDomDocument document;
@@ -37,18 +37,53 @@ int main(int argc, char *argv[]) {
         // eInterface.getMotor(1)->moveAbsolute(1,1,1);
         // eInterface.getMotor(1)->waitMove();*/
         CoordinatedMotion* cmotion = eInterface.getCoordinatedMotion();
-        State v1(4,0.0);
-        State v2(4,0);
-        v2[0]=1;
-        v2[2]=1;
-        v2[1]=1;
+       int x = 1;
+       int dx =- 1;
+       int y = 0;
+       int dy = 1;
+       int z = 0;
+       int dz = 0;
+       int t = 4;
 
-        v2[3]=.01;
+        State v1(4,0);
+        v1[0]=t;
+        v1[1]=1;
+        v1[2]=y;
+        v1[3]=z;
+
+        State v2(4,0);
+        v2[0]=t;
+        v2[1]=-1;
+        v2[2]=y;
+        v2[3]=z;
+
+        State v3(4,0);
+        v3[0]=t;
+        v3[1]=dx;
+        v3[2]=dy;
+        v3[3]=z+dz;
+
+        State v4(4,0);
+        v4[0]=t;
+        v4[1]=x;
+        v4[2]=dy;
+        v4[3]=z;
+
+        State v5(4,0);
+        v5[0]=t;
+        v5[1]=x;
+        v5[2]=y;
+        v5[3]=z;
+
+
      /*   State v3(5,0.0);
         v3[0]=6.0; */
         NPath p1(4);
         p1.addState(v1);
         p1.addState(v2);
+       // p1.addState(v3);
+        //  p1.addState(v4);
+     //   p1.addState(v5);
        // p1.addState(&v3);
         //        State v4(5,0.0);
         //        v4[0]=0;
@@ -70,9 +105,9 @@ int main(int argc, char *argv[]) {
            // cmotion->moveAlongPath(p2);
         }
     }
-    //    eInterface.waitOnMove();
+    eInterface.waitOnMove();
     printf("\nErrors: %s",eInterface.getErrors().toStdString().c_str());
-    //    eInterface.reset();
+    eInterface.reset();
     printf("\nDone\n");
     app.exit(true);
     return app.exec();//return 0;

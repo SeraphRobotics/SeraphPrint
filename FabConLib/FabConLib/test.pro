@@ -2,45 +2,86 @@
 # Project created by QtCreator 2011-06-10T00:48:58
 # -------------------------------------------------
 DEFINES += CONFIRM_ENABLED
-QT += script \
+QT += core \
+    script \
     xml
-#TARGET = TestMotors
+
+TARGET = TestMotors
 CONFIG += console
 CONFIG -= app_bundle
 TEMPLATE = app
-SOURCES += FabConLib/FabConLib/jsnpath.cpp \
-    FabConLib/FabConLib/bay.cpp \
-    FabConLib/FabConLib/xdflpath.cpp \
-    FabConLib/FabConLib/xdflvoxel.cpp \
-    FabConLib/FabConLib/material.cpp \
-    FabConLib/FabConLib/xyzmotion.cpp \
-    FabConLib/FabConLib/jscmotion.cpp \
-    FabConLib/FabConLib/jsxyz.cpp \
-    FabConLib/FabConLib/util.cpp \
-    FabConLib/FabConLib/xdflhandler.cpp \
-    FabConLib/FabConLib/unittests.cpp \
-    FabConLib/FabConLib/virtualmachines.cpp
-HEADERS += \
-    FabConLib/FabConLib/jsnpath.h \
-    FabConLib/FabConLib/bay.h \
-    FabConLib/FabConLib/xdflpath.h \
-    FabConLib/FabConLib/xdflvoxel.h \
-    FabConLib/FabConLib/material.h \
-    FabConLib/FabConLib/xyzmotion.h \
-    FabConLib/FabConLib/jscmotion.h \
-    FabConLib/FabConLib/jsxyz.h \
-    FabConLib/FabConLib/util.h \
-    FabConLib/FabConLib/xdflhandler.h \
-    FabConLib/FabConLib/unittests.h \
-    FabConLib/FabConLib/virtualmachines.h
+SOURCES += main.cpp \
+    bay.cpp \
+    xdflpath.cpp \
+    xdflvoxel.cpp \
+    material.cpp \
+    xyzmotion.cpp \
+    xdflhandler.cpp \
+    virtualmachines.cpp \
+    coreinterface.cpp \
+    loadconfigthread.cpp \
+    jsnpath.cpp \
+    jscmotion.cpp \
+    jsxyz.cpp \
+    testing/util.cpp \
+    testing/unittests.cpp \
+    testing/testerforci.cpp \
+    testing/jscitest.cpp
+
+
+
+HEADERS += bay.h \
+    xdflpath.h \
+    xdflvoxel.h \
+    material.h \
+    xyzmotion.h \
+    xdflhandler.h \
+    virtualmachines.h \
+    coreinterface.h \
+    loadconfigthread.h \
+    jsnpath.h \
+    jscmotion.h \
+    jsxyz.h \
+    testing/util.h \
+    testing/unittests.h \
+    testing/testerforci.h \
+    testing/jscitest.h
+
 INCLUDEPATH += JrkerrElectronics/
 include("JrKerr_Electronics.pro")
+
 OTHER_FILES += \
     media/testxdfl.xdfl \
     media/TestScript.js \
     media/testConfig.config \
     media/testxdfl-test.xdfl \
-    media/testxdfl-mid.xdfl
+    media/testxdfl-mid.xdfl \
+    media/JrKerr-Valve.config \
+    media/JrKerr-Single-deposition.config \
+    media/JrKerr-Duel-deposition.config
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

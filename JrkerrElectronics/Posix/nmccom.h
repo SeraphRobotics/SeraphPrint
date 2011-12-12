@@ -7,10 +7,6 @@
 #ifndef nmccomH
 #define nmccomH
 
-
-
-
-
 #include <QString>
 #include "../Posix/qextserial/qextserialport.h" //// Diff
 

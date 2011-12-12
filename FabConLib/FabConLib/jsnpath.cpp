@@ -2,29 +2,26 @@
 #include <stdio.h>
 
 
-void npathFromMatrix(const QScriptValue &obj,NPath &npath){
-
-
+void npathFromMatrix(const QScriptValue &obj,NPath &npath) {
     int statesize = obj.property("statesize").toInt32();
     npath.setStateSize(statesize);
     int len = obj.property("length").toInt32();
-    for(int i=0;i<len;i++){
+    for(int i=0;i<len;i++) {
         QScriptValue scriptvector = obj.property(i);
         QVector<double> v(statesize);
-        for (int j=0;j<statesize;j++){
+        for (int j=0;j<statesize;j++) {
             v[j] = scriptvector.property(j).toNumber();
         }
         npath.addState(QVector<double>(v));
     }
-
 }
 
-QScriptValue matrixFromNPath(QScriptEngine *engine,NPath &npath){
+QScriptValue matrixFromNPath(QScriptEngine *engine,NPath &npath) {
     QScriptValue obj = engine->newArray(npath.numberOfStates());
-    for(int i=0;i<npath.numberOfStates();i++){
+    for(int i=0;i<npath.numberOfStates();i++) {
         QVector<double> v = npath.getState(i);
         QScriptValue scriptVector = engine->newArray(npath.stateSize());
-        for(int j=0;j<npath.stateSize();j++){
+        for(int j=0;j<npath.stateSize();j++) {
             scriptVector.setProperty(j,v.at(j));
         }
         scriptVector.setProperty("distance",0);
@@ -35,12 +32,12 @@ QScriptValue matrixFromNPath(QScriptEngine *engine,NPath &npath){
     return obj;
 }
 
-QScriptValue matrixFromNPath(QScriptEngine *engine,NPath &npath, QVector<double> distances){
+QScriptValue matrixFromNPath(QScriptEngine *engine,NPath &npath, QVector<double> distances) {
     QScriptValue obj = engine->newArray(npath.numberOfStates());
-    for(int i=0;i<npath.numberOfStates();i++){
+    for (int i = 0; i < npath.numberOfStates(); i++) {
         QVector<double> v = npath.getState(i);
         QScriptValue scriptVector = engine->newArray(npath.stateSize());
-        for(int j=0;j<npath.stateSize();j++){
+        for (int j = 0; j < npath.stateSize(); j++) {
             scriptVector.setProperty(j,v.at(j));
         }
         scriptVector.setProperty("distance",distances.at(i));
@@ -52,14 +49,13 @@ QScriptValue matrixFromNPath(QScriptEngine *engine,NPath &npath, QVector<double>
 }
 
 
-QScriptValue newJsState(QScriptContext *context, QScriptEngine *engine)
-{
+QScriptValue newJsState(QScriptContext *context, QScriptEngine *engine) {
     int i = context->engine()->globalObject().property("statesize").toInt32();
     if (context->isCalledAsConstructor()) {
         // initialize the new object
         context->thisObject().setProperty("distance", 0);
         context->thisObject().setProperty("length", i);
-        for(int j=0;j<i;j++){
+        for (int j = 0; j < i; j++) {
             context->thisObject().setProperty(j,0);
         }
         // ...
@@ -71,7 +67,7 @@ QScriptValue newJsState(QScriptContext *context, QScriptEngine *engine)
         // create our own object and return that one
 
         QScriptValue object = engine->newArray(i);
-        for(int j=0;j<i;j++){
+        for(int j=0;j<i;j++) {
             object.setProperty(j,0);
         }
         object.setProperty("length",i);
@@ -81,19 +77,18 @@ QScriptValue newJsState(QScriptContext *context, QScriptEngine *engine)
     }
 }
 
-
-QScriptValue addState(QScriptContext * context,QScriptEngine *engine){
-    if(0==context->argumentCount() || 2<context->argumentCount()){return QScriptValue();}
+QScriptValue addState(QScriptContext * context,QScriptEngine *engine) {
+    if (0==context->argumentCount() || 2<context->argumentCount()) {return QScriptValue();}
 
     int len = context->thisObject().property("length").toInt32();
-    if (1==context->argumentCount()){
+    if (1==context->argumentCount()) {
         QScriptValue v =context->argument(0);
         context->thisObject().setProperty(len,v);
 
-    }else if (2==context->argumentCount()){
+    } else if (2==context->argumentCount()) {
         int index = context->argument(1).toInt32();
-        if(index>len){return QScriptValue();}
-        for(int j=len;j>index;j--){// shift everything down 1
+        if (index>len) {return QScriptValue();}
+        for(int j=len;j>index;j--) {// shift everything down 1
             QScriptValue last = context->thisObject().property(j-1);
             context->thisObject().setProperty(j,last);
         }
@@ -104,8 +99,7 @@ QScriptValue addState(QScriptContext * context,QScriptEngine *engine){
 
 }
 
-QScriptValue newJsNPath(QScriptContext *context, QScriptEngine *engine)
-{
+QScriptValue newJsNPath(QScriptContext *context, QScriptEngine *engine) {
     int i = context->engine()->globalObject().property("statesize").toInt32();
     if (context->isCalledAsConstructor()) {
         // initialize the new object

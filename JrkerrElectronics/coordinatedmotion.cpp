@@ -1,6 +1,6 @@
 #include "coordinatedmotion.h"
-#include <QDebug>
 #include <math.h>
+#include <QTextStream>
 
 CoordinatedMotion::CoordinatedMotion():initialized_(false),pathbegan_(false),frequency_(P_30HZ)
 {
@@ -32,6 +32,11 @@ void CoordinatedMotion::setGroupAddress(byte address)
     X_Y_Z_GROUP_ADDRESS = address;
 }
 
+void CoordinatedMotion::setBufferSize(int buffsize)
+{
+    BUFF_SIZE = buffsize;
+}
+
 void CoordinatedMotion::setFrequency(int frequency)
 {
     frequency_=frequency;
@@ -61,12 +66,12 @@ bool CoordinatedMotion::initializePathMode()
 
         tempInitialized = tempInitialized && j.value()->setGroup(X_Y_Z_GROUP_ADDRESS,(j.key()==1));// the i.key()==1 sets id 1 as the group leader
     }
-
+    int temp = BUFF_SIZE;
     initialized_= tempInitialized &&
                   NP::SetPathParams(
                     getNumberOfAxes(),
                     frequency_, //path frequency
-                    87,
+                    BUFF_SIZE,
                     //Max number of points in the path point buffer at one time.  Max value is 87.
                     //A higher value results in longer downloads to the path point buffer.
                     addressMap,
@@ -100,7 +105,7 @@ bool CoordinatedMotion::moveAlongPath(NPath states,int startPointIndex){
     NP::AddStates(hpath);
     int result = NP::DlPathPoints(&error_string);   //send path points to the printer and start path
     if (result == -2) error_string += "\n error adding points";
-
+    return true;
 }
 
 

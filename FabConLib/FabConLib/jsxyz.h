@@ -9,17 +9,27 @@ class JsXYZ : public QObject
 {
 Q_OBJECT
 public:
+    /**
+     * Default Constructor for the javascript binding of the xyzmotion class
+     */
     JsXYZ();
 
+    /**
+     * sets the xyz motion instance of the object
+     */
     void setXYZ(XYZMotion* xyz);
 
 public slots:
 
-//    QScriptValue pathTo(QScriptContext * context,QScriptEngine *engine);
+    /**
+     * JavaScript interface for the xyzmotion.pathTo function
+     */
     QScriptValue pathTo(QScriptValue x,QScriptValue y,QScriptValue z, QScriptValue speed);
 
+    /**
+     * Javascript interface for the xyzmotion.pathAlong
+     */
     QScriptValue pathAlong(QScriptValue JSPath,QScriptValue JSspeed);
-//    QScriptValue pathAlong(QScriptContext * context,QScriptEngine *engine);
 
 private:
     XYZMotion* xyz_;

@@ -68,10 +68,10 @@ bool NmcHardReset(byte addr, QString* error_string)
     #ifdef FatHmBrd
             ComPort->setBaudRate(BAUD230400);    //DIFF   //reset with default rate of 230400 for FatHmBrd...
     #else
-            ComPort->setBaudRate(BAUD19200);    //DIFF  //reset with default rate of 19200 for JRK boards
+            ComPort->setBaudRate(BAUD19200);     //DIFF  //reset with default rate of 19200 for JRK boards
     #endif
 
-    ComPort->flush();                           //DIFF   //clear out any random crap left in buffer
+    ComPort->flush();                            //DIFF   //clear out any random crap left in buffer
 
     return true;
 }

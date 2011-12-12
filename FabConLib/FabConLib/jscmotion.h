@@ -6,24 +6,39 @@
 #include <QtScript>
 #include "jsnpath.h"
 
-
-// used only for the runScipt function in virtualmachines
+// Used only for the runScipt function in virtualmachines
 class JsCmotion : public QObject
 {
-Q_OBJECT
-public:
-    JsCmotion();
-    void setCmotion(CoordinatedMotion* cmotion);
+    Q_OBJECT
 
-signals:
+public:
+    /**
+     * default constructor for the Javascript interface for a coordinated motion class
+     */
+    JsCmotion();
+
+    /**
+     * set the coordinated motion instance to be used
+     */
+    void setCmotion(CoordinatedMotion* cmotion);
+    /**
+     * used to validate the interface as being connected to a CoordinatedMotion object
+     */
+    bool hasCM;
 
 public slots:
+
+    /**
+     * used by the Qt System to return the number of axis in javascript
+     */
     int getNumberOfAxes();
 
+
+    /**
+     * used by the Qt System to convert an array to a relative NPath and execute it
+     */
     void moveAlongPath(QScriptValue points);
 
-public:
-    bool hasCM;
 private:
     CoordinatedMotion* cmotion_;
 

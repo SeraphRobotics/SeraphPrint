@@ -27,7 +27,8 @@ public:
     Motor(int id,const byte& address,
           const double countsPerRev,
           const double ticksPerSecond,
-          short kp, short kd, short ki, short il, byte ol, byte cl, short int el, byte sr, byte db);
+          short kp, short kd, short ki, short il, byte ol, byte cl, short int el, byte sr, byte db,
+          double minComPos, double maxComPos, double minComVel, double maxComVel, double minComAcc, double maxComAcc);
     /**
      *A constructor for a JRKErr servo motor which uses explicit value declaration
      */
@@ -35,7 +36,8 @@ public:
           const double countsPerRev,
           const double ticksPerSecond,
           double newVelocity, double newAcceleration,
-          short kp, short kd, short ki, short il, byte ol, byte cl, short int el, byte sr, byte db);
+          short kp, short kd, short ki, short il, byte ol, byte cl, short int el, byte sr, byte db,
+          double minComPos, double maxComPos, double minComVel, double maxComVel, double minComAcc, double maxComAcc);
 
 
 
@@ -81,7 +83,7 @@ public:
      */
     void setReversed(bool);
 
-public slots:
+public slots: // these are slots for when the item is added to javascipt interface.
 
     /**
      * returns the id of the motor

@@ -1,9 +1,7 @@
 #include "jscmotion.h"
 
 
-JsCmotion::JsCmotion():hasCM(false),cmotion_()
-{
-}
+JsCmotion::JsCmotion():hasCM(false),cmotion_() {}
 
 void JsCmotion::setCmotion(CoordinatedMotion* cmotion){
     cmotion_ = cmotion;

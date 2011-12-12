@@ -5,40 +5,81 @@
 #include "jsnpath.h"
 #include <stdio.h>
 
-#include "util.h"
+#include "testing/util.h"
 #include "xdflvoxel.h"
 
-VMPrototype::VMPrototype():comPort_(""),error_string_(""),initialized_(false),statesize_(0){
-}
+VMPrototype::VMPrototype():statesize_(1),laststate_(statesize_,0.0) {}
 
-
-bool VMPrototype::isInitialized(){
+bool VMPrototype::isInitialized() {
     return initialized_;
 }
 
-
-int VMPrototype::nstatesize(){
+int VMPrototype::nstatesize() {
     return statesize_;
 }
 
-void VMPrototype::setComPort(QString comPort){
-    if (!comPort.isNull()){comPort_=comPort;}
+void VMPrototype::setComPort(QString comPort) {
+    if (!comPort.isNull()) {comPort_=comPort;}
 }
 
-QString VMPrototype::getErrors(){
+QString VMPrototype::getErrors() {
     return error_string_;
 }
 
-bool VMPrototype::executeNPath(NPath path){
-    printf("wtf");
+void VMPrototype::dumpstates(){
+    printf("\nVMP called");
+}
+
+bool VMPrototype::executeNPath(NPath path) {
+    printf("Called execute in prototype");
+    return false;
+}
+
+bool VMPrototype::executeRelativeNPath(NPath path) {
+    return false;
+}
+
+State VMPrototype::currentState() {
+    return State(statesize_,0.0);
+}
+
+QVector<double> VMPrototype::currentPosition(){
+    State cp = currentState();
+    return xyzmotion->positionFromState(&cp);
+}
+
+bool VMPrototype::moveTo(double x, double y, double z, double speed) {
+    State startstate = currentState();
+    FabPoint cp = pointFromQVector(xyzmotion->positionFromState(&startstate));
+    FabPoint tp;
+    tp.x = x;
+    tp.y = y;
+    tp.z = z;
+    FabPoint delta = subtractpoints(tp,cp);
+    NPath n = xyzmotion->pathTo(delta.x,delta.y,delta.z,speed);
+    return executeRelativeNPath(n);
+}
+
+bool VMPrototype::move(double x, double y, double z, double speed) {
+    NPath n = xyzmotion->pathTo(x,y,z,speed);
+    return executeRelativeNPath(n);
+}
+
+bool VMPrototype::forceStop(){
     return true;
 }
 
+void VMPrototype::resetPosition(){
+    return;
+}
+
+
 QScriptEngine* VMPrototype::makeEngine(){
 
-    QScriptEngine* engine = new QScriptEngine;
 
-    //Add XYZMotion to engine_
+    QScriptEngine* engine = new QScriptEngine();
+
+    //Add XYZMotion to engine_.
 
     QScriptValue scriptXYZ = engine->newQObject(&jsxyz_);
     engine->globalObject().setProperty("xyz",scriptXYZ);
@@ -47,7 +88,7 @@ QScriptEngine* VMPrototype::makeEngine(){
     int statesize = nstatesize();
     engine->globalObject().setProperty("statesize",statesize);
     QScriptValue stateProto = engine->newArray(statesize);
-    for(int j=0;j<statesize;j++){
+    for(int j=0;j<statesize;j++) {
         stateProto.setProperty(j,0);
     }
     stateProto.setProperty("distance", 0);
@@ -60,17 +101,15 @@ QScriptEngine* VMPrototype::makeEngine(){
 }
 
 
-void VMPrototype::loadConfig(QDomDocument document){
-
-
+void VMPrototype::loadConfig(QDomDocument document) {
 
     QDomElement root = document.documentElement();
 
-    //BAYS
+    // BAYS
     QDomNode tools = root.namedItem("tool");
     QDomNodeList toolChildren  = tools.childNodes();
-    for(int k=0; k<toolChildren.length();k++){
-        if ("bay"==toolChildren.at(k).nodeName().toLower()){
+    for (unsigned int k = 0; k < toolChildren.length(); k++) {
+        if ("bay"==toolChildren.at(k).nodeName().toLower()) {
             bays.append(new Bay(toolChildren.at(k)));
             bays.last()->setIdMap(idtostatemap_);
             bays.last()->setEngine(makeEngine());
@@ -79,48 +118,45 @@ void VMPrototype::loadConfig(QDomDocument document){
 
     // XYZMOTION
     QDomNode motion = root.namedItem("motion");
-    xyzmotion =new XYZMotion(motion);
+    xyzmotion = new XYZMotion(motion);
     xyzmotion->setFrequency(frequency_);
     xyzmotion->setIdMap(idtostatemap_);
     jsxyz_.setXYZ(xyzmotion);
 
-
+    initialized_ = true;
 }
 
 
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////
 
-VirtualPrinter::VirtualPrinter():VMPrototype()
-{
-}
+VirtualPrinter::VirtualPrinter():VMPrototype() {}
 
-
-void VirtualPrinter::loadConfig(QDomDocument document){
+void VirtualPrinter::loadConfig(QDomDocument document) {
 
     QDomElement root = document.documentElement();
     QDomNode electronics = root.namedItem("electronics");
 
-
-    // EINTERFACE specific
-    //initialized the electronics
+    // ELECTRONICS INTERFACE
     eInterface.initialize(electronics,comPort_);
-    initialized_=eInterface.isInitialized();
+    initialized_  = eInterface.isInitialized();
     idtostatemap_ = eInterface.getCoordinatedMotion()->getIdToStateIndexMap();
     frequency_ = eInterface.getCoordinatedMotion()->getFrequency();
     statesize_ = eInterface.getCoordinatedMotion()->getNumberOfAxes()+1;
 
-
+    laststate_ = State(statesize_,0);
 
 
     //BAYS
     QDomNode tools = root.namedItem("tool");
     QDomNodeList toolChildren  = tools.childNodes();
-    for(int k=0; k<toolChildren.length();k++){
+    for(uint k=0; k<toolChildren.length();k++){
         if ("bay"==toolChildren.at(k).nodeName().toLower()){
             bays.append(new Bay(toolChildren.at(k)));
             bays.last()->setIdMap(idtostatemap_);
+            bays.last()->setStateSize(statesize_);
             bays.last()->setEngine(makeEngine());
         }
     }
@@ -133,16 +169,16 @@ void VirtualPrinter::loadConfig(QDomDocument document){
     jsxyz_.setXYZ(xyzmotion);
 }
 
-
+void VirtualPrinter::dumpstates(){}
 
 QString VirtualPrinter::getErrors(){
 
     QString returnstring = "";
     QTextStream ss(&returnstring,QIODevice::WriteOnly);
-    foreach(Motor* m,eInterface.getMotors()){
+    foreach(Motor* m,eInterface.getMotors()) {
         ss<<"\nMotor "<<m->getID()<<":"<<m->getErrors();
     }
-    foreach(Bay* b,bays){
+    foreach(Bay* b,bays) {
         ss<<"\nBay "<<b->getId()<<":"<<b->getErrors();
     }
     ss<<"\nCMotion:"<<eInterface.getCoordinatedMotion()->getErrors();
@@ -152,18 +188,48 @@ QString VirtualPrinter::getErrors(){
     return returnstring;
 }
 
-bool VirtualPrinter::executeNPath(NPath path){
-    if(!initialized_){return false;}
+bool VirtualPrinter::executeNPath(NPath path) {
+    if(!initialized_) {return false;}
     eInterface.getCoordinatedMotion()->initializePathMode();
+    laststate_ = path.lastAbsolute();
     return eInterface.getCoordinatedMotion()->moveAlongPath(path);
 }
 
+bool VirtualPrinter::executeRelativeNPath(NPath path) {
+    path.setOrigin(laststate_);
+    return executeNPath(path);
+}
+
+State VirtualPrinter::currentState() {
+
+    State cp(statesize_,0.0);
+    QMapIterator<int,int> i(idtostatemap_);
+    while(i.hasNext()) {
+        i.next();
+        double p = eInterface.getMotor(i.key())->getPosition();
+        cp[i.value()]=p;
+    }
+    return cp;
+}
 
 
-TestPrinter::TestPrinter():VMPrototype(){}
+bool VirtualPrinter::forceStop(){
+    eInterface.forceStop();
+    initialized_ = false;
+    return true;
+}
 
+void VirtualPrinter::resetPosition(){
+    eInterface.resetPosition();
+}
 
-void TestPrinter::loadConfig(QDomDocument document){
+///////////////////////////////////////////////////////
+
+TestPrinter::TestPrinter():VMPrototype() {
+    totalprintcommands_.append(NPath(statesize_,false));
+}
+
+void TestPrinter::loadConfig(QDomDocument document) {
 //    QDomElement root = document.documentElement();
 //    QDomNode electronics = root.namedItem("electronics");
 
@@ -175,70 +241,74 @@ void TestPrinter::loadConfig(QDomDocument document){
     idtostatemap_[2]=3;
     idtostatemap_[3]=4;
     statesize_ = 5;
-    //totalprintcommands_ = NPath(statesize_,false);
+//    totalprintcommands_ = NPath(statesize_,false);
     VMPrototype::loadConfig(document);
-
-
-
-
+	
 }
 
-
-
-bool TestPrinter::executeNPath(NPath path){
+bool TestPrinter::executeNPath(NPath path) {
     path.toAbsolute();
-//    for(int i=0;i<path.numberOfStates();i++){
+//    for(int i=0;i<path.numberOfStates();i++) {
 //        totalprintcommands_.addState(path.getState(i));
 //    }
     totalprintcommands_.append(path);
+    laststate_ = path.lastAbsolute();
+    return true;
 }
 
-void TestPrinter::dumpstates(){
-    printf(QString::number(totalprintcommands_.size()).toStdString().c_str());
-    for(int i=0;i<totalprintcommands_.size();i++){
+bool TestPrinter::executeRelativeNPath(NPath path) {
+    path.setOrigin(laststate_);
+    return executeNPath(path);
+}
+
+void TestPrinter::dumpstates() {
+    for(int i=0;i<totalprintcommands_.size();i++) {
         QString s("");
         QTextStream ss(&s,QFile::WriteOnly);
         ss<<"Total"<<i;
         test(s,totalprintcommands_.at(i));
     }
+}
 
+State TestPrinter::currentState() {
+    return State(totalprintcommands_.last().lastAbsolute());
+}
+
+void TestPrinter::resetPosition(){
+    laststate_ = State(statesize_,0.0);
+    NPath n(statesize_,false);
+    n.addState(laststate_);
+    totalprintcommands_.append(n);
 }
 
 
-
-
-
-QString runScript(VirtualPrinter *vm, QString script_){
+QString runScript(VirtualPrinter *vm, QString script_) {
     QString error="";
     QTextStream ss(&error,QIODevice::ReadOnly);
 
     QScriptEngine* engine = vm->makeEngine();
 
-    //Add Motors to Engine enviroment
+    // Add motors to engine environment
     QString name="";
     QTextStream ns(&name,QIODevice::WriteOnly);
     QScriptValue motorArray = engine->newArray(vm->eInterface.getMotors().size());
     engine->globalObject().setProperty("motors",motorArray);
-    foreach(Motor* m, vm->eInterface.getMotors()){
+    foreach(Motor* m, vm->eInterface.getMotors()) {
         name.clear();
         QScriptValue scriptmotor = engine->newQObject(m);
-        ns<< ""<<m->getID();
+        ns << "" << m->getID();
         motorArray.setProperty(name,scriptmotor);
     }
 
-
-    //Added Coordinated Motion object to engine
+    // Add coordinated motion object to engine
     JsCmotion jscm_;
     jscm_.setCmotion(vm->eInterface.getCoordinatedMotion());
     QScriptValue scriptCMotion = engine->newQObject(&jscm_);
     engine->globalObject().setProperty("cmotion",scriptCMotion);
 
-
-
-    if (engine->checkSyntax(script_).state()==QScriptSyntaxCheckResult::Error){
+    if (engine->checkSyntax(script_).state()==QScriptSyntaxCheckResult::Error) {
        ss<<engine->checkSyntax(script_).errorMessage();
     }
-
 
     engine->evaluate(script_);
 
@@ -246,5 +316,4 @@ QString runScript(VirtualPrinter *vm, QString script_){
        ss<<engine->uncaughtException().toString();
     }
     return error;
-
 }

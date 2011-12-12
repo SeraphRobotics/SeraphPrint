@@ -3,74 +3,69 @@
 #include <stdio.h>
 #include <math.h>
 
-XYZMotion::XYZMotion() :acceleration_(0),statesize_(0),frequency_(30.0)
-{
-}
+XYZMotion::XYZMotion() :acceleration_(0),statesize_(0),frequency_(30.0) {}
 
-XYZMotion::XYZMotion(const QDomNode& sourceDomNode):statesize_(0){
+XYZMotion::XYZMotion(const QDomNode& sourceDomNode):statesize_(0) {
     QDomNodeList bayChildren = sourceDomNode.childNodes();
-    for(int i=0; i<bayChildren.length();i++){
+    for(uint i=0; i<bayChildren.length();i++){
         QDomNode bchild = bayChildren.at(i);
-        if (bchild.isComment()){continue;}
-        if ("acceleration" == bchild.nodeName().toLower()){
+        if (bchild.isComment()) {continue;}
+        if ("acceleration" == bchild.nodeName().toLower()) {
             acceleration_ = bchild.toElement().text().toDouble();
-        }else if("axis" == bchild.nodeName().toLower()){
+        } else if ("axis" == bchild.nodeName().toLower()) {
             axis a;
             QDomNodeList bchildren = bchild.childNodes();
-            for(int j=0;j<bchildren.size();j++){
+            for (int j=0; j < bchildren.size(); j++) {
                  QDomNode achild = bchildren.at(j);
-                if(achild.isComment()){continue;}
-                if("actuatorid"==achild.nodeName().toLower()){
+                if (achild.isComment()) {continue;}
+                if ("actuatorid"==achild.nodeName().toLower()) {
                     a.actuatorID = achild.toElement().text().toInt();
-                }else if ("revolutionsperdistance"==achild.nodeName().toLower()){
+                } else if ("revolutionsperdistance"==achild.nodeName().toLower()) {
                     a.revPerDist = achild.toElement().text().toDouble();
-                }else if ("range"==achild.nodeName().toLower()){
+                } else if ("range"==achild.nodeName().toLower()) {
                     a.range = achild.toElement().text().toDouble();
-                }else if ("name"== achild.nodeName().toLower()){
+                } else if ("name"== achild.nodeName().toLower()) {
                     a.name = achild.toElement().text().toLower();
                 }
             }
             axismap_[a.name] = a;
-
-
         }
     }
-
 }
 
-void XYZMotion::setAxes(QMap<QString,axis> axismap){
-    foreach(QString s,axismap.keys()){
+void XYZMotion::setAxes(QMap<QString,axis> axismap) {
+    foreach(QString s,axismap.keys()) {
         axismap_[s.toLower()]=axismap[s];
     }
 }
 
-
-void XYZMotion::setAcceleration(double a){
-    if (0!=a){acceleration_=a;}
+void XYZMotion::setAcceleration(double a) {
+    if (0!=a) {acceleration_=a;}
 }
+
 double XYZMotion::getAcceleration()const{
     return acceleration_;
 }
 
-void XYZMotion::setFrequency(int frequency){
+void XYZMotion::setFrequency(int frequency) {
     frequency_=frequency;
 }
 
-void XYZMotion::setIdMap(QMap<int,int> map){
+void XYZMotion::setIdMap(QMap<int,int> map) {
     idToStateIndex_ = map;
     statesize_ = map.keys().size()+1;
 }
 
-void XYZMotion::accelerateAlong(NPath* np, QList<Point> accel_list, double dist_a,bool deccel){
+void XYZMotion::accelerateAlong(NPath* np, QList<FabPoint> accel_list, double dist_a,bool decel) {
     /*
-    Target Points are the state locaitonsi n XYZ
-    Waypoints are the points in the path list
+    Target points are the state locations in XYZ;
+    waypoints are the points in the path list.
     The goal is to accelerate along the waypoints.
     */
-    QListIterator<Point> accelIt(accel_list);
-    Point lastpoint;
-    Point curpoint;
-    Point between_point;
+    QListIterator<FabPoint> accelIt(accel_list);
+    FabPoint lastpoint;
+    FabPoint curpoint;
+    FabPoint between_point;
 
     State tempState(statesize_,0.0);
     double coef= acceleration_/2.0/frequency_/frequency_;
@@ -85,7 +80,7 @@ void XYZMotion::accelerateAlong(NPath* np, QList<Point> accel_list, double dist_
     double di=0; // r_i - Rj  Distance between current waypoint and target position
     double dj=0; // distance between current waypoint and the next
 
-    if (deccel){
+    if (decel) {
         v0 = acceleration_*t1/frequency_;
         coef = -coef;// Invert for decelleration
     }
@@ -94,11 +89,11 @@ void XYZMotion::accelerateAlong(NPath* np, QList<Point> accel_list, double dist_
     lastpoint = accelIt.next();
     curpoint = accelIt.next();
     dj = distance(lastpoint,curpoint);
-    for (int i=1;i<=timesteps;i++){
+    for (int i=1; i <= timesteps; i++) {
         ri = v0*i + coef*i*i;
         di = ri-Rj;
 
-        if(di>dj && accelIt.hasNext()){
+        if (di > dj && accelIt.hasNext()) {
             dj = distance(lastpoint,curpoint);
             Rj +=dj;
             lastpoint = curpoint;
@@ -112,11 +107,10 @@ void XYZMotion::accelerateAlong(NPath* np, QList<Point> accel_list, double dist_
     }
 }
 
-NPath XYZMotion::pathAlong(XDFLPath path,double speed){
-
+NPath XYZMotion::pathAlong(XDFLPath path,double speed) {
 //    XDFLPath grPath = path.getAsGlobalRelative();
-    Point origin = path.start();
-    if (0==acceleration_ || 0==frequency_){return NPath(statesize_);}
+    FabPoint origin = path.start();
+    if (0==acceleration_ || 0==frequency_) {return NPath(statesize_);}
 
     speed = fabs(speed);
     NPath np(statesize_,false);
@@ -125,26 +119,24 @@ NPath XYZMotion::pathAlong(XDFLPath path,double speed){
     double dist_a = speed*speed/2.0/acceleration_;
     double dj=0;
     path.toRelative();
-    QList<Point> points = path.getGlobalRelativePoints();
-    Point lastpoint = points.first();
-    Point curpoint;
-    QList<Point> accel_list;
-    QList<Point> deccel_list;
-    QList<Point> coast_list;
+    QList<FabPoint> points = path.getGlobalRelativePoints();
+    FabPoint lastpoint = points.first();
+    FabPoint curpoint;
+    QList<FabPoint> accel_list;
+    QList<FabPoint> decel_list;
+    QList<FabPoint> coast_list;
 
-    //Ensure that the system can accelerate over the distance of the path
-    if(path.length()<2.0*dist_a){
+    // Ensure that the system can accelerate over the distance of the path.
+    if (path.length()<2.0*dist_a) {
         dist_a = .5*path.length();
     }
 
-
-    //Populate acceleration list and find endpoint of acceleration
+    // Populate acceleration list and find endpoint of acceleration.
     int accelInt=0;
-    for(accelInt=0;accelInt<points.length();accelInt++){
-
+    for (accelInt=0;accelInt<points.length();accelInt++) {
         if (dist + distance(lastpoint,points[accelInt]) >= dist_a) {
             double d = dist_a-dist;
-            Point accelstop = pointBetween(lastpoint,points[accelInt],d);
+            FabPoint accelstop = pointBetween(lastpoint,points[accelInt],d);
             accel_list.append(accelstop);
             break;
         }
@@ -153,63 +145,58 @@ NPath XYZMotion::pathAlong(XDFLPath path,double speed){
         lastpoint = points[accelInt];
     }
 
-
-    //Populate decceleration list and find startpoint of decceleration
-    int deccelInt=0;
+    // Populate deceleration list and find startpoint of deceleration.
+    int decelInt=0;
     dist=0;
     lastpoint=points.last();
-    for(deccelInt=points.length()-1;deccelInt>-1;deccelInt--){
-        if (dist + distance(lastpoint,points[deccelInt]) >= dist_a) {
+    for (decelInt=points.length()-1;decelInt>-1;decelInt--) {
+        if (dist + distance(lastpoint,points[decelInt]) >= dist_a) {
             double d = dist_a-dist;
-            Point accelstop = pointBetween(lastpoint,points[deccelInt],d);
-            deccel_list.prepend(accelstop);
-
+            FabPoint accelstop = pointBetween(lastpoint,points[decelInt],d);
+            decel_list.prepend(accelstop);
             break;
         }
-        dist += distance(lastpoint,points[deccelInt]);
-        deccel_list.prepend(points[deccelInt]);
-        lastpoint = points[deccelInt];
+        dist += distance(lastpoint,points[decelInt]);
+        decel_list.prepend(points[decelInt]);
+        lastpoint = points[decelInt];
     }
 
     // Populate coasting list
     coast_list.append(accel_list.last());
 
-    for(int i=accelInt;i<deccelInt+1;i++){
+    for (int i=accelInt; i < decelInt+1; i++) {
         coast_list.append(points[i]);
     }
-    coast_list.append(deccel_list.first());
+    coast_list.append(decel_list.first());
 
-
-//    {//TESTING
+//    {// TESTING
 //    printf("\nACCELERATION size:%i",accel_list.length());
-//    for(int i=0;i<accel_list.length();i++){
+//    for (int i=0; i < accel_list.length(); i++) {
 //        Point p=accel_list.at(i);
 //        printf("\n\t %f, %f, %f",p.x,p.y,p.z);
 //    }
 
 //    printf("\n\nCOAST size:%i",coast_list.length());
-//    for(int i=0;i<coast_list.length();i++){
+//    for (int i=0; i < coast_list.length(); i++) {
 //        Point p=coast_list.at(i);
 //        printf("\n\t %f, %f, %f",p.x,p.y,p.z);
 //    }
 
-//    printf("\n\nDECEL size:%i",deccel_list.length());
-//    for(int i=0;i<deccel_list.length();i++){
-//        Point p=deccel_list.at(i);
+//    printf("\n\nDECEL size:%i",decel_list.length());
+//    for (int i=0; i < decel_list.length(); i++) {
+//        Point p=decel_list.at(i);
 //        printf("\n\t %f, %f, %f",p.x,p.y,p.z);
 //    }
 //    }
 
-
     accelerateAlong(&np,accel_list,dist_a,false);//acceleration
 
-
-    //Coasting
-    if (coast_list.size()>1){
-        QListIterator<Point> coasting(coast_list);
+    // Coasting
+    if (coast_list.size()>1) {
+        QListIterator<FabPoint> coasting(coast_list);
         lastpoint = coast_list.first();
         curpoint = coasting.next();
-        while (coasting.hasNext()){
+        while (coasting.hasNext()) {
             lastpoint = curpoint;
             curpoint = coasting.next();
             tempState = positionToState(curpoint.x,curpoint.y,curpoint.z);
@@ -219,25 +206,21 @@ NPath XYZMotion::pathAlong(XDFLPath path,double speed){
         }
     }
     //deceleration
-    accelerateAlong(&np,deccel_list,dist_a,true);
+    accelerateAlong(&np,decel_list,dist_a,true);
 
     State temp = positionToState(origin.x,origin.y,origin.z);
     np.setOrigin(temp);
     np.toRelative();
     return np;
-
-
 }
 
-
-NPath XYZMotion::pathTo(double x, double y, double z, double speed){
+NPath XYZMotion::pathTo(double x, double y, double z, double speed) {
     // see http://people.mech.kuleuven.be/~bruyninc/blender/doc/interpolation-api.html#trapezoidal-velocity
     // dx_i = x_i/dist*a^2/(v^2*f^2)*(2i-1)
 
-
     NPath np(statesize_,false);
     double dist = sqrt(x*x+y*y+z*z);
-    if (0==acceleration_ || 0==frequency_ || 0==speed || 0==dist){return NPath(statesize_);}
+    if (0==acceleration_ || 0==frequency_ || 0==speed || 0==dist) {return NPath(statesize_);}
     double dist_a = speed*speed/acceleration_/2.0;
     double dist_v =0;
     int xindex = idToStateIndex_[axismap_["x"].actuatorID];
@@ -254,21 +237,20 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed){
     double dt=0;
     double v1 =0;
     double x1 = 0;
-
     //    double D=0;
 
     State tempState(statesize_,0.0);
     coef = acceleration_/2.0/frequency_/frequency_;
     dt = 1.0/frequency_;
 
-    if(dist<dist_a*2){// Special case, acceleration distance is larger than distance
+    if (dist<dist_a*2) {// Special case: acceleration distance is larger than distance
         dist_a = dist/2.0;
         double t1  = sqrt(2.0*dist_a/acceleration_);
         timesteps = floor(t1*frequency_);
 
         v1 = acceleration_*t1;
         x1 = acceleration_/2.0*t1*t1;
-        for (int i=0;i<=timesteps;i++){
+        for (int i=0; i <= timesteps; i++) {
             tempState[0] = 1.0/frequency_;
             tempState[xindex] = xscale*norm_x*coef*i*i;
             tempState[yindex] = yscale*norm_y*coef*i*i;
@@ -278,11 +260,10 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed){
             //                   + norm_y*yscale*(coef*i*i)*norm_y*yscale*(coef*i*i)
             //                   + norm_z*zscale*(coef*i*i)*norm_z*zscale*(coef*i*i));
             //            printf("\nD:%f",D);
-
         }
 
-        //deceleration
-        for (int i=0;i<timesteps+1;i++){
+        // deceleration
+        for (int i=0; i < timesteps+1; i++) {
             tempState[0] = 1.0/frequency_;
             tempState[xindex] = norm_x*xscale*(x1+v1*i*dt-coef*i*i);//(2.0*i-1.0);
             tempState[yindex] = norm_y*yscale*(x1+v1*i*dt-coef*i*i);//(2.0*i-1.0);
@@ -304,7 +285,7 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed){
         //        D=sqrt(xscale*x*xscale*x+yscale*y*yscale*y+zscale*z*zscale*z);
         //        printf("\n D:%f",D);
 
-    } else{
+    } else {
         //make the ramp up .
 
         dist_v = dist-2.0*dist_a;
@@ -314,7 +295,7 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed){
         v1 = acceleration_*t1;
         x1 = acceleration_/2.0*t1*t1;
 
-        for (int i=0;i<=timesteps;i++){
+        for (int i=0; i <= timesteps; i++) {
             tempState[0] = 1.0/frequency_;
             tempState[xindex] = xscale*norm_x*coef*i*i;
             tempState[yindex] = yscale*norm_y*coef*i*i;
@@ -336,9 +317,8 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed){
         //        D=x2;
         //        printf("\n\nD:%f\n",D);
 
-
         //Ramp down
-        for (int i=1;i<timesteps;i++){
+        for (int i=1; i < timesteps; i++) {
             tempState[0] = 1.0/frequency_;
             tempState[xindex] = norm_x*xscale*(x2+speed*i*dt-coef*i*i);//(2.0*i-1.0);
             tempState[yindex] = norm_y*yscale*(x2+speed*i*dt-coef*i*i);//(2.0*i-1.0);
@@ -365,8 +345,7 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed){
     return np;
 }
 
-
-State XYZMotion::positionToState(double x,double y,double z){
+State XYZMotion::positionToState(double x,double y,double z) {
     int xindex = idToStateIndex_[axismap_["x"].actuatorID];
     double xscale = axismap_["x"].revPerDist;
     int yindex = idToStateIndex_[axismap_["y"].actuatorID];
@@ -380,18 +359,29 @@ State XYZMotion::positionToState(double x,double y,double z){
     return temp;
 }
 
-double XYZMotion::distanceFromState(State* state){
+QVector<double> XYZMotion::positionFromState(State* state) {
     int xindex = idToStateIndex_[axismap_["x"].actuatorID];
     double xscale = axismap_["x"].revPerDist;
     int yindex = idToStateIndex_[axismap_["y"].actuatorID];
     double yscale = axismap_["y"].revPerDist;
     int zindex = idToStateIndex_[axismap_["z"].actuatorID];
     double zscale = axismap_["z"].revPerDist;
-    double x,y,z;
-    x = state->at(xindex)/xscale;
-    y = state->at(yindex)/yscale;
-    z = state->at(zindex)/zscale;
-    return sqrt(x*x+y*y+z*z);
+    QVector<double> v(3,0);
+    v[0] = state->at(xindex)/xscale;
+    v[1] = state->at(yindex)/yscale;
+    v[2] = state->at(zindex)/zscale;
+    return v;
+}
 
+double XYZMotion::distanceFromState(State* state) {
+    QVector<double> v = positionFromState(state);
+    return sqrt(v.at(0)*v.at(0)+v.at(1)*v.at(1)+v.at(2)*v.at(2));
+}
 
+QList<double> XYZMotion::buildSpace(){
+    QList<double> a;
+    a[0]=axismap_["x"].range;
+    a[1]=axismap_["y"].range;
+    a[2]=axismap_["z"].range;
+    return a;
 }

@@ -1,14 +1,12 @@
 #include "jsxyz.h"
 #include "jsnpath.h"
 #include "xdflpath.h"
-#include "util.cpp"
+#include "testing/util.cpp"
 
-JsXYZ::JsXYZ()
-{
-}
+JsXYZ::JsXYZ() {}
 
-//QScriptValue JsXYZ::pathTo(QScriptContext * context,QScriptEngine *engine){
-//    if (4!=context->argumentCount()){return engine->newArray(0);}
+//QScriptValue JsXYZ::pathTo(QScriptContext * context,QScriptEngine *engine) {
+//    if (4!=context->argumentCount()) {return engine->newArray(0);}
 //    double x,y,z,speed;
 //    x = context->argument(0).toNumber();
 //    y = context->argument(1).toNumber();
@@ -18,10 +16,7 @@ JsXYZ::JsXYZ()
 //    return matrixFromNPath(engine,n);
 //}
 
-
-QScriptValue JsXYZ::pathTo(QScriptValue xs,QScriptValue ys,QScriptValue zs, QScriptValue speeds){
-
-
+QScriptValue JsXYZ::pathTo(QScriptValue xs,QScriptValue ys,QScriptValue zs, QScriptValue speeds) {
     double x,y,z,speed;
 
     x = xs.toNumber();
@@ -30,30 +25,28 @@ QScriptValue JsXYZ::pathTo(QScriptValue xs,QScriptValue ys,QScriptValue zs, QScr
     speed = speeds.toNumber();
     NPath n = xyz_->pathTo(x,y,z,speed);
     QVector<double> distances(n.numberOfStates(),0.0);
-    for (int i=0; i<n.numberOfStates();i++){
+    for (int i=0; i<n.numberOfStates();i++) {
         distances[i] = xyz_->distanceFromState(&n.getState(i));
     }
     QScriptValue jsnpath = matrixFromNPath(xs.engine(),n,distances);
     return jsnpath;
 }
 
-//QScriptValue JsXYZ::pathAlong(QScriptContext * context,QScriptEngine *engine){}
-QScriptValue JsXYZ::pathAlong(QScriptValue JSPath,QScriptValue JSspeed){
+//QScriptValue JsXYZ::pathAlong(QScriptContext * context,QScriptEngine *engine) {}
+QScriptValue JsXYZ::pathAlong(QScriptValue JSPath,QScriptValue JSspeed) {
     double speed = JSspeed.toNumber();
     XDFLPath xpath;
     pathFromObj(JSPath,xpath);
 
-
     NPath n = xyz_->pathAlong(xpath,speed);
     QVector<double> distances(n.numberOfStates(),0.0);
-    for (int i=0; i<n.numberOfStates();i++){
+    for (int i=0; i < n.numberOfStates(); i++) {
         distances[i] = xyz_->distanceFromState(&n.getState(i));
     }
     QScriptValue jsnpath = matrixFromNPath(JSPath.engine(),n,distances);
     return jsnpath;
 }
 
-
-void JsXYZ::setXYZ(XYZMotion* xyz){
+void JsXYZ::setXYZ(XYZMotion* xyz) {
     xyz_ = xyz;
 }

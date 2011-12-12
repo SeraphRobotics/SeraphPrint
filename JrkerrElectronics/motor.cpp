@@ -7,7 +7,9 @@ Motor::Motor(int id,const byte& address,
              const double countsPerRev,
              const double ticksPerSecond,
              short kp, short kd, short ki, short il,
-             byte ol, byte cl, short int el, byte sr, byte db):
+             byte ol, byte cl, short int el, byte sr, byte db,
+             double minComPos, double maxComPos, double minComVel,
+             double maxComVel, double minComAcc, double maxComAcc):
 initialized_(false),
 commandedPosition_(0.0),
 isReversed_(false),
@@ -24,12 +26,12 @@ CL(cl),
 EL(el),
 SR(sr),
 DB(db),
-MIN_COMMANDED_POSITION(-2147483648.0/countsPerRev),// see page 23 of picsrvsc.pdf
-MAX_COMMANDED_POSITION(2147483647.0/countsPerRev),
-MIN_COMMANDED_VELOCITY(0.0),
-MAX_COMMANDED_VELOCITY(2500000.0/countsPerRev),//see page 15 of picsrvsc.pdf
-MIN_COMMANDED_ACCELERATION(0.0),
-MAX_COMMANDED_ACCELERATION(125000000000.0/countsPerRev),
+MIN_COMMANDED_POSITION(minComPos/countsPerRev),// see page 23 of picsrvsc.pdf
+MAX_COMMANDED_POSITION(maxComPos/countsPerRev),
+MIN_COMMANDED_VELOCITY(minComVel),
+MAX_COMMANDED_VELOCITY(maxComVel/countsPerRev),//see page 15 of picsrvsc.pdf
+MIN_COMMANDED_ACCELERATION(minComAcc),
+MAX_COMMANDED_ACCELERATION(maxComAcc/countsPerRev),
 velocity_(0.0),
 acceleration_(0.0)
 {}
@@ -40,7 +42,9 @@ Motor::Motor(int id, const byte &address,
              double ticksPerSecond,
              double newVelocity, double newAcceleration,
              short kp, short kd, short ki, short il,
-             byte ol, byte cl, short el, byte sr, byte db):
+             byte ol, byte cl, short el, byte sr, byte db,
+             double minComPos, double maxComPos, double minComVel,
+             double maxComVel, double minComAcc, double maxComAcc):
 initialized_(false),
 commandedPosition_(0.0),
 isReversed_(false),
@@ -59,13 +63,15 @@ CL(cl),
 EL(el),
 SR(sr),
 DB(db),
-MIN_COMMANDED_POSITION(-2147483648.0/countsPerRev),
-MAX_COMMANDED_POSITION(2147483647.0/countsPerRev),
-MIN_COMMANDED_VELOCITY(0.0),
-MAX_COMMANDED_VELOCITY(2500000.0/countsPerRev),
-MIN_COMMANDED_ACCELERATION(0.0),
-MAX_COMMANDED_ACCELERATION(125000000000.0/countsPerRev)
+MIN_COMMANDED_POSITION(minComPos/countsPerRev),
+MAX_COMMANDED_POSITION(maxComPos/countsPerRev),
+MIN_COMMANDED_VELOCITY(minComVel),
+MAX_COMMANDED_VELOCITY(maxComVel/countsPerRev),
+MIN_COMMANDED_ACCELERATION(minComAcc),
+MAX_COMMANDED_ACCELERATION(maxComAcc/countsPerRev)
 {}
+
+
 
 void Motor::updateData()
 {
@@ -146,7 +152,7 @@ bool Motor::setGroup(byte groupAddress, bool isLeader)
 
 bool Motor::resetPosition()
 {
-   	bool working = ServoResetPos(ADDRESS,&error_);
+    bool working = ServoResetPos(ADDRESS,&error_);
     commandedPosition_ = 0.0;
     return working;
 }
@@ -154,7 +160,7 @@ bool Motor::resetPosition()
 bool Motor::moving()
 {
     if(!initialized_){return false;}
-    updateData(); //updates the motor info, does this work? MOVE_DONE | PATH_MODE
+    updateData();//updates the motor info, does this work? MOVE_DONE | PATH_MODE
     bool statAuxRead = NmcReadStatus(ADDRESS, SEND_AUX, &error_);
     //MOVE_DONE
     byte auxByte = ServoGetAux(ADDRESS); //does not work?

@@ -14,6 +14,11 @@ class ElectronicsInterface : public QObject
     Q_OBJECT
 
 public:
+
+    /**
+     * This class is what allows other classes to interface with the Fab@Home hardware.
+     * it contructs the motors and CoordinatedMotion classes in its constructor.
+     */
     ElectronicsInterface();
 
     /**
@@ -30,6 +35,11 @@ public:
      * resets the electronics
      */
     void reset();
+
+    /**
+     * resets position of all of the motors
+     */
+    void resetPosition();
 
     /**
      * returns a pointer to the coordinatedmotion object
@@ -53,16 +63,35 @@ public:
      */
     void waitOnMove();
 
+    /**
+     * returns the error strings of the motors and CoordinatedMotion classes
+     */
     QString getErrors();
+
+
+    /**
+     * emergency stops all motors, causes the system to no longer be initialized
+     */
+    void forceStop();
 
 private:
 
+    /**
+     * creates the einterface coordinated motion class
+     */
     void createCoodinatedMotion();
 
+    /**
+     * This should be moved to the motor class.
+     */
     void createMotor(QDomNode node);
 
+    // this should be a contstructor
     QString loadSettings(QDomNode node);
 
+    /**
+     * Cleans up the classes spawned by the ElectronicsInterface when its destroyed;
+     */
     bool cleanUp();
 
 public:
@@ -73,6 +102,7 @@ private:
 
     unsigned int NUM_MODULES, BAUD_RATE;
     byte X_Y_Z_GROUP_ADDRESS;//JRKERR SPECIFIC
+    int BUFF_SIZE; //buffer size
     QString COM_PORT;
     QString error_string_;
     int frequency_;
