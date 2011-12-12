@@ -28,8 +28,6 @@ SOURCES += main.cpp \
     testing/testerforci.cpp \
     testing/jscitest.cpp
 
-
-
 HEADERS += bay.h \
     xdflpath.h \
     xdflvoxel.h \

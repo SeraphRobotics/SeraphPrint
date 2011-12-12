@@ -4,7 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui\
+          xml\
+          script
 
 TARGET = FabPrint
 TEMPLATE = app
@@ -41,7 +43,7 @@ FORMS    += mainwindow.ui \
     motordialog.ui
 
 INCLUDEPATH += FabConLib
-include(FabConLib/FabConLib/test.pro)
+include(FabConLib/FabConLib/include.pro)
 
 RESOURCES += \
     arrows/resources.qrc
