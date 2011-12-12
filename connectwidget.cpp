@@ -2,7 +2,7 @@
 #include "ui_connectwidget.h"
 #include <QFileDialog>
 #include <QMessageBox>
-#include "JrkerrElectronics/Posix/qextserial/qextserialenumerator.h"
+#include "qextserialenumerator.h"
 #include <QDebug>
 #include <iostream>
 #include <QDir>

@@ -10,6 +10,7 @@
 #include "gamepad.h"
 #include "FabConLib/xdflhandler.h"
 #include "FabConLib/virtualmachines.h"
+#include "FabConLib/coreinterface.h"
 
 namespace Ui {
     class MainWindow;
@@ -65,29 +66,31 @@ signals:
     void reportPrinterProgress(int currPath, QString status);
 
 private:
-    Ui::MainWindow *ui;
-    ConnectWidget* connectWidget;
-        QSettings settings;
-    JobWidget* jobWidget;
-    MaterialsWidget* materialsWidget;
-    PrintWidget* printWidget;
-    GamePad* gamepad_container;
-    //Interface printInterface;
-    VirtualPrinter vm;
-    XDFLHandler *handler;
-    int current_state;
-    QString file_arg;
-    bool use_file_arg;
-
-    // aen27, 1 December 2011
-    bool haveValidFile;
-    bool isConnected;
-
-    bool materialsInitialized;
     void updateState();
     void enableOne(int);
     void setUpWidgets();
     void setUpConnections();
+
+private:
+    Ui::MainWindow *ui;
+    ConnectWidget* connectWidget;
+    JobWidget* jobWidget;
+    MaterialsWidget* materialsWidget;
+    PrintWidget* printWidget;
+    GamePad* gamepad_container;
+
+    QSettings settings;
+
+    int current_state;
+    QString file_arg;
+    bool use_file_arg;
+    // aen27, 1 December 2011
+    bool haveValidFile;
+    bool isConnected;
+    bool materialsInitialized;
+
+    CoreInterface* ci_;
+
 };
 
 #endif // MAINWINDOW_H

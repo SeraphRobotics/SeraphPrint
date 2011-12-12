@@ -21,23 +21,23 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    // Setup Internal States
+    ci_ = new CoreInterface();
     use_file_arg = false;
-    ui->setupUi(this);
-    handler->setVM(&vm);
+    haveValidFile = false;
+    isConnected = false;
 
+
+    // Setup UI
+    ui->setupUi(this);
     current_state = 0;
     this->setWindowTitle("FabPrint");
     ui->connectButton->setStyleSheet(ACTIVE);
     ui->jobButton->setStyleSheet(INCOMPLETE);
     ui->materialsButton->setStyleSheet(INCOMPLETE);
     ui->printButton->setStyleSheet(INCOMPLETE);
-
-    haveValidFile = false;
-    isConnected = false;
-
     this->setGeometry(120, 120, 531, 260);
     this->setFixedSize(this->size());
-
     connect(ui->forwardButton, SIGNAL(clicked()), this, SLOT(forwardClicked()));
     connect(ui->backButton, SIGNAL(clicked()), this, SLOT(backClicked()));
 
@@ -47,12 +47,6 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setUpWidgets();
 
     setUpConnections();
-
-    /*QSettings settings("Creative Machines Lab", "FabPrint");
-    QString savedConfig = settings.value("config","").toString();
-    if (!savedConfig.isEmpty()) {
-        sendPreloadedConfig(savedConfig);
-    }*/
 }
 
 /**
@@ -241,6 +235,7 @@ void MainWindow::setPrinter(QString port, QString config_path)
     cout << "In setPrinter slot" << std::endl;
     cout << "Config path: " << config_path.toStdString() << endl;
 
+    QString configString;
     QDomDocument configDom;
     // load the config file into the DOM document
     {
@@ -253,9 +248,9 @@ void MainWindow::setPrinter(QString port, QString config_path)
       configFile.close();
     }
 
-    vm.setComPort(port);
-    vm.loadConfig(configDom);
-    if (vm.isInitialized())
+    ci_->setConfig(configString,port);
+
+    if (ci_->vm_->isInitialized())
     {
         cout << "Config file loaded successfully" << std::endl;
 //        QSettings settings("Creative Machines Lab", "FabPrint");
@@ -278,6 +273,7 @@ void MainWindow::setPrinter(QString port, QString config_path)
 
 void MainWindow::setXDFLFile(QString xdfl_path)
 {
+    QString xdflString;
     QDomDocument xdflDom;
     // load the XDFL file into the DOM document
     {
@@ -288,8 +284,9 @@ void MainWindow::setXDFLFile(QString xdfl_path)
       }
       xdflDom.setContent(&xdflFile);
       xdflFile.close();
+      xdflString = xdflDom.toString();
     }
-    handler->loadFromDom(xdflDom);
+    ci_->setXDFL(xdflString);
     printf("\nDomLoaded");
 }
 
@@ -343,8 +340,9 @@ void MainWindow::getBayNum(int bayNum)
 
 void MainWindow::setGo()
 {
-    handler->start();
-    emit sendTotalPaths(handler->getNumCommands());
+    ci_->startPrint();
+
+//    emit sendTotalPaths(handler->getNumCommands());
     // TODO: Use current/total path display (not implemented in Interface)
     // This will eventually require periodically polling the current path.
 
@@ -358,7 +356,7 @@ void MainWindow::setGo()
 
 void MainWindow::setPause()
 {
-    handler->pause();
+    ci_->pausePrint();
 
     this->setFixedHeight(612);
 
@@ -371,7 +369,7 @@ void MainWindow::setPause()
 
 void MainWindow::setResume()
 {
-    handler->resume();
+    ci_->resumePrint();
 
     this->setFixedHeight(260);
 
@@ -383,7 +381,7 @@ void MainWindow::setResume()
 
 void MainWindow::setStop()
 {
-    /*Not sure how to stop yet*/
+    ci_->forceStop();
 
     this->setFixedHeight(471);
     this->gamepad_container->move(0, 260);
@@ -393,9 +391,7 @@ void MainWindow::setStop()
 }
 
 void MainWindow::moveHandler(double xPos, double yPos, double zPos) {
-
-    /*Create NPath to move the motors. Not sure how to do this yet*/
-
+    ci_->move(xPos,yPos,zPos,30);
 }
 
 void MainWindow::propertiesHandler(QString motorname, double velocity, double acceleration) {
