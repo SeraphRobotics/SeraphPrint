@@ -166,7 +166,7 @@ void MainWindow::enableOne(int newActiveButton)
 void MainWindow::setUpConnections()
 {
     // Connect widget
-        connect(connectWidget, SIGNAL(connectToPrinter(QString,QString)), this, SLOT(setPrinter(QString,QString)));
+    connect(connectWidget, SIGNAL(connectToPrinter(QString,QString)), this, SLOT(setPrinter(QString,QString)));
 
     //  Possible future use
     //  connect(this, SIGNAL(sendPreloadedConfig(QString)), connectWidget, SLOT(preloadConfig(QString)));
@@ -194,26 +194,26 @@ void MainWindow::setUpConnections()
 void MainWindow::setUpWidgets()
 {
 
-    connectWidget = new ConnectWidget(this);
+    connectWidget = new ConnectWidget(this,ci_);
 
     //Job widget
-    jobWidget = new JobWidget(this);
+    jobWidget = new JobWidget(this, ci_);
     jobWidget->hide();
 //    if (use_file_arg)
 //    {
 //        jobWidget->preloadedFabFile();
 //    }
 
-    materialsWidget = new MaterialsWidget(this);
+    materialsWidget = new MaterialsWidget(this,ci_);
     materialsWidget->hide();
 
-    printWidget = new PrintWidget(this);
+    printWidget = new PrintWidget(this,ci_);
     printWidget->hide();
 
 
     ui->currentWidget = connectWidget;
 
-    gamepad_container = new GamePad(this);
+    gamepad_container = new GamePad(this,ci_);
     gamepad_container->move(0, 260);
     gamepad_container->hide();
 

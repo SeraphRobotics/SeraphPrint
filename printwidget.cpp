@@ -1,12 +1,13 @@
 #include "printwidget.h"
 #include "ui_printwidget.h"
 
-PrintWidget::PrintWidget(QWidget *parent) :
+PrintWidget::PrintWidget(QWidget *parent, CoreInterface *ci) :
     QWidget(parent),
     ui(new Ui::PrintWidget)
 {
     ui->setupUi(this);
 
+    ci_ = ci;
     isPrinting = false;
     isPaused = true;
     //connect(ui->backButton, SIGNAL(clicked()), this, SLOT(backClicked()));

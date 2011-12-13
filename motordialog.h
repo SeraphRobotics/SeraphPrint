@@ -16,7 +16,7 @@ public:
     ~motordialog();
 
 signals:
-    void setProperties(QString motorName, double velocity, double acceleration, bool reverse);
+    void setProperties(QString motorName, double velocity, double acceleration);
     void closed();
 
 

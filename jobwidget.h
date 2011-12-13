@@ -2,6 +2,7 @@
 #define JOBWIDGET_H
 
 #include <QWidget>
+#include "FabConLib/coreinterface.h"
 
 namespace Ui {
     class JobWidget;
@@ -12,19 +13,19 @@ class JobWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit JobWidget(QWidget *parent = 0);
+    explicit JobWidget(QWidget *parent, CoreInterface *ci);
     ~JobWidget();
 
 public slots:
     void preloadedFabFile();
     void onLoadClicked();
 
-signals:
-    void sendAndLoadFile(QString fab_path);
+    void LoadFile(QString xdfl_path);
 
 private:
     Ui::JobWidget *ui;
-    QString fab_path;
+    CoreInterface *ci_;
+    QString xdfl_path;
     void setAndSaveFile(QString file, bool save);
     void doInitialLoad();
 

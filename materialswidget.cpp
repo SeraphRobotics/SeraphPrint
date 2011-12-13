@@ -3,12 +3,12 @@
 #include "baywidget.h"
 #include <iostream>
 
-MaterialsWidget::MaterialsWidget(QWidget *parent) :
+MaterialsWidget::MaterialsWidget(QWidget *parent, CoreInterface *ci) :
     QWidget(parent),
     ui(new Ui::MaterialsWidget)
 {
     ui->setupUi(this);
-
+    ci_ = ci;
     /*//FOR TESTING PURPOSES
     //should all be done by initializeMaterials()
     QVector<string> materials(3);
@@ -36,7 +36,7 @@ void MaterialsWidget::initializeMaterials(int nBays, QVector<string> bayMaterial
     for (int x = 0; x < numBays; x++)
     {
         QString bayName = QString("Bay") + QString(" ") + QString::number(x);
-        BayWidget* b = new BayWidget(this, bayName, materials);
+        BayWidget* b = new BayWidget(this,ci_,x);
         bayWidgets.append(b);
         ui->horizontalLayout->addWidget(b);
         connect(b, SIGNAL(sendBayCommand(int,double,bool)), this, SLOT(setBayCommand(int,double,bool)));

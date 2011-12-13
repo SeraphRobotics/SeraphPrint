@@ -15,7 +15,7 @@ class MaterialsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit MaterialsWidget(QWidget *parent = 0);
+    explicit MaterialsWidget(QWidget *parent, CoreInterface *ci);
     //map<string, MaterialCalibration, LessThanString> materialCalibrations;
     ~MaterialsWidget();
 
@@ -33,6 +33,7 @@ private:
     int numBays;
     QVector<std::string> materials;
     QVector<BayWidget*> bayWidgets;
+    CoreInterface *ci_;
 
 };
 

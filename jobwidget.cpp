@@ -5,8 +5,9 @@
 #include <QSettings>
 #include <qdebug>
 
-JobWidget::JobWidget(QWidget *parent) : QWidget(parent), ui(new Ui::JobWidget)
+JobWidget::JobWidget(QWidget *parent,CoreInterface *ci) : QWidget(parent), ui(new Ui::JobWidget)
 {
+    ci_ = ci;
     ui->setupUi(this);
 
     connect(ui->button_load, SIGNAL(clicked()), this, SLOT(onLoadClicked()));
@@ -55,7 +56,7 @@ void JobWidget::setAndSaveFile(QString filePath, bool doSave)
         }
 
         qDebug() << "About to emit signal in setAndSaveFile!"; // <<<<<<<<<<
-        emit sendAndLoadFile(filePath);
+//        emit sendAndLoadFile(filePath);
     }
 }
 
@@ -72,4 +73,22 @@ void JobWidget::on_browseButton_clicked()
     ui->lineEdit_file->setText(filename);
 
     //setAndSaveFile(filename, true);
+}
+
+void JobWidget::LoadFile(QString xdfl_path){
+    QString xdflString;
+    QDomDocument xdflDom;
+    // load the XDFL file into the DOM document
+    {
+      QFile xdflFile(xdfl_path);
+      if (!xdflFile.open(QFile::ReadOnly)) {
+          printf("\nFAILED TO OPEN XDFL FILE\n");
+          return;
+      }
+      xdflDom.setContent(&xdflFile);
+      xdflFile.close();
+      xdflString = xdflDom.toString();
+    }
+    ci_->setXDFL(xdflString);
+    printf("\nDomLoaded");
 }

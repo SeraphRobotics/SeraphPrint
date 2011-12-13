@@ -53,7 +53,7 @@ void motordialog::onAccelBox_Changed() {
 
 void motordialog::on_okButton_clicked()
 {
-    emit setProperties(motorId, ui->velocitySpin_2->value(), ui->accelerationSpin_2->value(), ui->reverseCheckButton->isChecked());
+    emit setProperties(motorId, ui->velocitySpin_2->value(), ui->accelerationSpin_2->value());
     this->close();
 }
 

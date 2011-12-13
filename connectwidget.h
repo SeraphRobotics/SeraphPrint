@@ -5,6 +5,7 @@
 #include <QHash>
 #include <QFileInfoList>
 #include <QDir>
+#include "FabConLib/coreinterface.h"
 
 namespace Ui
 {
@@ -16,23 +17,22 @@ class ConnectWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ConnectWidget(QWidget *parent = 0);
+    explicit ConnectWidget(QWidget *parent, CoreInterface *ci);
     ~ConnectWidget();
-
-signals:
-    void connectToPrinter(QString port, QString config_path);
 
 private:
     void loadFiles();
+    void addConfig(QString path);
+
+private:
     Ui::ConnectWidget *ui;
+    CoreInterface *ci_;
     QStringList portList;
     QFileInfoList configList;
     QDir configFileDirectory;
 
-    void addConfig(QString path);
 
-//public slots:
-//    void preloadConfig(QString preloaded_path);
+
 
 private slots:
     void on_configButton_clicked();
