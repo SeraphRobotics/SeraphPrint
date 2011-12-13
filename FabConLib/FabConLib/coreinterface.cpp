@@ -84,6 +84,7 @@ void CoreInterface::setXDFL(QString xdfl){
     connect(handler_,SIGNAL(terminated()),this,SLOT(donePrinting()));
     connect(handler_,SIGNAL(finished()),handler_,SLOT(deleteLater()));
     connect(handler_,SIGNAL(startingCommand(int)),this,SLOT(processingCommand(int)));
+    connect(handler_,SIGNAL(needMaterialChange(int)),this,SLOT(needMaterial(int)));
     // Make other needed connections here
 
     //everything here after should be handled by a seperate slot called by the xdflhandler while its running but not printing.
