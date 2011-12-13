@@ -48,6 +48,11 @@ public:
     double getEstimatedVolume();
 
     /**
+     * returns the number of commands in the currently set XDFL file
+     */
+    int getNumberOfCommands();
+
+    /**
      * sets the Virtual Machine the program will use
      */
     void setVM(VMPrototype* vm);

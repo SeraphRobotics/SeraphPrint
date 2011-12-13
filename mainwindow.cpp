@@ -344,7 +344,7 @@ void MainWindow::getBayNum(int bayNum)
 void MainWindow::setGo()
 {
     handler->start();
-    emit sendTotalPaths(handler->getNumCommands());
+    emit sendTotalPaths(handler->getNumberOfCommands());
     // TODO: Use current/total path display (not implemented in Interface)
     // This will eventually require periodically polling the current path.
 

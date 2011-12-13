@@ -60,7 +60,7 @@ signals:
     void sendBayPosition(double position);
     //Print
     void sendCurrentPath(int n);
-    void sendTotalPaths(int n); // Will not be used until the new library is added; Interface functionality not implemented
+    void sendTotalPaths(int n);
     void posChanged(double x, double y, double z);
     void reportPrinterProgress(int currPath, QString status);
 

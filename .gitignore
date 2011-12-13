@@ -1,1 +1,6 @@
 *.pro.user
+*.pdb
+*.Release
+*.Debug
+debug
+release
