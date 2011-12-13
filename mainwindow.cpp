@@ -3,6 +3,7 @@
 #include "QDesktopWidget.h"
 #include "iostream"
 #include <QMessageBox>
+#include <QDebug>
 
 
 // Edit these stylesheets to change the appearance of the progress bar
@@ -69,9 +70,25 @@ void MainWindow::backClicked()
 
 
 void MainWindow::onStateChaged(int i){
-    printf("state changed to %i",i);
-    fflush(stdout);
+    qDebug() <<"\nMainWindow: State changed to "<<i<<"\n";
     machineState = i;
+    if(i==CoreInterface::NotInitialized){
+        qDebug()<<"connection lost";
+        haveValidFile = false;
+        isConnected = false;
+        materialsInitialized = false;
+    }
+
+    else if (i==CoreInterface::Connected){
+        haveValidFile = false;
+        isConnected = true;
+        materialsInitialized = false;
+    }
+    else if(i==CoreInterface::FileLoaded){
+        haveValidFile = true;
+        isConnected = true;
+        materialsInitialized = false;
+    }
     updateState();
 }
 /**
@@ -85,7 +102,7 @@ void MainWindow::updateState()
     ui->currentWidget->hide();
 
     // NOTE: If jumping around in the state is permitted, back and forward buttons must be enabled/disabled everywhere
-    printf("\nCurrent State: %i",current_state);
+    qDebug()<<"\nCurrent View State: "<<current_state;
 
     switch (current_state)
     {
@@ -93,12 +110,14 @@ void MainWindow::updateState()
 
         if (machineState!=CoreInterface::NotInitialized){
             current_state = JOB;
+
             updateState();
         }else{
             ui->backButton->setEnabled(false);
             ui->currentWidget = connectWidget;
             enableOne(CONNECT);
         }
+
         break;
     case JOB:
         ui->backButton->setEnabled(true);
@@ -114,16 +133,18 @@ void MainWindow::updateState()
     case MATERIALS:
         ui->forwardButton->setEnabled(true);
         ui->currentWidget = materialsWidget;
+        materialsWidget->updateBays();
         materialsWidget->show();
         enableOne(MATERIALS);
         break;
-//    case PRINT:
-//        ui->forwardButton->setEnabled(false);
-//        ui->currentWidget = printWidget;
-//        enableOne(PRINT);
-//        break;
+    case PRINT:
+        ui->forwardButton->setEnabled(false);
+        ui->currentWidget = printWidget;
+        enableOne(PRINT);
+        break;
     }
     ui->currentWidget->show();
+    qDebug()<<"Current View State is now:"<<current_state;
 }
 
 // Yes, I know...

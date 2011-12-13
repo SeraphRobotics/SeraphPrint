@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QSettings>
 #include <qdebug>
+#include <QMessageBox>
 
 JobWidget::JobWidget(QWidget *parent,CoreInterface *ci) : QWidget(parent), ui(new Ui::JobWidget)
 {
@@ -54,9 +55,7 @@ void JobWidget::setAndSaveFile(QString filePath, bool doSave)
             theSettings.setValue("last used fab file", filePath);
             theSettings.sync();
         }
-
-        qDebug() << "About to emit signal in setAndSaveFile!"; // <<<<<<<<<<
-//        emit sendAndLoadFile(filePath);
+        LoadFile(filePath);
     }
 }
 
@@ -72,7 +71,7 @@ void JobWidget::on_browseButton_clicked()
 
     ui->lineEdit_file->setText(filename);
 
-    //setAndSaveFile(filename, true);
+    setAndSaveFile(filename, true);
 }
 
 void JobWidget::LoadFile(QString xdfl_path){
@@ -82,7 +81,8 @@ void JobWidget::LoadFile(QString xdfl_path){
     {
       QFile xdflFile(xdfl_path);
       if (!xdflFile.open(QFile::ReadOnly)) {
-          printf("\nFAILED TO OPEN XDFL FILE\n");
+          qDebug() <<"\nFAILED TO OPEN XDFL FILE\n";
+          QMessageBox::warning(this,tr("ERROR"),tr("Could not open XDFL file"));
           return;
       }
       xdflDom.setContent(&xdflFile);
@@ -90,5 +90,4 @@ void JobWidget::LoadFile(QString xdfl_path){
       xdflString = xdflDom.toString();
     }
     ci_->setXDFL(xdflString);
-    printf("\nDomLoaded");
 }

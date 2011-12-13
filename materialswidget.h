@@ -20,12 +20,17 @@ public:
 
     ~MaterialsWidget();
 
+public slots:
+    void updateBays();
+    void cleanUpBays();
+    void setMaterials(QMap<int,Material> materials);
 
 private:
     Ui::MaterialsWidget *ui;
     int numBays;
     QVector<BayWidget*> bayWidgets;
     CoreInterface *ci_;
+    QMap<int,Material> materials_;
 
 };
 
