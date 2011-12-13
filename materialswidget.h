@@ -3,7 +3,8 @@
 
 #include <QWidget>
 #include "baywidget.h"
-#include <string>
+#include "FabConLib/coreinterface.h"
+
 using namespace std;
 
 namespace Ui {
@@ -16,22 +17,13 @@ class MaterialsWidget : public QWidget
 
 public:
     explicit MaterialsWidget(QWidget *parent, CoreInterface *ci);
-    //map<string, MaterialCalibration, LessThanString> materialCalibrations;
+
     ~MaterialsWidget();
 
-public slots:
-    void initializeMaterials(int numBays, QVector<string> bayMaterials);
-    void setBayCommand(int bayNum, double distance, bool absolute);
-    void setBayMaterial(int bayNum, QString material);
-
-signals:
-    void sendBayCommand(int bayNum, double distance, bool absolute);
-    void sendBayMaterial(int bayNum, QString material);
 
 private:
     Ui::MaterialsWidget *ui;
     int numBays;
-    QVector<std::string> materials;
     QVector<BayWidget*> bayWidgets;
     CoreInterface *ci_;
 

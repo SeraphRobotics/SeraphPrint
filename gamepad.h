@@ -17,11 +17,14 @@ public:
     ~GamePad();
 
 private slots:
-
+    // SYSTEM edit slots used by motor dialog
     void onMotorChanged(QString motorname, double velocity, double acceleration);
 
+    // STATE change slots used by CoreInterface
     void onPositionChanged(double xPos, double yPos, double zPos);
 
+
+    // BUTTON SLOTS
     void on_zCommandSpin_editingFinished();
     void on_zIncrementSpin_editingFinished();
     void on_yIncrementSpin_editingFinished();

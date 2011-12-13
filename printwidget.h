@@ -27,6 +27,7 @@ signals:
     void pause();
     void stop();
     void resume();
+    void cancel();
 
 private:
     Ui::PrintWidget *ui;

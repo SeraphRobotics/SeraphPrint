@@ -62,7 +62,10 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
     else
     {
         configFileDirectory = QDir(QDir::homePath() + "\\" + FAB_CONFIG_DIRECTORY_NAME_WIN);
-
+        if(!configFileDirectory.exists()){
+            configFileDirectory.mkdir("child");
+            printf("\nmaking dir child");
+        }
         // Code to make sure the directory exists on Windows...
         // configFileDirectory = whatever I want it to be on Windows
     }
@@ -74,22 +77,6 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
     QSettings theSettings("Creative Machines Lab", "FabPrint");
     ui->configBox->setCurrentIndex(theSettings.value("load config next time index", 0).toInt());
 
-////    qDebug() << "This is the directory from which .config files will be pulled for the combo box:";
-////    qDebug() << QCoreApplication::applicationDirPath();
-
-//    configList = appdir.entryInfoList(QStringList("*.config"), QDir::Files);
-
-////    // Add a blank entry to index 0 for a custom user-specified file.
-////    configList.prepend(QFileInfo());
-
-//    // FROM THIS POINT ON, configList and configBox ENTRIES SHOULD STAY IN ORDER!
-
-//    foreach(QFileInfo config, configList)
-//    {
-//        ui->configBox->addItem(config.baseName());
-//    }
-
-//    ui->configBox->setItemText(0, "n/a (Custom)");
 
 //SAMPLE getPorts() OUTPUT (MAC OS)
 //Starting /Applications/D:/fab@home/FabPrint/FabPrint-build-desktop/FabPrint.app/Contents/MacOS/FabPrint...
@@ -129,6 +116,8 @@ void ConnectWidget::loadFiles()
     foreach(QFileInfo config, configList){
         ui->configBox->addItem(config.baseName());
     }
+
+
 }
 
 ConnectWidget::~ConnectWidget()
@@ -187,25 +176,20 @@ void ConnectWidget::on_connectButton_clicked(){
         canConnect = false;
     }
 
-    if (configIndex == -1 || (configIndex == 0 && !configList.at(0).exists())){
-        QMessageBox::information(this, "FabPrint", tr("Error: Select a valid printer configuration from the list."));
-        canConnect = false;
-    }
+//    if (configIndex == -1 || (configIndex == 0 && !configList.at(0).exists())){
+//        QMessageBox::information(this, "FabPrint", tr("Error: Select a valid printer configuration from the list."));
+//        canConnect = false;
+//    }
 
-    if (canConnect){
-        // aen27, 30 November 2011
-        ui->connectButton->setEnabled(false);
-        ui->portBox->setEnabled(false);
-        ui->configBox->setEnabled(false);
-        ui->configButton->setEnabled(false);
-
+    if (canConnect||true){
         QSettings theSettings("Creative Machines Lab", "FabPrint");
         theSettings.setValue("load config next time index", ui->configBox->currentIndex());
         theSettings.sync();
 
 
-        QString config_path = configList.at(configIndex).filePath();
-
+        // LOAD THE FILE
+//        QString config_path = configList.at(configIndex).filePath();
+        QString config_path = "JrKerr-Single-deposition.config";
         QString configString;
         QDomDocument configDom;
         // load the config file into the DOM document
@@ -220,7 +204,17 @@ void ConnectWidget::on_connectButton_clicked(){
         }
         configString = configDom.toString();
 
+
+        // ATTEMPT THE CONNECTION
         ci_->setConfig(configString,portList.at(portIndex));
+        emit atemptConnect();
         /// Need an mechanism for checking errors
     }
+}
+
+void ConnectWidget::loading(bool load){
+    ui->connectButton->setEnabled(load);
+    ui->portBox->setEnabled(load);
+    ui->configBox->setEnabled(load);
+    ui->configButton->setEnabled(load);
 }

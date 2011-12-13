@@ -20,6 +20,12 @@ public:
     explicit ConnectWidget(QWidget *parent, CoreInterface *ci);
     ~ConnectWidget();
 
+public slots:
+    void loading(bool load);
+
+signals:
+    void atemptConnect();
+
 private:
     void loadFiles();
     void addConfig(QString path);

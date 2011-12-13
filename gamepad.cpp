@@ -26,7 +26,6 @@ GamePad::GamePad(QWidget *parent,CoreInterface* ci) :
     zOpen = false;
 
     //update the position fields
-//    connect(parent, SIGNAL(posChanged(double,double,double)), this, SLOT(onPositionChanged(double,double,double)));;
     connect(ci_,SIGNAL(currentPosition(double,double,double)),this,SLOT(onPositionChanged(double,double,double)));
 
 }
@@ -62,7 +61,7 @@ void GamePad::on_xLaunchButton_clicked()
     xOpen = true;
     motordialog* dialog = new motordialog(this,"X", XVelocity, XAcceleration,false);
     dialog->show();
-    connect(dialog, SIGNAL(setProperties(QString,double,double,bool)), this, SLOT(onMotorChanged(QString, double, double, bool)));
+    connect(dialog, SIGNAL(setProperties(QString,double,double)), this, SLOT(onMotorChanged(QString, double, double)));
     connect(dialog, SIGNAL(closed()), this, SLOT(onXDialogDes()));
     }
 }
@@ -74,7 +73,7 @@ void GamePad::on_yLaunchButton_clicked()
         yOpen = true;
         motordialog* dialog = new motordialog(this,"Y",YVelocity, YAcceleration,false);
         dialog->show();
-        connect(dialog, SIGNAL(setProperties(QString,double,double,bool)), this, SLOT(onMotorChanged(QString, double, double, bool)));
+        connect(dialog, SIGNAL(setProperties(QString,double,double)), this, SLOT(onMotorChanged(QString, double, double)));
         connect(dialog, SIGNAL(closed()), this, SLOT(onYDialogDes()));
     }
 }
@@ -86,7 +85,7 @@ void GamePad::on_zLabelButton_clicked()
         zOpen = true;
         motordialog* dialog = new motordialog(this,"Z",ZVelocity, ZAcceleration,false);
         dialog->show();
-        connect(dialog, SIGNAL(setProperties(QString,double,double,bool)), this, SLOT(onMotorChanged(QString, double, double, bool)));
+        connect(dialog, SIGNAL(setProperties(QString,double,double)), this, SLOT(onMotorChanged(QString, double, double)));
         connect(dialog, SIGNAL(closed()), this, SLOT(onZDialogDes()));
     }
 }
@@ -176,6 +175,9 @@ void GamePad::on_urPushButton_clicked()
 {
     //emit moveTo(ui->xPositionSpin->value() - ui->xIncrementSpin->value(),
     //            ui->yPositionSpin->value() + ui->yIncrementSpin->value(), ui->zPositionSpin->value());
+    printf("\nclicked");
+    fflush(stdout);
+
     double v = sqrt(XVelocity*XVelocity+YVelocity*YVelocity);
     ci_->move(- ui->xIncrementSpin->value(), ui->yIncrementSpin->value(),0,v);
 }

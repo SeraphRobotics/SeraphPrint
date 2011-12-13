@@ -19,18 +19,20 @@ BayWidget::BayWidget(QWidget *parent, CoreInterface *ci,int id):
 
     //Create baydialog for this bay
     dialog = new BayDialog(this,id,ci);
-    // connect(dialog, SIGNAL(sendBayCommand(int,double,bool)), this, SLOT(setBayCommand(int,double,bool)));
+    connect(ci_,SIGNAL(materialsAvailable(QMap<int,Material>)),this,SLOT(setMaterials(QMap<int,Material>)));
 
 }
 
-void BayWidget::setMaterials(QMap<int,QString> materials){
-    materialMap_ = materials;
+void BayWidget::setMaterials(QMap<int,Material> materials){
     QStringList materialList;
-    QMapIterator<int,QString> i(materialMap_);
-    while(i.hasNext()){
+
+    QMapIterator<int,Material> i(materials);
+    while (i.hasNext()){
         i.next();
-        materialList.append(i.value());
-        idtomaterials_[i.value()]=i.key();
+        Material m = i.value();
+        materialMap_[i.key()]= m.name;
+        idtomaterials_[m.name]=i.key();
+        materialList.append(m.name);
     }
     ui->materialCombo->addItems(materialList);
 }

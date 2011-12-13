@@ -18,6 +18,8 @@ void CoreInterface::setState(SystemState s){
 
 void CoreInterface::setConfig(QString configFile,QString comport){
 
+    printf("\nloaded and comport is %s\n",comport.toStdString().c_str());
+    fflush(stdout);
     // load the config file into the DOM document
     QDomDocument document;
     document.setContent(configFile);
@@ -46,6 +48,8 @@ void CoreInterface::moveTo(double x, double y, double z, double speed){
         emit outOfStateCall();
         return;
     }
+    printf("\nmoving");
+    fflush(stdout);
     emit moving();
     vm_->moveTo(x,y,z,speed);
 //    getCurrentPosition();
@@ -58,7 +62,7 @@ void CoreInterface::move(double x, double y, double z, double speed){
     }
     emit moving();
     vm_->move(x,y,z,speed);
-//    getCurrentPosition();
+    getCurrentPosition();
 }
  QVector<double> CoreInterface::getCurrentPosition(){
      if ((state_==NotInitialized)||(state_==Printing)){return QVector<double>(3,0);}
@@ -164,6 +168,8 @@ void CoreInterface::needMaterial(int i){
 }
 
 void CoreInterface::configLoaded(){
+    printf("connected");
+    fflush(stdout);
     setState(Connected);
     getCurrentPosition();
 //    connect(&positionTimer_,SIGNAL(timeout()),this,SLOT(getCurrentPosition()));

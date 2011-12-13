@@ -21,7 +21,7 @@ public:
 
 public slots:
     void setBayCommand(int bayNum, double distance);
-    void setMaterials(QMap<int,QString> materials);
+    void setMaterials(QMap<int,Material> materials);
 
 private slots:
     void on_editButton_clicked();
