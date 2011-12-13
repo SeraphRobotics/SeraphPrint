@@ -25,6 +25,7 @@ BayWidget::BayWidget(QWidget *parent, CoreInterface *ci,int id):
 
 void BayWidget::setMaterials(QMap<int,Material> materials){
     QStringList materialList;
+    materialList.append(QString());
 
     QMapIterator<int,Material> i(materials);
     while (i.hasNext()){
@@ -62,6 +63,8 @@ void BayWidget::setBayCommand(int bayNum, double distance)
 void BayWidget::on_materialCombo_activated(const QString &arg1)
 {
     QString material = arg1;
-    int matid = idtomaterials_[material];
-    ci_->setMaterial(id_,matid);
+    if(idtomaterials_.contains(material)){
+        int matid = idtomaterials_[material];
+        ci_->setMaterial(id_,matid);
+    }
 }

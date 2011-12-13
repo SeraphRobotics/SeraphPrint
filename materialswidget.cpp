@@ -1,7 +1,7 @@
 #include "materialswidget.h"
 #include "ui_materialswidget.h"
 #include "baywidget.h"
-#include <iostream>
+#include <QMessageBox>
 
 MaterialsWidget::MaterialsWidget(QWidget *parent, CoreInterface *ci) :
     QWidget(parent),
@@ -10,6 +10,7 @@ MaterialsWidget::MaterialsWidget(QWidget *parent, CoreInterface *ci) :
     ui->setupUi(this);
     ci_ = ci;
     connect(ci_,SIGNAL(materialsAvailable(QMap<int,Material>)),this,SLOT(setMaterials(QMap<int,Material>)));
+    connect(ci_,SIGNAL(needMaterialLoaded(int)),this,SLOT(materialNeeded(int)));
     updateBays();
 
 }
@@ -43,4 +44,13 @@ void  MaterialsWidget::cleanUpBays(){
 
 void MaterialsWidget::setMaterials(QMap<int,Material> materials){
     materials_ = materials;
+}
+
+
+void MaterialsWidget::materialNeeded(int i){
+    QString message;
+    QTextStream ms(&message,QIODevice::WriteOnly);
+    ms<<"Print is paused since it needs a material not loaded in the machine\n";
+    ms<<"Please load Material id:"<<i<<" Name: "<<materials_[i].name;
+    QMessageBox::warning(this,"Material Needed",message);
 }

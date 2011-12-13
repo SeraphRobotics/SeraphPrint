@@ -30,7 +30,9 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
         //       the order of portBox items be maintained.
         // The selected port name is retrieved by portList.at(ui->portBox->currentIndex()).
 
-        if (!port.friendName.isEmpty())
+        bool usb = port.friendName.contains("usb",Qt::CaseInsensitive);
+
+        if (usb)//!port.friendName.isEmpty())
         {
             portList.append(port.portName);
             ui->portBox->addItem(port.friendName);

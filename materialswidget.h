@@ -24,6 +24,7 @@ public slots:
     void updateBays();
     void cleanUpBays();
     void setMaterials(QMap<int,Material> materials);
+    void materialNeeded(int i);
 
 private:
     Ui::MaterialsWidget *ui;

@@ -95,6 +95,11 @@ void MainWindow::onStateChaged(int i){
     }
     updateState();
 }
+
+void MainWindow::materialNeeded(int){
+    setPause();
+}
+
 /**
  * Add to the cases in this method to execute
  * transitions between widgets.  Widgets that
@@ -195,6 +200,7 @@ void MainWindow::setUpConnections()
 {
     //CoreInterface
     connect(ci_,SIGNAL(stateChaged(int)),this,SLOT(onStateChaged(int)));
+    connect(ci_,SIGNAL(needMaterialLoaded(int)),this,SLOT(materialNeeded(int)));
 
     // Print widget
     connect(printWidget, SIGNAL(go()), this, SLOT(setGo()));
@@ -288,7 +294,7 @@ void MainWindow::setPause()
     this->gamepad_container->move(0, 400);
     this->materialsWidget->move(0, 200);
     this->materialsWidget->show();
-    this->gamepad_container->show();
+    this->gamepad_container->hide();//show();
 
 }
 

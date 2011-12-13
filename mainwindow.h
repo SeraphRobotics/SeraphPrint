@@ -41,6 +41,7 @@ public slots:
     void setResume();
     void printerConnected();
     void onStateChaged(int i);
+    void materialNeeded(int i);
 
 signals:
     //Connect

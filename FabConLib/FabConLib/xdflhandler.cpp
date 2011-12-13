@@ -370,6 +370,7 @@ void XDFLHandler::runNPath(NPath n) {
 }
 
 bool XDFLHandler::setMaterial(int id) {
+    if (0==id){return true;}
     if (!mat_map.keys().contains(id)) {
             qDebug()<<"Material not found in XDFL";
             emit needMaterialChange(id);

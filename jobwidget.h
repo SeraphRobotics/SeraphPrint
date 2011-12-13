@@ -20,6 +20,7 @@ public slots:
     void preloadedFabFile();
     void onLoadClicked();
 
+    void estimatesLoaded(double time, double volume);
     void LoadFile(QString xdfl_path);
 
 private:
