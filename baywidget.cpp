@@ -30,9 +30,14 @@ void BayWidget::setMaterials(QMap<int,Material> materials){
     while (i.hasNext()){
         i.next();
         Material m = i.value();
-        materialMap_[i.key()]= m.name;
-        idtomaterials_[m.name]=i.key();
-        materialList.append(m.name);
+        QString name = m.name.toLower();
+        if (materialList.contains(name)){
+            QTextStream ns(&name,QIODevice::WriteOnly);
+            ns<<m.id;
+        }
+        materialMap_[i.key()]= name ;
+        idtomaterials_[name]=i.key();
+        materialList.append(name);
     }
     ui->materialCombo->addItems(materialList);
 }

@@ -10,6 +10,13 @@
  * A struct for defining a material
  */
 struct Material{
+
+    Material(){
+        id =0;
+        name = "";
+        Q=1;
+    }
+
     int id;
     QString name;
     double Q;// Flow rate in mm^3/min

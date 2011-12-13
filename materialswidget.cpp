@@ -17,6 +17,8 @@ MaterialsWidget::MaterialsWidget(QWidget *parent, CoreInterface *ci) :
 MaterialsWidget::~MaterialsWidget()
 {
     delete ui;
+    foreach(BayWidget* b,bayWidgets){delete b;}
+
 }
 
 
@@ -35,7 +37,7 @@ void MaterialsWidget::updateBays(){
 void  MaterialsWidget::cleanUpBays(){
     foreach(BayWidget* b,bayWidgets){
         ui->horizontalLayout->removeWidget(b);
-        delete b;
+        //delete b;
     }
 }
 

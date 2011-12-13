@@ -70,24 +70,28 @@ void MainWindow::backClicked()
 
 
 void MainWindow::onStateChaged(int i){
-    qDebug() <<"\nMainWindow: State changed to "<<i<<"\n";
+    qDebug() <<"\Machine State changed to "<<i;
     machineState = i;
     if(i==CoreInterface::NotInitialized){
-        qDebug()<<"connection lost";
+        qDebug()<<"connection lost...";
         haveValidFile = false;
         isConnected = false;
         materialsInitialized = false;
-    }
-
-    else if (i==CoreInterface::Connected){
+    }else if (i==CoreInterface::Connected){
+        printerConnected();
+        qDebug()<<"Connected...";
         haveValidFile = false;
         isConnected = true;
         materialsInitialized = false;
-    }
-    else if(i==CoreInterface::FileLoaded){
+    }else if(i==CoreInterface::FileLoaded){
+        qDebug()<<"File Loaded...";
         haveValidFile = true;
         isConnected = true;
         materialsInitialized = false;
+    }else if(i==CoreInterface::Printing){
+        qDebug()<<"Printing...";
+        haveValidFile = true;
+        isConnected = true;
     }
     updateState();
 }
@@ -108,15 +112,16 @@ void MainWindow::updateState()
     {
     case CONNECT:
 
-        if (machineState!=CoreInterface::NotInitialized){
-            current_state = JOB;
+//        if (machineState!=CoreInterface::NotInitialized){
+//            current_state = JOB;
 
-            updateState();
-        }else{
+//            updateState();
+//        }else{
             ui->backButton->setEnabled(false);
             ui->currentWidget = connectWidget;
+//            this->gamepad_container->show();
             enableOne(CONNECT);
-        }
+//        }
 
         break;
     case JOB:
@@ -128,19 +133,21 @@ void MainWindow::updateState()
             ui->forwardButton->setEnabled(false);
         }
         ui->currentWidget = jobWidget;
+        this->gamepad_container->show();
         enableOne(JOB);
         break;
     case MATERIALS:
         ui->forwardButton->setEnabled(true);
         ui->currentWidget = materialsWidget;
         materialsWidget->updateBays();
-        materialsWidget->show();
+        this->gamepad_container->show();
         enableOne(MATERIALS);
         break;
     case PRINT:
         ui->forwardButton->setEnabled(false);
         ui->currentWidget = printWidget;
         enableOne(PRINT);
+        this->gamepad_container->show();
         break;
     }
     ui->currentWidget->show();
@@ -215,11 +222,13 @@ void MainWindow::setUpWidgets()
     printWidget = new PrintWidget(this,ci_);
     printWidget->hide();
 
+
+    ui->currentWidget = connectWidget;
+
     gamepad_container = new GamePad(this,ci_);
     gamepad_container->move(0, 260);
     gamepad_container->hide();
 
-    ui->currentWidget = connectWidget;
 
 }
 
@@ -245,7 +254,7 @@ void MainWindow::printerConnected(){
 //        settings.sync();
         this->setFixedHeight(471);
         this->setFixedWidth(531);
-        gamepad_container->show();
+        this->gamepad_container->show();
         ui->forwardButton->setEnabled(true);
         isConnected = true;
     }

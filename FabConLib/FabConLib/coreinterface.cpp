@@ -123,13 +123,14 @@ void CoreInterface::setMaterial(int bayid,int materialid){
 void CoreInterface::moveBayMotor(int bayid, double amount, double time){
     if ((state_==NotInitialized) || (state_==Printing)){return;}
     // THIS SUCKS we need to rethink this
+    qDebug()<<"Ordered Bay to Move";
     vm_->bays[bayid]->jogActuators(amount,time);
 }
 
 void CoreInterface::startPrint(){
     if (state_!=FileLoaded){return;}
-    positionTimer_.disconnect();
-    positionTimer_.setInterval(10000000);
+//    positionTimer_.disconnect();
+//    positionTimer_.setInterval(10000000);
     vm_->moveToThread(handler_);
     setState(Printing);
     QTimer::singleShot(0,handler_,SLOT(start()));
@@ -150,7 +151,7 @@ void CoreInterface::cancelPrint(){
 
 void CoreInterface::forceStop(){
     vm_->forceStop();
-    positionTimer_.disconnect();
+//    positionTimer_.disconnect();
     setState(NotInitialized);
 }
 
@@ -160,7 +161,7 @@ void CoreInterface::processingCommand(int i){
 }
 
 void CoreInterface::needMaterial(int i){
-    pausePrint();
+//    pausePrint();
     emit needMaterialLoaded(i);
 
 }

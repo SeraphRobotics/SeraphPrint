@@ -1,7 +1,7 @@
 #include "xdflhandler.h"
 #include "testing/util.h"
 #include <QApplication>
-
+#include <QDebug>
 
 XDFLHandler::XDFLHandler():handlerstate_(XDFLHandler::Stopped),estimationDone_(false),
     estimatedTime_(0),estimatedVolume_(0),current_material_(0),current_command_(0)
@@ -54,7 +54,7 @@ void XDFLHandler::pause() {
     QMutexLocker locker(&mutex_);
 
     if (handlerstate_ == XDFLHandler::Running) {
-        printf("\nPausing...\n");
+        qDebug()<<"Pausing...";
         handlerstate_ = XDFLHandler::Paused;
     }
 
@@ -66,7 +66,7 @@ void XDFLHandler::resume() {
     QMutexLocker locker(&mutex_);
 
     if (handlerstate_ == XDFLHandler::Paused) {
-        printf("\nResuming...\n");
+        qDebug()<<"Resuming...";
         handlerstate_ = XDFLHandler::Running;
         resumed_.wakeAll();
     }
@@ -78,7 +78,7 @@ void XDFLHandler::resume() {
 void XDFLHandler::cancel() {
     QMutexLocker locker(&mutex_);
 
-    printf("\ncanceling...");
+    qDebug()<<"canceling...";
     if (handlerstate_ == XDFLHandler::Running) {
         handlerstate_ = XDFLHandler::Stopped;
     }
@@ -103,26 +103,26 @@ void XDFLHandler::loadFromDom(QDomDocument xdfl) {
 
     QDomElement root = xdfl.documentElement();
     if (root.isNull()) {
-        printf("\nNULL ROOT");
+        qDebug()<<"NULL ROOT";
         return;
     }
     QDomNode paletteNode = root.namedItem("palette");
     if (paletteNode.isNull()) {
         paletteNode = root.namedItem("Palette");// its case sensitive
         if (paletteNode.isNull()) {
-            printf("\nNULL PALETTE");
+            qDebug()<<"NULL PALETTE";
             return;
         }
     }
     QDomNode commandsNode = root.namedItem("commands");
     if (commandsNode.isNull()) {
-        printf("\nNULL COMMANDS");
+        qDebug()<<"NULL COMMANDS";
         return;
     }
     commands_ = commandsNode.childNodes();
     emit numberOfCommands(commands_.length());
     if (commands_.isEmpty()) {
-        printf("\nNO COMMANDS");
+        qDebug()<<"NO COMMANDS";
         // throw exceptions? Return false?
         return;
     }
@@ -226,7 +226,7 @@ void XDFLHandler::run()
 {
     // When this method is called, the current state should be Ready.
 
-    printf("\nInitializing the XDFL handler thread.");
+    qDebug()<<"Initializing the XDFL handler thread.";
 
     QMutexLocker locker(&mutex_);
     current_command_ = 0;
@@ -240,7 +240,7 @@ void XDFLHandler::run()
         handlerstate_ = XDFLHandler::Running;
     }
     else {
-        printf("\nERROR: XDFL handler was not ready.");
+        qDebug()<<"ERROR: XDFL handler was not ready.";
         handlerstate_ = XDFLHandler::Stopped;
     }
 
@@ -252,7 +252,7 @@ void XDFLHandler::run()
             locker.relock();
             if (current_command_ == commands_.length()) {
                 // XDFL file completed.
-                printf("\nXDFL file processing completed.");
+                qDebug()<<"XDFL file processing completed.";
                 handlerstate_ = XDFLHandler::Stopped;
             }
         }
@@ -262,7 +262,7 @@ void XDFLHandler::run()
             resumed_.wait(&mutex_);
         }
         else {
-            printf("\nERROR: XDFL handler state was incorrect.");
+            qDebug()<<"ERROR: XDFL handler state was incorrect.";
             handlerstate_ = XDFLHandler::Stopped;
         }
     }
@@ -270,7 +270,7 @@ void XDFLHandler::run()
     // Stop processing and reset progress.
     laststate_        = vm_->currentState();
 
-    printf("\nExiting the XDFL handler thread.");
+    qDebug()<<"\nExiting the XDFL handler thread.";
     vm_->moveToThread(QApplication::instance()->thread());
     // (mutex automatically released upon locker destruction)
 }
@@ -292,7 +292,7 @@ void XDFLHandler::  processCommand() {
         if (p.isNull()) { return; }// check to see if the path is valid
 
         // Check to see if the material is listed in the header or if we are switching bays.
-        setMaterial(p.materialID);
+        if(!setMaterial(p.materialID)){return;}
 
         // If the start of this XDFL path is not close to the end of the last one,
         // generate a transition path.
@@ -325,8 +325,7 @@ void XDFLHandler::  processCommand() {
         XDFLVoxel v = voxFromQDom(commandTag);
 
         // Check to see if the material is listed in the header.
-        setMaterial(v.id);
-
+        if(!setMaterial(v.id)){return;}
         new_start_point.x = v.x;
         new_start_point.y = v.y;
         new_start_point.z = v.z;
@@ -370,18 +369,25 @@ void XDFLHandler::runNPath(NPath n) {
 //    emit doNPath(n);
 }
 
-void XDFLHandler::setMaterial(int id) {
+bool XDFLHandler::setMaterial(int id) {
+    if (!mat_map.keys().contains(id)) {
+            qDebug()<<"Material not found in XDFL";
+            emit needMaterialChange(id);
+            // This should be checked at loading of commands
+            pause();
+            return false;
+    }else if(!material_bay_mapping_.keys().contains(id)) {
+        qDebug()<<"Material not loaded";
+        emit needMaterialChange(id);
+        pause();
+        return false;
+    }
+
     if (current_material_ == 0) {
         current_material_ = id;
+
     }else if ((current_material_ == id)||(id == 0)) {
-        return;
-    }else if (!mat_map.keys().contains(id)) {
-        printf("Material not found.");
-        fflush(stdout);
-        emit needMaterialChange(id);
-        // This should be checked at loading of commands
-    }else if(!material_bay_mapping_.keys().contains(id)) {
-        emit needMaterialChange(id);
+        return true;
     }else{
         // THIS MAY BE A PROBLEMATIC WAY OF HANDELING SHIFTING OF THE TOOL BAYS
         FabPoint Pnew = pointFromQVector(material_bay_mapping_[id]->getLocation());
@@ -389,8 +395,9 @@ void XDFLHandler::setMaterial(int id) {
         FabPoint delta = subtractpoints(Pnew,Pold);
         double speed = material_bay_mapping_[id]->getMaterial().property["pathspeed"].toDouble();
         current_material_ = id;
-        printf("\nChanging materials.");
-        fflush(stdout);
+        qDebug()<<"\nChanging materials.";
         runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
+
     }
+    return true;
 }
