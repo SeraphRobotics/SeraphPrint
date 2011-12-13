@@ -123,12 +123,14 @@ void XDFLHandler::loadFromDom(QDomDocument xdfl) {
         printf("\nNULL COMMANDS");
         return;
     }
+
     commands_ = commandsNode.childNodes();
     if (commands_.isEmpty()) {
         printf("\nNO COMMANDS");
         // throw exceptions? Return false?
         return;
     }
+    current_command_ = 0;
 
     QDomNodeList materialTags  = paletteNode.childNodes();
     for (unsigned int k = 0; k < materialTags.length(); k++) {
