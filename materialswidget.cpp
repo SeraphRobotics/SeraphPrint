@@ -1,61 +1,56 @@
 #include "materialswidget.h"
 #include "ui_materialswidget.h"
 #include "baywidget.h"
-#include <iostream>
+#include <QMessageBox>
 
-MaterialsWidget::MaterialsWidget(QWidget *parent) :
+MaterialsWidget::MaterialsWidget(QWidget *parent, CoreInterface *ci) :
     QWidget(parent),
     ui(new Ui::MaterialsWidget)
 {
     ui->setupUi(this);
-
-    /*//FOR TESTING PURPOSES
-    //should all be done by initializeMaterials()
-    QVector<string> materials(3);
-    materials.append("silicone");
-    materials.append("plastic");
-    materials.append("epoxy");
-
-    for (int x = 0; x < 4; x++)
-    {
-        QString bayName = QString("Bay") + QString(" ") + QString::number(x);
-        BayWidget* b = new BayWidget(this, bayName, materials);
-        bayWidgets.append(b);
-        ui->horizontalLayout->addWidget(b);
-        connect(b, SIGNAL(sendBayCommand(int,double,bool)), this, SLOT(setBayCommand(int,double,bool)));
-        connect(b, SIGNAL(sendBayMaterial(int,QString)), this, SLOT(setBayMaterial(int,QString)));
-    }
-    //END TESTING*/
-}
-
-void MaterialsWidget::initializeMaterials(int nBays, QVector<string> bayMaterials)
-{
-    numBays = nBays;
-    materials = bayMaterials;
-    //std::cout << "NumBays: " << nBays << endl;
-    for (int x = 0; x < numBays; x++)
-    {
-        QString bayName = QString("Bay") + QString(" ") + QString::number(x);
-        BayWidget* b = new BayWidget(this, bayName, materials);
-        bayWidgets.append(b);
-        ui->horizontalLayout->addWidget(b);
-        connect(b, SIGNAL(sendBayCommand(int,double,bool)), this, SLOT(setBayCommand(int,double,bool)));
-        connect(b, SIGNAL(sendBayMaterial(int,QString)), this, SLOT(setBayMaterial(int,QString)));
-    }
+    ci_ = ci;
+    connect(ci_,SIGNAL(materialsAvailable(QMap<int,Material>)),this,SLOT(setMaterials(QMap<int,Material>)));
+    connect(ci_,SIGNAL(needMaterialLoaded(int)),this,SLOT(materialNeeded(int)));
+    updateBays();
 
 }
 
 MaterialsWidget::~MaterialsWidget()
 {
     delete ui;
+    foreach(BayWidget* b,bayWidgets){delete b;}
+
 }
 
-void MaterialsWidget::setBayCommand(int bayNum, double distance, bool absolute)
-{
-    emit sendBayCommand(bayNum, distance, absolute);
+
+void MaterialsWidget::updateBays(){
+    numBays = ci_->vm_->bays.size();
+
+    cleanUpBays();
+    for (int x = 0; x < numBays; x++){
+        BayWidget* b = new BayWidget(this,ci_,x);
+        b->setMaterials(materials_);
+        bayWidgets.append(b);
+        ui->horizontalLayout->addWidget(b);
+    }
 }
 
-void MaterialsWidget::setBayMaterial(int bayNum, QString material)
-{
-    emit sendBayMaterial(bayNum, material);
+void  MaterialsWidget::cleanUpBays(){
+    foreach(BayWidget* b,bayWidgets){
+        ui->horizontalLayout->removeWidget(b);
+        //delete b;
+    }
+}
+
+void MaterialsWidget::setMaterials(QMap<int,Material> materials){
+    materials_ = materials;
+}
+
+
+void MaterialsWidget::materialNeeded(int i){
+    QString message;
+    QTextStream ms(&message,QIODevice::WriteOnly);
+    ms<<"Print is paused since it needs a material not loaded in the machine\n";
+    ms<<"Please load Material id:"<<i<<" Name: "<<materials_[i].name;
+    QMessageBox::warning(this,"Material Needed",message);
 }
