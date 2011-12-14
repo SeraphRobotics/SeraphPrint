@@ -1,1 +1,8 @@
 *.pro.user
+*.pdb
+*.Release
+*.Debug
+debug
+release
+/JrkerrElectronics/Windows/qextserial/qextserial-win.pro.user
+/JrkerrElectronics/Posix/qextserial/Makefile

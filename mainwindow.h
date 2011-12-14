@@ -55,6 +55,7 @@ private:
     void setUpWidgets();
     void setUpConnections();
 
+
 private:
     Ui::MainWindow *ui;
     ConnectWidget* connectWidget;

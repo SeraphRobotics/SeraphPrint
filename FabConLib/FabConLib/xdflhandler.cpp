@@ -91,6 +91,10 @@ void XDFLHandler::cancel() {
     // (mutex automatically released upon locker destruction)
 }
 
+int XDFLHandler::getNumberOfCommands() {
+    return commands_.length();
+}
+
 void XDFLHandler::setVM(VMPrototype* vm) {
     vm_ = vm;
     laststate_= State(vm_->nstatesize(),0.0);
@@ -119,13 +123,14 @@ void XDFLHandler::loadFromDom(QDomDocument xdfl) {
         qDebug()<<"NULL COMMANDS";
         return;
     }
+
     commands_ = commandsNode.childNodes();
-    emit numberOfCommands(commands_.length());
     if (commands_.isEmpty()) {
         qDebug()<<"NO COMMANDS";
         // throw exceptions? Return false?
         return;
     }
+    current_command_ = 0;
 
     QDomNodeList materialTags  = paletteNode.childNodes();
     for (unsigned int k = 0; k < materialTags.length(); k++) {
