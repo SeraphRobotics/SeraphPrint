@@ -9,6 +9,7 @@
 #include <QSettings>
 #include <QFile>
 #include <QFileInfo>
+#include <QDebug>
 
 #define FAB_CONFIG_DIRECTORY_NAME_UNIX ".fab_configs"
 #define FAB_CONFIG_DIRECTORY_NAME_WIN "Fab Configs"
@@ -143,22 +144,22 @@ void ConnectWidget::addConfig(QString path)
 
         qDebug() << newPath;
         if(!command->copy(newPath)){
-            printf("Error copying the code.");
+            qDebug()<<"Error copying the code.";
         }
 
     }
     else{
-        printf("Error opening the file.");
+        qDebug()<<"Error opening the file.";
     }
 }
 
 /*
  Public slot to preload a remembered configuration file.
  */
-//void ConnectWidget::preloadConfig(QString preloaded_path)
-//{
-//    addConfig(preloaded_path);
-//}
+/*void ConnectWidget::preloadConfig(QString preloaded_path)
+{
+    addConfig(preloaded_path);
+}*/
 
 void ConnectWidget::on_configButton_clicked(){
     QString filepath = QFileDialog::getOpenFileName(this, tr("Open"),
@@ -173,32 +174,35 @@ void ConnectWidget::on_connectButton_clicked(){
     int configIndex = ui->configBox->currentIndex();
     bool canConnect = true;
 
-    if (portIndex == -1){
+
+
+    if ((portIndex == -1)||(portList.isEmpty())){
         QMessageBox::information(this, "FabPrint", tr("Error: Select a valid COM port from the list."));
         canConnect = false;
     }
 
-//    if (configIndex == -1 || (configIndex == 0 && !configList.at(0).exists())){
-//        QMessageBox::information(this, "FabPrint", tr("Error: Select a valid printer configuration from the list."));
-//        canConnect = false;
-//    }
+    if (configIndex == -1 || configList.isEmpty()){//(configIndex == 0 && !configList.at(0).exists())){
+        QMessageBox::information(this, "FabPrint", tr("Error: Select a valid printer configuration from the list."));
+        canConnect = false;
+    }
 
-    if (canConnect||true){
+    if (canConnect){
         QSettings theSettings("Creative Machines Lab", "FabPrint");
         theSettings.setValue("load config next time index", ui->configBox->currentIndex());
         theSettings.sync();
 
 
         // LOAD THE FILE
-//        QString config_path = configList.at(configIndex).filePath();
-        QString config_path = "JrKerr-Single-deposition.config";
+        QString config_path = configList.at(configIndex).filePath();
+//        QString config_path = "JrKerr-Single-deposition.config";
         QString configString;
         QDomDocument configDom;
         // load the config file into the DOM document
         {
           QFile configFile(config_path);
           if (!configFile.open(QFile::ReadOnly)) {
-              printf("\nFAILED TO OPEN CONFIG FILE\n");
+              qDebug()<<"FAILED TO OPEN CONFIG FILE";
+              QMessageBox::warning(this,tr("Config Error"),tr("Cound not open config file"));
               return;
           }
           configDom.setContent(&configFile);

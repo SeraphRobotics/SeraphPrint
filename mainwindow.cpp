@@ -253,7 +253,7 @@ void MainWindow::printerConnected(){
 
     if (ci_->vm_->isInitialized())
     {
-        printf("\nConfig file loaded successfully");
+        qDebug()<<"Config file loaded successfully";
 //        QSettings settings("Creative Machines Lab", "FabPrint");
 //        settings.setValue("config",config_path);
 //        cout << settings.value("config").toString().toStdString() << std::endl;

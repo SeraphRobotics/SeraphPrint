@@ -15,8 +15,8 @@ motordialog::motordialog(QWidget *parent, QString direction, double vel, double 
     ui->accelerationSlider_2->setValue(accel);
     ui->velocitySpin_2->setValue(vel);
     ui->accelerationSpin_2->setValue(accel);
-    ui->reverseCheckButton->setChecked(checked);
-    ui->reverseCheckButton->hide();
+//    ui->reverseCheckButton->setChecked(checked);
+//    ui->reverseCheckButton->hide();
     motorId = direction;
 
     //signals / slots

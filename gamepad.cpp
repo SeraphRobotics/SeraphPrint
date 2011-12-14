@@ -175,9 +175,6 @@ void GamePad::on_urPushButton_clicked()
 {
     //emit moveTo(ui->xPositionSpin->value() - ui->xIncrementSpin->value(),
     //            ui->yPositionSpin->value() + ui->yIncrementSpin->value(), ui->zPositionSpin->value());
-    printf("\nclicked");
-    fflush(stdout);
-
     double v = sqrt(XVelocity*XVelocity+YVelocity*YVelocity);
     ci_->move(- ui->xIncrementSpin->value(), ui->yIncrementSpin->value(),0,v);
 }
