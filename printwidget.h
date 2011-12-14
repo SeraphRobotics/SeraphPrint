@@ -20,7 +20,9 @@ public slots:
     void setCurrentPath(int num);
     void setTotalPaths(int num);
     void getPrinterProgress(int currPath, QString status);
-    // "Executing path <currentPath> of <totalPaths>..."
+    void estimated(double time, double volume, int numCmd);
+    void printDone();
+    void setPaused();
 
 signals:
     void go();
@@ -38,6 +40,7 @@ private:
     bool isPaused;
 
 private slots:
+    void updateButtons();
     void on_stopButton_clicked();
     void on_playButton_clicked();
 };

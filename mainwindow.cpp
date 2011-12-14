@@ -70,7 +70,7 @@ void MainWindow::backClicked()
 
 
 void MainWindow::onStateChaged(int i){
-    qDebug() <<"\Machine State changed to "<<i;
+    qDebug()<<"Machine State changed to "<<i;
     machineState = i;
     if(i==CoreInterface::NotInitialized){
         qDebug()<<"connection lost...";
@@ -98,6 +98,7 @@ void MainWindow::onStateChaged(int i){
 
 void MainWindow::materialNeeded(int){
     setPause();
+    printWidget->setPaused();
 }
 
 /**
@@ -159,7 +160,6 @@ void MainWindow::updateState()
     qDebug()<<"Current View State is now:"<<current_state;
 }
 
-// Yes, I know...
 
 
 
@@ -201,6 +201,7 @@ void MainWindow::setUpConnections()
     //CoreInterface
     connect(ci_,SIGNAL(stateChaged(int)),this,SLOT(onStateChaged(int)));
     connect(ci_,SIGNAL(needMaterialLoaded(int)),this,SLOT(materialNeeded(int)));
+    connect(ci_,SIGNAL(printsComplete()),this,SLOT(printDone()));
 
     // Print widget
     connect(printWidget, SIGNAL(go()), this, SLOT(setGo()));
@@ -211,7 +212,6 @@ void MainWindow::setUpConnections()
 
 void MainWindow::setUpWidgets()
 {
-
     connectWidget = new ConnectWidget(this,ci_);
 
     //Job widget
@@ -221,21 +221,25 @@ void MainWindow::setUpWidgets()
 //    {
 //        jobWidget->preloadedFabFile();
 //    }
-
     materialsWidget = new MaterialsWidget(this,ci_);
     materialsWidget->hide();
 
     printWidget = new PrintWidget(this,ci_);
     printWidget->hide();
 
-
     ui->currentWidget = connectWidget;
 
     gamepad_container = new GamePad(this,ci_);
     gamepad_container->move(0, 260);
     gamepad_container->hide();
+}
 
-
+void MainWindow::printDone(){
+    if(current_state !=JOB){
+        current_state = JOB;
+        QMessageBox::information(this,"Print Complete","Your print has finished");
+        updateState();
+    }
 }
 
 void MainWindow::setUseFileArg(bool useit)

@@ -90,7 +90,8 @@ void CoreInterface::setXDFL(QString xdfl){
     //everything here after should be handled by a seperate slot called by the xdflhandler while its running but not printing.
     double t = handler_->getEstimatedTime();
     double v = handler_->getEstimatedVolume();
-    emit estimated(t,v);
+    int numCommands = handler_->getNumberOfCommands();
+    emit estimated(t,v,numCommands);
     idMaterialMap_ = handler_->getMaterials();
     emit materialsAvailable(idMaterialMap_);
     // Goes at the end
@@ -179,4 +180,5 @@ void CoreInterface::donePrinting(){
 //    setState(Connected);
 //    getCurrentPosition();
     configLoaded();
+    emit printsComplete();
 }

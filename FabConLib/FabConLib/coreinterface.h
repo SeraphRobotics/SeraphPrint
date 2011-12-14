@@ -52,7 +52,7 @@ signals:
     /**
      * emits when an estimate of the time and volume of a config file is ready
      */
-    void estimated(double time, double volume);
+    void estimated(double time, double volume, int numberOfCommands);
 
     //Bay
 
@@ -78,6 +78,11 @@ signals:
      */
     void needMaterialLoaded(int i);
 
+    /**
+     * emits when a print is done or canceled
+     */
+    void printsComplete();
+
 public slots:
 
     // Connection
@@ -87,11 +92,6 @@ public slots:
      * passing a comport of '' will use the comport of the config file
      */
     void setConfig(QString configFile,QString comport);
-
-    /**
-     * used by the load config thread for processing. this should never be called by another object.
-     */
-    void configLoaded(); //ONLY FOR loadConfigThread
 
     // GamePad
 
@@ -169,6 +169,19 @@ public slots:
     void forceStop();
 
 
+
+private:
+    /**
+     * internal function used to update the state of the system
+     */
+    void setState(SystemState);
+
+private slots:
+    /**
+     * used by the load config thread for processing. this should never be called by another object.
+     */
+    void configLoaded(); //ONLY FOR loadConfigThread
+
     // XDFL handling
     /**
      * internal slot used for handeling XDFL printing
@@ -186,11 +199,8 @@ public slots:
      * connects the XDFLHandler to the CoreInterface needMaterialLoaded signal
      */
     void needMaterial(int i);//ONLY FOR XDFLHANDLER
-private:
-    /**
-     * internal function used to update the state of the system
-     */
-    void setState(SystemState);
+
+
 
 public:
     VirtualPrinter *vm_;

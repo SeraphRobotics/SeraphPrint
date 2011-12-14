@@ -13,7 +13,7 @@ JobWidget::JobWidget(QWidget *parent,CoreInterface *ci) : QWidget(parent), ui(ne
     ui->setupUi(this);
 
     connect(ui->button_load, SIGNAL(clicked()), this, SLOT(onLoadClicked()));
-    connect(ci_,SIGNAL(estimated(double,double)),this,SLOT(estimatesLoaded(double,double)));
+    connect(ci_,SIGNAL(estimated(double,double,int)),this,SLOT(estimatesLoaded(double,double,int)));
 
     doInitialLoad();
 }
@@ -61,7 +61,7 @@ void JobWidget::setAndSaveFile(QString filePath, bool doSave)
     }
 }
 
-void JobWidget::estimatesLoaded(double time, double volume){
+void JobWidget::estimatesLoaded(double time, double volume, int numcmd){
     QString timeString;
     QString volumeString;
     QTextStream vs(&volumeString,QIODevice::WriteOnly);

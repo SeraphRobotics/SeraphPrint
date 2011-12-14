@@ -42,6 +42,7 @@ public slots:
     void printerConnected();
     void onStateChaged(int i);
     void materialNeeded(int i);
+    void printDone();
 
 signals:
     //Connect

@@ -186,15 +186,15 @@ void ConnectWidget::on_connectButton_clicked(){
         canConnect = false;
     }
 
-    if (canConnect||true){
+    if (canConnect){
         QSettings theSettings("Creative Machines Lab", "FabPrint");
         theSettings.setValue("load config next time index", ui->configBox->currentIndex());
         theSettings.sync();
 
 
         // LOAD THE FILE
-//        QString config_path = configList.at(configIndex).filePath();
-        QString config_path = "JrKerr-Single-deposition.config";
+        QString config_path = configList.at(configIndex).filePath();
+//        QString config_path = "JrKerr-Single-deposition.config";
         QString configString;
         QDomDocument configDom;
         // load the config file into the DOM document
