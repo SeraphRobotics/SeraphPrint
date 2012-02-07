@@ -23,7 +23,7 @@ void LoadConfigThread::setConfig(QDomDocument config){
 }
 
 void LoadConfigThread::checkReady(){
-    if (!vm_->isInitialized() && config_.isNull()){
+    if (!vm_->isInitialized() &&config_.isNull()){//
         ready_ = true;
         emit ready();
     }
@@ -35,7 +35,10 @@ void LoadConfigThread::run(){
     if (ready_){
         vm_->loadConfig(config_);
         vm_->moveToThread(QApplication::instance()->thread());
-        if(vm_->isInitialized()){emit loaded();}
+        if(vm_->isInitialized()){
+            emit loaded();
+        }
+
     }else{
         vm_->moveToThread(QApplication::instance()->thread());
     }
