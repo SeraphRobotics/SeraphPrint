@@ -13,7 +13,8 @@ SOURCES += FabConLib/FabConLib/bay.cpp \
     FabConLib/FabConLib/testing/util.cpp \
     FabConLib/FabConLib/testing/unittests.cpp \
     FabConLib/FabConLib/testing/testerforci.cpp \
-    FabConLib/FabConLib/testing/jscitest.cpp
+    FabConLib/FabConLib/testing/jscitest.cpp \
+    FabConLib/FabConLib/comportdetector.cpp
 
 HEADERS += FabConLib/FabConLib/bay.h \
     FabConLib/FabConLib/xdflpath.h \
@@ -30,7 +31,8 @@ HEADERS += FabConLib/FabConLib/bay.h \
     FabConLib/FabConLib/testing/util.h \
     FabConLib/FabConLib/testing/unittests.h \
     FabConLib/FabConLib/testing/testerforci.h \
-    FabConLib/FabConLib/testing/jscitest.h
+    FabConLib/FabConLib/testing/jscitest.h \
+    FabConLib/FabConLib/comportdetector.h
 
 INCLUDEPATH += JrkerrElectronics/
 include("JrKerr_Electronics.pro")

@@ -2,20 +2,22 @@
 #include "ui_connectwidget.h"
 #include <QFileDialog>
 #include <QMessageBox>
-#include "JrkerrElectronics/Posix/qextserial/qextserialenumerator.h"
+#include "qextserialenumerator.h"
 #include <QDebug>
 #include <iostream>
 #include <QDir>
 #include <QSettings>
 #include <QFile>
 #include <QFileInfo>
+#include <QDebug>
 
 #define FAB_CONFIG_DIRECTORY_NAME_UNIX ".fab_configs"
 #define FAB_CONFIG_DIRECTORY_NAME_WIN "Fab Configs"
 
-ConnectWidget::ConnectWidget(QWidget *parent) : QWidget(parent), ui(new Ui::ConnectWidget)
+ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(parent), ui(new Ui::ConnectWidget)
 {
     ui->setupUi(this);
+    ci_ = ci;
 
     // Populate portList and ui->portBox.
     foreach(QextPortInfo port, QextSerialEnumerator::getPorts())
@@ -29,7 +31,9 @@ ConnectWidget::ConnectWidget(QWidget *parent) : QWidget(parent), ui(new Ui::Conn
         //       the order of portBox items be maintained.
         // The selected port name is retrieved by portList.at(ui->portBox->currentIndex()).
 
-        if (!port.friendName.isEmpty())
+        bool usb = port.friendName.contains("usb",Qt::CaseInsensitive);
+
+        if (usb)//!port.friendName.isEmpty())
         {
             portList.append(port.portName);
             ui->portBox->addItem(port.friendName);
@@ -61,7 +65,10 @@ ConnectWidget::ConnectWidget(QWidget *parent) : QWidget(parent), ui(new Ui::Conn
     else
     {
         configFileDirectory = QDir(QDir::homePath() + "\\" + FAB_CONFIG_DIRECTORY_NAME_WIN);
-
+        if(!configFileDirectory.exists()){
+            configFileDirectory.mkdir("child");
+            printf("\nmaking dir child");
+        }
         // Code to make sure the directory exists on Windows...
         // configFileDirectory = whatever I want it to be on Windows
     }
@@ -73,22 +80,6 @@ ConnectWidget::ConnectWidget(QWidget *parent) : QWidget(parent), ui(new Ui::Conn
     QSettings theSettings("Creative Machines Lab", "FabPrint");
     ui->configBox->setCurrentIndex(theSettings.value("load config next time index", 0).toInt());
 
-////    qDebug() << "This is the directory from which .config files will be pulled for the combo box:";
-////    qDebug() << QCoreApplication::applicationDirPath();
-
-//    configList = appdir.entryInfoList(QStringList("*.config"), QDir::Files);
-
-////    // Add a blank entry to index 0 for a custom user-specified file.
-////    configList.prepend(QFileInfo());
-
-//    // FROM THIS POINT ON, configList and configBox ENTRIES SHOULD STAY IN ORDER!
-
-//    foreach(QFileInfo config, configList)
-//    {
-//        ui->configBox->addItem(config.baseName());
-//    }
-
-//    ui->configBox->setItemText(0, "n/a (Custom)");
 
 //SAMPLE getPorts() OUTPUT (MAC OS)
 //Starting /Applications/D:/fab@home/FabPrint/FabPrint-build-desktop/FabPrint.app/Contents/MacOS/FabPrint...
@@ -125,10 +116,11 @@ void ConnectWidget::loadFiles()
     ui->configBox->clear();
 
     // Add all of the files from the configList to the combo box
-    foreach(QFileInfo config, configList)
-    {
+    foreach(QFileInfo config, configList){
         ui->configBox->addItem(config.baseName());
     }
+
+
 }
 
 ConnectWidget::~ConnectWidget()
@@ -152,63 +144,83 @@ void ConnectWidget::addConfig(QString path)
 
         qDebug() << newPath;
         if(!command->copy(newPath)){
-            printf("Error copying the code.");
+            qDebug()<<"Error copying the code.";
         }
 
     }
     else{
-        printf("Error opening the file.");
+        qDebug()<<"Error opening the file.";
     }
 }
 
 /*
  Public slot to preload a remembered configuration file.
  */
-//void ConnectWidget::preloadConfig(QString preloaded_path)
-//{
-//    addConfig(preloaded_path);
-//}
-
-void ConnectWidget::on_configButton_clicked()
+/*void ConnectWidget::preloadConfig(QString preloaded_path)
 {
+    addConfig(preloaded_path);
+}*/
+
+void ConnectWidget::on_configButton_clicked(){
     QString filepath = QFileDialog::getOpenFileName(this, tr("Open"),
     QDir::homePath(), tr("Printer Config File (*.config);;All Files (*.*)"));
     addConfig(filepath); // addConfig should do the file copy/move
     loadFiles();
-
     // TODO: the chooser dialog starts in the last-used directory instead of the home folder
 }
 
-void ConnectWidget::on_connectButton_clicked()
-{
+void ConnectWidget::on_connectButton_clicked(){
     int portIndex   = ui->portBox  ->currentIndex();
     int configIndex = ui->configBox->currentIndex();
     bool canConnect = true;
 
-    if (portIndex == -1)
-    {
+
+
+    if ((portIndex == -1)||(portList.isEmpty())){
         QMessageBox::information(this, "FabPrint", tr("Error: Select a valid COM port from the list."));
         canConnect = false;
     }
 
-    if (configIndex == -1 || (configIndex == 0 && !configList.at(0).exists()))
-    {
+    if (configIndex == -1 || configList.isEmpty()){//(configIndex == 0 && !configList.at(0).exists())){
         QMessageBox::information(this, "FabPrint", tr("Error: Select a valid printer configuration from the list."));
         canConnect = false;
     }
 
-    if (canConnect)
-    {
-        // aen27, 30 November 2011
-        ui->connectButton->setEnabled(false);
-        ui->portBox->setEnabled(false);
-        ui->configBox->setEnabled(false);
-        ui->configButton->setEnabled(false);
-
+    if (canConnect){
         QSettings theSettings("Creative Machines Lab", "FabPrint");
         theSettings.setValue("load config next time index", ui->configBox->currentIndex());
         theSettings.sync();
 
-        emit connectToPrinter(portList.at(portIndex), configList.at(configIndex).filePath());
+
+        // LOAD THE FILE
+        QString config_path = configList.at(configIndex).filePath();
+//        QString config_path = "JrKerr-Single-deposition.config";
+        QString configString;
+        QDomDocument configDom;
+        // load the config file into the DOM document
+        {
+          QFile configFile(config_path);
+          if (!configFile.open(QFile::ReadOnly)) {
+              qDebug()<<"FAILED TO OPEN CONFIG FILE";
+              QMessageBox::warning(this,tr("Config Error"),tr("Cound not open config file"));
+              return;
+          }
+          configDom.setContent(&configFile);
+          configFile.close();
+        }
+        configString = configDom.toString();
+
+
+        // ATTEMPT THE CONNECTION
+        ci_->setConfig(configString,portList.at(portIndex));
+        emit atemptConnect();
+        /// Need an mechanism for checking errors
     }
+}
+
+void ConnectWidget::loading(bool load){
+    ui->connectButton->setEnabled(load);
+    ui->portBox->setEnabled(load);
+    ui->configBox->setEnabled(load);
+    ui->configButton->setEnabled(load);
 }

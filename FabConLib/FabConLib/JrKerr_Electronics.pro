@@ -6,14 +6,12 @@ SOURCES +=   JrkerrElectronics/electronicsinterface.cpp \
       JrkerrElectronics/coordinatedmotion.cpp \
       JrkerrElectronics/npath.cpp \
       JrkerrElectronics/nmotion.cpp \
-    comportdetector.cpp
 
 HEADERS +=   JrkerrElectronics/electronicsinterface.h \
       JrkerrElectronics/motor.h \
       JrkerrElectronics/coordinatedmotion.h \
       JrkerrElectronics/npath.h \
       JrkerrElectronics/nmotion.h \
-    comportdetector.h
 
 
 win32: { 

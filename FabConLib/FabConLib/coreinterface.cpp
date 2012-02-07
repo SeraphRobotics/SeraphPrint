@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <QApplication>
+#include <QDebug>
 
 CoreInterface::CoreInterface():state_(NotInitialized){
     vm_ = new VirtualPrinter();
@@ -46,6 +47,7 @@ void CoreInterface::moveTo(double x, double y, double z, double speed){
         emit outOfStateCall();
         return;
     }
+    qDebug()<<"moving";
     emit moving();
     vm_->moveTo(x,y,z,speed);
 //    getCurrentPosition();
@@ -58,7 +60,7 @@ void CoreInterface::move(double x, double y, double z, double speed){
     }
     emit moving();
     vm_->move(x,y,z,speed);
-//    getCurrentPosition();
+    getCurrentPosition();
 }
  QVector<double> CoreInterface::getCurrentPosition(){
      if ((state_==NotInitialized)||(state_==Printing)){return QVector<double>(3,0);}
@@ -82,12 +84,14 @@ void CoreInterface::setXDFL(QString xdfl){
     connect(handler_,SIGNAL(terminated()),this,SLOT(donePrinting()));
     connect(handler_,SIGNAL(finished()),handler_,SLOT(deleteLater()));
     connect(handler_,SIGNAL(startingCommand(int)),this,SLOT(processingCommand(int)));
+    connect(handler_,SIGNAL(needMaterialChange(int)),this,SLOT(needMaterial(int)));
     // Make other needed connections here
 
     //everything here after should be handled by a seperate slot called by the xdflhandler while its running but not printing.
     double t = handler_->getEstimatedTime();
     double v = handler_->getEstimatedVolume();
-    emit estimated(t,v);
+    int numCommands = handler_->getNumberOfCommands();
+    emit estimated(t,v,numCommands);
     idMaterialMap_ = handler_->getMaterials();
     emit materialsAvailable(idMaterialMap_);
     // Goes at the end
@@ -121,13 +125,14 @@ void CoreInterface::setMaterial(int bayid,int materialid){
 void CoreInterface::moveBayMotor(int bayid, double amount, double time){
     if ((state_==NotInitialized) || (state_==Printing)){return;}
     // THIS SUCKS we need to rethink this
+    qDebug()<<"Ordered Bay to Move";
     vm_->bays[bayid]->jogActuators(amount,time);
 }
 
 void CoreInterface::startPrint(){
     if (state_!=FileLoaded){return;}
-    positionTimer_.disconnect();
-    positionTimer_.setInterval(10000000);
+//    positionTimer_.disconnect();
+//    positionTimer_.setInterval(10000000);
     vm_->moveToThread(handler_);
     setState(Printing);
     QTimer::singleShot(0,handler_,SLOT(start()));
@@ -148,7 +153,7 @@ void CoreInterface::cancelPrint(){
 
 void CoreInterface::forceStop(){
     vm_->forceStop();
-    positionTimer_.disconnect();
+//    positionTimer_.disconnect();
     setState(NotInitialized);
 }
 
@@ -158,7 +163,7 @@ void CoreInterface::processingCommand(int i){
 }
 
 void CoreInterface::needMaterial(int i){
-    pausePrint();
+//    pausePrint();
     emit needMaterialLoaded(i);
 
 }
@@ -175,4 +180,5 @@ void CoreInterface::donePrinting(){
 //    setState(Connected);
 //    getCurrentPosition();
     configLoaded();
+    emit printsComplete();
 }

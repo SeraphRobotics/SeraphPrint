@@ -48,6 +48,11 @@ public:
     double getEstimatedVolume();
 
     /**
+     * returns the number of commands in the currently set XDFL file
+     */
+    int getNumberOfCommands();
+
+    /**
      * sets the Virtual Machine the program will use
      */
     void setVM(VMPrototype* vm);
@@ -100,7 +105,7 @@ private:
     void processCommand(); // This function will be called every time handling is started or resumed.
     NPath dwell(double time_in_ms);
     void runNPath(NPath n);
-    void setMaterial(int id);
+    bool setMaterial(int id);
 
 public:
     QMap<int,Material> getMaterials(); // When is this used?

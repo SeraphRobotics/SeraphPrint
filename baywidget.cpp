@@ -3,24 +3,44 @@
 #include "baydialog.h"
 #include <iostream>
 
-BayWidget::BayWidget(QWidget *parent, QString bayName, QVector<std::string> bayMaterials)
-    : QWidget(parent), ui(new Ui::BayWidget)
+
+BayWidget::BayWidget(QWidget *parent, CoreInterface *ci,int id):
+    QWidget(parent), ui(new Ui::BayWidget)
 {
     ui->setupUi(this);
+    id_=id;
+
+    QString bayName;
+    QTextStream bs(&bayName,QIODevice::WriteOnly);
+    bs<<"Bay "<<id;
     ui->bayLabel->setText(bayName);
 
-    QStringList materials;
-    //Add items (materials) to drop down
-    for(int x = 0; x < bayMaterials.size(); x++)
-    {
-        materials << QString::fromStdString(bayMaterials.at(x));
-    }
-    ui->materialCombo->addItems(materials);
+    ci_=ci;
 
     //Create baydialog for this bay
-    dialog = new BayDialog(this,ui->bayLabel->text());
-    connect(dialog, SIGNAL(sendBayCommand(int,double,bool)), this, SLOT(setBayCommand(int,double,bool)));
+    dialog = new BayDialog(this,id,ci);
+    connect(ci_,SIGNAL(materialsAvailable(QMap<int,Material>)),this,SLOT(setMaterials(QMap<int,Material>)));
 
+}
+
+void BayWidget::setMaterials(QMap<int,Material> materials){
+    QStringList materialList;
+    materialList.append(QString());
+
+    QMapIterator<int,Material> i(materials);
+    while (i.hasNext()){
+        i.next();
+        Material m = i.value();
+        QString name = m.name.toLower();
+        if (materialList.contains(name)){
+            QTextStream ns(&name,QIODevice::WriteOnly);
+            ns<<m.id;
+        }
+        materialMap_[i.key()]= name ;
+        idtomaterials_[name]=i.key();
+        materialList.append(name);
+    }
+    ui->materialCombo->addItems(materialList);
 }
 
 
@@ -35,15 +55,16 @@ BayWidget::~BayWidget()
 }
 
 
-void BayWidget::setBayCommand(int bayNum, double distance, bool absolute)
+void BayWidget::setBayCommand(int bayNum, double distance)
 {
-    emit sendBayCommand(bayNum, distance, absolute);
+    ci_->moveBayMotor(bayNum,distance,distance);/// THIS IS BAD FORM: TODO add a time/speed mechanism
 }
 
 void BayWidget::on_materialCombo_activated(const QString &arg1)
 {
     QString material = arg1;
-    QString bayName = ui->bayLabel->text().at(ui->bayLabel->text().length()-1);
-    int bayNum = bayName.toInt();
-    emit sendBayMaterial(bayNum, material);
+    if(idtomaterials_.contains(material)){
+        int matid = idtomaterials_[material];
+        ci_->setMaterial(id_,matid);
+    }
 }

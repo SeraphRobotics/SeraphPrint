@@ -3,56 +3,45 @@
 #include "QDesktopWidget.h"
 #include "iostream"
 #include <QMessageBox>
+#include <QDebug>
 
 
 // Edit these stylesheets to change the appearance of the progress bar
 #define ACTIVE "* { background-color: rgb(0,0,128); color: rgb(255,255,255); padding-top: 6px; padding-bottom: 6px}"
 #define DONE "* { background-color: rgb(0,128,0); color: rgb(255,255,255) }"
 #define INCOMPLETE "* { background-color: rgb(128,0,0); color: rgb(255,255,255) }"
-enum
-{
-    CONNECT,
-    JOB,
-    MATERIALS,
-    PRINT
-};
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    current_state(CONNECT),
+    file_arg(""),
+    use_file_arg(false),
+    haveValidFile(false),
+    isConnected(false),
+    materialsInitialized(false),
+    machineState(0)
 {
-    use_file_arg = false;
-    ui->setupUi(this);
-    handler->setVM(&vm);
+    // Setup Internal States
+    ci_ = new CoreInterface();
 
-    current_state = 0;
+
+    // Setup UI
+    ui->setupUi(this);
     this->setWindowTitle("FabPrint");
     ui->connectButton->setStyleSheet(ACTIVE);
     ui->jobButton->setStyleSheet(INCOMPLETE);
     ui->materialsButton->setStyleSheet(INCOMPLETE);
     ui->printButton->setStyleSheet(INCOMPLETE);
-
-    haveValidFile = false;
-    isConnected = false;
-
     this->setGeometry(120, 120, 531, 260);
     this->setFixedSize(this->size());
-
     connect(ui->forwardButton, SIGNAL(clicked()), this, SLOT(forwardClicked()));
     connect(ui->backButton, SIGNAL(clicked()), this, SLOT(backClicked()));
-
-    //    // Job widget
-    //    connect(jobWidget, SIGNAL(sendAndLoadFile(QString)), this, SLOT(setFabFile(QString)));
 
     this->setUpWidgets();
 
     setUpConnections();
-
-    /*QSettings settings("Creative Machines Lab", "FabPrint");
-    QString savedConfig = settings.value("config","").toString();
-    if (!savedConfig.isEmpty()) {
-        sendPreloadedConfig(savedConfig);
-    }*/
 }
 
 /**
@@ -79,6 +68,39 @@ void MainWindow::backClicked()
     }
 }
 
+
+void MainWindow::onStateChaged(int i){
+    qDebug()<<"Machine State changed to "<<i;
+    machineState = i;
+    if(i==CoreInterface::NotInitialized){
+        qDebug()<<"connection lost...";
+        haveValidFile = false;
+        isConnected = false;
+        materialsInitialized = false;
+    }else if (i==CoreInterface::Connected){
+        printerConnected();
+        qDebug()<<"Connected...";
+        haveValidFile = false;
+        isConnected = true;
+        materialsInitialized = false;
+    }else if(i==CoreInterface::FileLoaded){
+        qDebug()<<"File Loaded...";
+        haveValidFile = true;
+        isConnected = true;
+        materialsInitialized = false;
+    }else if(i==CoreInterface::Printing){
+        qDebug()<<"Printing...";
+        haveValidFile = true;
+        isConnected = true;
+    }
+    updateState();
+}
+
+void MainWindow::materialNeeded(int){
+    setPause();
+    printWidget->setPaused();
+}
+
 /**
  * Add to the cases in this method to execute
  * transitions between widgets.  Widgets that
@@ -90,52 +112,57 @@ void MainWindow::updateState()
     ui->currentWidget->hide();
 
     // NOTE: If jumping around in the state is permitted, back and forward buttons must be enabled/disabled everywhere
+    qDebug()<<"\nCurrent View State: "<<current_state;
 
     switch (current_state)
     {
     case CONNECT:
-        ui->backButton->setEnabled(false);
-        //ui->tempLabel->setText("[ Connect Widget ]");
-        ui->currentWidget = connectWidget;
-        enableOne(CONNECT);
+
+//        if (machineState!=CoreInterface::NotInitialized){
+//            current_state = JOB;
+
+//            updateState();
+//        }else{
+            ui->backButton->setEnabled(false);
+            ui->currentWidget = connectWidget;
+//            this->gamepad_container->show();
+            enableOne(CONNECT);
+//        }
+
         break;
     case JOB:
         ui->backButton->setEnabled(true);
-
-        if (haveValidFile)
-        {
+        if (haveValidFile){
             ui->forwardButton->setEnabled(true);
         }
-        else
-        {
+        else{
             ui->forwardButton->setEnabled(false);
         }
-
         ui->currentWidget = jobWidget;
-//        qDebug() << "About to call initial load...";
-
-//        if (!haveValidFile)
-//        {
-//            jobWidget->doInitialLoad();
-//        }
-
+        this->gamepad_container->show();
         enableOne(JOB);
         break;
     case MATERIALS:
         ui->forwardButton->setEnabled(true);
         ui->currentWidget = materialsWidget;
+        materialsWidget->updateBays();
+        this->gamepad_container->show();
         enableOne(MATERIALS);
         break;
     case PRINT:
         ui->forwardButton->setEnabled(false);
         ui->currentWidget = printWidget;
         enableOne(PRINT);
+        this->gamepad_container->show();
         break;
     }
     ui->currentWidget->show();
+    qDebug()<<"Current View State is now:"<<current_state;
 }
 
-// Yes, I know...
+
+
+
 void MainWindow::enableOne(int newActiveButton)
 {
     switch (newActiveButton)
@@ -171,58 +198,48 @@ void MainWindow::enableOne(int newActiveButton)
 }
 void MainWindow::setUpConnections()
 {
-    // Connect widget
-        connect(connectWidget, SIGNAL(connectToPrinter(QString,QString)), this, SLOT(setPrinter(QString,QString)));
-
-    //  Possible future use
-    //  connect(this, SIGNAL(sendPreloadedConfig(QString)), connectWidget, SLOT(preloadConfig(QString)));
-
-    // Gamepad widget
-    connect(gamepad_container, SIGNAL(moveTo(double,double,double)), this, SLOT(moveHandler(double,double,double)));
-    connect(gamepad_container, SIGNAL(setProperties(QString, double, double)), this, SLOT(propertiesHandler(QString, double, double)));
-
-    // Materials widget
-    connect(this, SIGNAL(sendBaysAndMaterials(int,QVector<string>)), materialsWidget, SLOT(initializeMaterials(int,QVector<string>)));
-    connect(materialsWidget, SIGNAL(sendBayCommand(int,double,bool)), this, SLOT(setBayCommand(int,double,bool)));
-    connect(materialsWidget, SIGNAL(sendBayMaterial(int,QString)), this, SLOT(setBayMaterial(int,QString)));
+    //CoreInterface
+    connect(ci_,SIGNAL(stateChaged(int)),this,SLOT(onStateChaged(int)));
+    connect(ci_,SIGNAL(needMaterialLoaded(int)),this,SLOT(materialNeeded(int)));
+    connect(ci_,SIGNAL(printsComplete()),this,SLOT(printDone()));
 
     // Print widget
     connect(printWidget, SIGNAL(go()), this, SLOT(setGo()));
     connect(printWidget, SIGNAL(pause()), this, SLOT(setPause()));
     connect(printWidget, SIGNAL(stop()), this, SLOT(setStop()));
     connect(printWidget, SIGNAL(resume()), this, SLOT(setResume()));
-    connect(this, SIGNAL(sendCurrentPath(int)), printWidget, SLOT(setCurrentPath(int)));
-    connect(this, SIGNAL(sendTotalPaths(int)), printWidget, SLOT(setTotalPaths(int)));
-    //connect(&printInterface, SIGNAL(reportPrinterProgress(int,QString)), this, SLOT(getPrinterProgress(int,QString)));
-    //connect(this, SIGNAL(reportPrinterProgress(int,QString)), printWidget, SLOT(getPrinterProgress(int,QString)));
 }
 
 void MainWindow::setUpWidgets()
 {
-
-    connectWidget = new ConnectWidget(this);
+    connectWidget = new ConnectWidget(this,ci_);
 
     //Job widget
-    jobWidget = new JobWidget(this);
+    jobWidget = new JobWidget(this, ci_);
     jobWidget->hide();
 //    if (use_file_arg)
 //    {
 //        jobWidget->preloadedFabFile();
 //    }
-
-    materialsWidget = new MaterialsWidget(this);
+    materialsWidget = new MaterialsWidget(this,ci_);
     materialsWidget->hide();
 
-    printWidget = new PrintWidget(this);
+    printWidget = new PrintWidget(this,ci_);
     printWidget->hide();
-
 
     ui->currentWidget = connectWidget;
 
-    gamepad_container = new GamePad(this);
+    gamepad_container = new GamePad(this,ci_);
     gamepad_container->move(0, 260);
     gamepad_container->hide();
+}
 
+void MainWindow::printDone(){
+    if(current_state !=JOB){
+        current_state = JOB;
+        QMessageBox::information(this,"Print Complete","Your print has finished");
+        updateState();
+    }
 }
 
 void MainWindow::setUseFileArg(bool useit)
@@ -236,36 +253,20 @@ void MainWindow::setFileArg(QString theFile)
     file_arg = theFile;
 }
 
-void MainWindow::setPrinter(QString port, QString config_path)
-{
-    cout << "In setPrinter slot" << std::endl;
-    cout << "Config path: " << config_path.toStdString() << endl;
+void MainWindow::printerConnected(){
 
-    QDomDocument configDom;
-    // load the config file into the DOM document
+    if (ci_->vm_->isInitialized())
     {
-      QFile configFile(config_path);
-      if (!configFile.open(QFile::ReadOnly)) {
-          printf("\nFAILED TO OPEN CONFIG FILE\n");
-          return;
-      }
-      configDom.setContent(&configFile);
-      configFile.close();
-    }
-
-    vm.setComPort(port);
-    vm.loadConfig(configDom);
-    if (vm.isInitialized())
-    {
-        cout << "Config file loaded successfully" << std::endl;
+        qDebug()<<"Config file loaded successfully";
 //        QSettings settings("Creative Machines Lab", "FabPrint");
 //        settings.setValue("config",config_path);
 //        cout << settings.value("config").toString().toStdString() << std::endl;
 //        settings.sync();
         this->setFixedHeight(471);
         this->setFixedWidth(531);
-        gamepad_container->show();
+        this->gamepad_container->show();
         ui->forwardButton->setEnabled(true);
+        isConnected = true;
     }
 
     else
@@ -276,75 +277,8 @@ void MainWindow::setPrinter(QString port, QString config_path)
 
 }
 
-void MainWindow::setXDFLFile(QString xdfl_path)
-{
-    QDomDocument xdflDom;
-    // load the XDFL file into the DOM document
-    {
-      QFile xdflFile(xdfl_path);
-      if (!xdflFile.open(QFile::ReadOnly)) {
-          printf("\nFAILED TO OPEN XDFL FILE\n");
-          return;
-      }
-      xdflDom.setContent(&xdflFile);
-      xdflFile.close();
-    }
-    handler->loadFromDom(xdflDom);
-    printf("\nDomLoaded");
-}
-
-void MainWindow::setFabFile(QString fab_path)
-{
-    /*qDebug() << "In setFabFile; fab_path = " << fab_path;
-
-    file_arg = fab_path; // Why are we even using the global variable here?
-
-    if (printInterface.loadFabFile(file_arg))
-    {
-        emit sendBaysAndMaterials(printInterface.numLoadedBays(), printInterface.getMaterials());
-        ui->forwardButton->setEnabled(true);
-        haveValidFile = true;
-    }
-    else
-    {
-        QMessageBox::information(this, "FabPrint", tr("Error: invalid .fab or .xdfl file"));
-        ui->forwardButton->setEnabled(false);
-        haveValidFile = false;
-    }*/
-    return;
-}
-
-void MainWindow::setBayCommand(int bayNum, double distance, bool absolute)
-{
-
-    /*FIGURE OUT HOW TO MOVE A BAY BASED ON DISTANCE*/
-
-    return;
-
-}
-
-void MainWindow::setBayMaterial(int bayNum, QString material)
-{
-    /*Not sure if this is the right function call*/
-    /*How to get material from QString?*/
-
-    /*Material mat;
-    vm.bays[bayNum]->setMaterial(mat);*/
-
-    return;
-}
-
-void MainWindow::getBayNum(int bayNum)
-{
-    /*DO WE EVER USE THIS?*/
-
-    //emit sendBayPosition(printInterface.getBayPosition(bayNum));
-}
-
 void MainWindow::setGo()
 {
-    handler->start();
-    emit sendTotalPaths(handler->getNumCommands());
     // TODO: Use current/total path display (not implemented in Interface)
     // This will eventually require periodically polling the current path.
 
@@ -358,20 +292,18 @@ void MainWindow::setGo()
 
 void MainWindow::setPause()
 {
-    handler->pause();
 
     this->setFixedHeight(612);
 
     this->gamepad_container->move(0, 400);
     this->materialsWidget->move(0, 200);
     this->materialsWidget->show();
-    this->gamepad_container->show();
+    this->gamepad_container->hide();//show();
 
 }
 
 void MainWindow::setResume()
 {
-    handler->resume();
 
     this->setFixedHeight(260);
 
@@ -383,31 +315,11 @@ void MainWindow::setResume()
 
 void MainWindow::setStop()
 {
-    /*Not sure how to stop yet*/
-
     this->setFixedHeight(471);
     this->gamepad_container->move(0, 260);
     this->materialsWidget->move(0, 0);
     this->materialsWidget->hide();
     this->gamepad_container->show();
-}
-
-void MainWindow::moveHandler(double xPos, double yPos, double zPos) {
-
-    /*Create NPath to move the motors. Not sure how to do this yet*/
-
-}
-
-void MainWindow::propertiesHandler(QString motorname, double velocity, double acceleration) {
-    //printInterface.setVelocity(motorname, velocity);
-    //printInterface.setAcceleration(motorname, acceleration);
-    return;
-}
-
-void MainWindow::getPrinterProgress(int currPath, QString status)
-{
-    //emit reportPrinterProgress(currPath, status);
-    return;
 }
 
 MainWindow::~MainWindow()
