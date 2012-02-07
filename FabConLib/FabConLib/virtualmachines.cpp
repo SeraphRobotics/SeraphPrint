@@ -8,7 +8,7 @@
 #include "testing/util.h"
 #include "xdflvoxel.h"
 
-VMPrototype::VMPrototype():statesize_(1),laststate_(statesize_,0.0) {}
+VMPrototype::VMPrototype():statesize_(1),laststate_(statesize_,0.0),initialized_(false){}
 
 bool VMPrototype::isInitialized() {
     return initialized_;
