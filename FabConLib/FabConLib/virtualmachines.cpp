@@ -3,12 +3,11 @@
 #include <QTextStream>
 #include <QFile>
 #include "jsnpath.h"
-#include <stdio.h>
 
 #include "testing/util.h"
 #include "xdflvoxel.h"
 
-VMPrototype::VMPrototype():statesize_(1),laststate_(statesize_,0.0),initialized_(false){}
+VMPrototype::VMPrototype():initialized_(false),statesize_(1),laststate_(statesize_,0.0){}
 
 bool VMPrototype::isInitialized() {
     return initialized_;
@@ -27,11 +26,9 @@ QString VMPrototype::getErrors() {
 }
 
 void VMPrototype::dumpstates(){
-    printf("\nVMP called");
 }
 
 bool VMPrototype::executeNPath(NPath path) {
-    printf("Called execute in prototype");
     return false;
 }
 
@@ -104,9 +101,18 @@ QScriptEngine* VMPrototype::makeEngine(){
 void VMPrototype::loadConfig(QDomDocument document) {
     QDomElement root = document.documentElement();
 
+
+    // XYZMOTION
+    QDomNode motion = root.namedItem("motion");
+    xyzmotion = new XYZMotion(motion);
+    xyzmotion->setFrequency(frequency_);
+    xyzmotion->setIdMap(idtostatemap_);
+    jsxyz_.setXYZ(xyzmotion);
+
     // BAYS
     QDomNode tools = root.namedItem("tool");
     QDomNodeList toolChildren  = tools.childNodes();
+    bays.clear();
     bays = QList<Bay*>();
     for (unsigned int k = 0; k < toolChildren.length(); k++) {
         if ("bay"==toolChildren.at(k).nodeName().toLower()) {
@@ -116,12 +122,7 @@ void VMPrototype::loadConfig(QDomDocument document) {
         }
     }
 
-    // XYZMOTION
-    QDomNode motion = root.namedItem("motion");
-    xyzmotion = new XYZMotion(motion);
-    xyzmotion->setFrequency(frequency_);
-    xyzmotion->setIdMap(idtostatemap_);
-    jsxyz_.setXYZ(xyzmotion);
+
 
     initialized_ = true;
 }
@@ -149,9 +150,21 @@ void VirtualPrinter::loadConfig(QDomDocument document) {
     laststate_ = State(statesize_,0);
 
 
+    // XYZMOTION
+    QDomNode motion = root.namedItem("motion");
+    xyzmotion =new XYZMotion(motion);
+    xyzmotion->setFrequency(frequency_);
+    xyzmotion->setIdMap(idtostatemap_);
+    jsxyz_.setXYZ(xyzmotion);
+
+
     //BAYS
     QDomNode tools = root.namedItem("tool");
     QDomNodeList toolChildren  = tools.childNodes();
+
+    bays.clear();
+    bays = QList<Bay*>();
+
     for(uint k=0; k<toolChildren.length();k++){
         if ("bay"==toolChildren.at(k).nodeName().toLower()){
             bays.append(new Bay(toolChildren.at(k)));
@@ -161,12 +174,7 @@ void VirtualPrinter::loadConfig(QDomDocument document) {
         }
     }
 
-    // XYZMOTION
-    QDomNode motion = root.namedItem("motion");
-    xyzmotion =new XYZMotion(motion);
-    xyzmotion->setFrequency(frequency_);
-    xyzmotion->setIdMap(idtostatemap_);
-    jsxyz_.setXYZ(xyzmotion);
+
 }
 
 void VirtualPrinter::dumpstates(){}
