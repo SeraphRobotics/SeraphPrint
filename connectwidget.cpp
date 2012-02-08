@@ -67,7 +67,7 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
         configFileDirectory = QDir(QDir::homePath() + "\\" + FAB_CONFIG_DIRECTORY_NAME_WIN);
         if(!configFileDirectory.exists()){
             configFileDirectory.mkdir("child");
-            printf("\nmaking dir child");
+            qDebug("making dir child");
         }
         // Code to make sure the directory exists on Windows...
         // configFileDirectory = whatever I want it to be on Windows

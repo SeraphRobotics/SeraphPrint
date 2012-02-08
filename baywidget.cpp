@@ -65,6 +65,7 @@ void BayWidget::on_materialCombo_activated(const QString &arg1)
     QString material = arg1;
     if(idtomaterials_.contains(material)){
         int matid = idtomaterials_[material];
+        qDebug()<<"Material in bay "<<id_<<" set to "<<matid;
         ci_->setMaterial(id_,matid);
     }
 }

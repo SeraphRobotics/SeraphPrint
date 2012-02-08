@@ -1,6 +1,7 @@
 #include "coordinatedmotion.h"
 #include <math.h>
 #include <QTextStream>
+#include <QDebug>
 
 CoordinatedMotion::CoordinatedMotion():initialized_(false),pathbegan_(false),frequency_(P_30HZ)
 {
@@ -52,7 +53,7 @@ bool CoordinatedMotion::initializePathMode()
     if(initialized_){return true;}
     // Check to see if sufficent number of motors have been added
     if ((motors_.size()<3)||!X_Y_Z_GROUP_ADDRESS){
-       // printf("Not enough motors");
+        qDebug("Not enough motors");
         error_string = "not enough motors";
         return false;
     }

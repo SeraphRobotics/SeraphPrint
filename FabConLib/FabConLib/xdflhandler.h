@@ -108,6 +108,7 @@ private:
     NPath dwell(double time_in_ms);
     void runNPath(NPath n);
     bool setMaterial(int id);
+    void updateInfo();
 
 public:
     QMap<int,Material> getMaterials(); // When is this used?
@@ -128,6 +129,7 @@ private:
     unsigned int current_command_;
     FabPoint last_end_point_;
     State laststate_; // machine state (a vector; distinct from the handler state)
+    bool needMaterial_;
 };
 
 #endif // XDFLHANDLER_H

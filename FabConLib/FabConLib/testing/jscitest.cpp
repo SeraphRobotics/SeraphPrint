@@ -1,4 +1,5 @@
 #include "jscitest.h"
+#include <QDebug>
 
 JsCiTest::JsCiTest(){
     ci_ = new CoreInterface();
@@ -11,7 +12,7 @@ QString JsCiTest::loadXDFL(){
     {
       QFile xdflFile(xdflFilePath);
       if (!xdflFile.open(QFile::ReadOnly)) {
-          printf("\nFAILED TO OPEN XDFL FILE\n");
+          qDebug("FAILED TO OPEN XDFL FILE\n");
           return QString();
       }
       xdflDom.setContent(&xdflFile);
@@ -25,13 +26,13 @@ void JsCiTest::test(){
 
     connect(ci_,SIGNAL(stateChaged(int)),this,SLOT(connected(int)));
 
-    printf("\nattemping to make a connection...");
+    qDebug() << "attemping to make a connection...";
     QString configFilePath="../../../media/JrKerr-Single-deposition.config";
     QDomDocument document;
     {
       QFile configFile(configFilePath);
       if (!configFile.open(QFile::ReadOnly)) {
-          printf("\nFAILED TO OPEN CONFIG FILE\n");
+          qDebug() << "FAILED TO OPEN CONFIG FILE\n";
           return;
       }
       document.setContent(&configFile);
@@ -41,12 +42,12 @@ void JsCiTest::test(){
 }
 
 void JsCiTest::connected(int i){
-    printf("\nSTATE IS %i",i);
+    qDebug("STATE IS %i",i);
     if(i==CoreInterface::Connected){
         //////////////Object is connected///////////
 
         QTextStream sstream(&script_,QIODevice::WriteOnly);
-        sstream<<"\n"<<"ci.move(0,-8,0,80);";
+//        sstream<<"\n"<<"ci.move(-50,0,0,80);";
         sstream<<"\n"<<"ci.setXDFL(xdflstring);";
         sstream<<"\n"<<"ci.setMaterial(0,1);";
         sstream<<"\n"<<"";
@@ -64,7 +65,8 @@ void JsCiTest::connected(int i){
 
 
     }else if(i==CoreInterface::FileLoaded){
-        printf("\nFile Ready");
+        /// Tells the printer to start the print job is has via Javascript
+        qDebug("\nFile Ready");
         script_.clear();
         QTextStream sstream(&script_,QIODevice::WriteOnly);
         sstream<<"\n"<<"ci.startPrint()";
@@ -72,11 +74,37 @@ void JsCiTest::connected(int i){
         runScript();
 
     }else if(i==CoreInterface::Printing){
-        printf("\nPrinting");
+        qDebug("\nPrinting");
+        QTimer::singleShot(2000,this,SLOT(pause()));
+        QTimer::singleShot(12000,this,SLOT(resume()));
+
+
+
+
     }else{
-        printf("\nUNKNOWN STATE");
+        qDebug("\nUNKNOWN STATE is %i",i);
     }
 }
+
+void JsCiTest::pause(){
+    qDebug("\nPAUSING");
+    script_.clear();
+    QTextStream sstream(&script_,QIODevice::WriteOnly);
+    sstream<<"\n"<<"ci.pausePrint()";
+    sstream<<"\n"<<"";
+    runScript();
+    qDebug("\nPAUSED");
+}
+void JsCiTest::resume(){
+    qDebug("\nResuming");
+    script_.clear();
+    QTextStream sstream(&script_,QIODevice::WriteOnly);
+    sstream<<"\n"<<"ci.resumePrint()";
+    sstream<<"\n"<<"";
+    runScript();
+    qDebug("\nresumed");
+}
+
 
 void JsCiTest::runScript(){
     QString error="";
@@ -93,5 +121,5 @@ void JsCiTest::runScript(){
     if (engine_.hasUncaughtException()) {
        ss<<engine_.uncaughtException().toString();
     }
-    printf("\nERRORS:%s",error.toStdString().c_str());
+    qDebug("\nERRORS:%s",error.toStdString().c_str());
 }

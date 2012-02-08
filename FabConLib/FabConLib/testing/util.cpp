@@ -1,9 +1,10 @@
 #include "util.h"
+#include <QDebug>
 
 void testdump(NPath h,QString filename) {
     QFile file(filename);
     if (!file.open(QFile::WriteOnly)) {
-        printf("\nCould not open dump file");
+        qDebug("Could not open dump file");
         return;
     }
     QTextStream out(&file);
@@ -18,7 +19,7 @@ void testdump(NPath h,QString filename) {
 
     }
     file.close();
-    printf("\nWrote file %s",filename.toStdString().c_str());
+    qDebug("Wrote file %s",filename.toStdString().c_str());
     fflush(stdout);
 }
 
@@ -59,29 +60,29 @@ void test(QString filename,NPath h) {
 }
 
 void printNPath(QString str, NPath* n) {
-    printf(str.toStdString().c_str());
+    qDebug(str.toStdString().c_str());
     State tempstate;
     for(int i=0; i<n->numberOfStates();i++) {
         tempstate = n->getState(i);
-        printf("\n %i:\t",i);
+        qDebug(" %i:\t",i);
         printState("",tempstate);
     }
 }
 
 void printState(QString str,State s) {
-    printf(str.toStdString().c_str());
+    qDebug(str.toStdString().c_str());
     for(int i=0;i<s.size();i++) {
-        printf("%f ",s.at(i));
+        qDebug("%f ",s.at(i));
     }
 }
 
 void printMaterial(Material m) {
-    printf("\n Material: %s",m.name.toStdString().c_str());
-    printf("\n\tQ: %f",m.Q);
+    qDebug(" Material: %s",m.name.toStdString().c_str());
+    qDebug("\tQ: %f",m.Q);
     QStringList keys = m.property.keys();
     QStringListIterator i(keys);
     while(i.hasNext()){
         QString temp =i.next();
-        printf("\n\t%s:%s",temp.toStdString().c_str(),m.property[temp].toStdString().c_str());
+        qDebug("\t%s:%s",temp.toStdString().c_str(),m.property[temp].toStdString().c_str());
     }
 }

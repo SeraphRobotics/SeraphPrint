@@ -1,6 +1,5 @@
 #include "xyzmotion.h"
 #include "jsnpath.h"
-#include <stdio.h>
 #include <math.h>
 
 XYZMotion::XYZMotion() :acceleration_(0),statesize_(0),frequency_(30.0) {}
@@ -169,25 +168,6 @@ NPath XYZMotion::pathAlong(XDFLPath path,double speed) {
     }
     coast_list.append(decel_list.first());
 
-//    {// TESTING
-//    printf("\nACCELERATION size:%i",accel_list.length());
-//    for (int i=0; i < accel_list.length(); i++) {
-//        Point p=accel_list.at(i);
-//        printf("\n\t %f, %f, %f",p.x,p.y,p.z);
-//    }
-
-//    printf("\n\nCOAST size:%i",coast_list.length());
-//    for (int i=0; i < coast_list.length(); i++) {
-//        Point p=coast_list.at(i);
-//        printf("\n\t %f, %f, %f",p.x,p.y,p.z);
-//    }
-
-//    printf("\n\nDECEL size:%i",decel_list.length());
-//    for (int i=0; i < decel_list.length(); i++) {
-//        Point p=decel_list.at(i);
-//        printf("\n\t %f, %f, %f",p.x,p.y,p.z);
-//    }
-//    }
 
     accelerateAlong(&np,accel_list,dist_a,false);//acceleration
 
@@ -256,10 +236,6 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed) {
             tempState[yindex] = yscale*norm_y*coef*i*i;
             tempState[zindex] = zscale*norm_z*coef*i*i;
             np.addState(State(tempState));
-            //            D=sqrt(norm_x*xscale*(coef*i*i)*norm_x*xscale*(coef*i*i)
-            //                   + norm_y*yscale*(coef*i*i)*norm_y*yscale*(coef*i*i)
-            //                   + norm_z*zscale*(coef*i*i)*norm_z*zscale*(coef*i*i));
-            //            printf("\nD:%f",D);
         }
 
         // deceleration
@@ -269,11 +245,6 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed) {
             tempState[yindex] = norm_y*yscale*(x1+v1*i*dt-coef*i*i);//(2.0*i-1.0);
             tempState[zindex] = norm_z*zscale*(x1+v1*i*dt-coef*i*i);//(2.0*i-1.0);
             np.addState(State(tempState));
-            //            D=sqrt(norm_x*xscale*(x1+v1*i*dt-coef*i*i)*norm_x*xscale*(x1+v1*i*dt-coef*i*i)
-            //                   + norm_y*yscale*(x1+v1*i*dt-coef*i*i)*norm_y*yscale*(x1+v1*i*dt-coef*i*i)
-            //                   + norm_z*zscale*(x1+v1*i*dt-coef*i*i)*norm_z*zscale*(x1+v1*i*dt-coef*i*i));
-            //            printf("\nD:%f",D);
-            //            printf("\nD:%f\tdy:%f\tdist:%f\trevy:%f\tvy:%f",D,norm_y*coef*i*i,norm_y*coef*(2*i-1),norm_y*coef*(2*i-1)*yscale,norm_y*coef*(2*i-1)*frequency_);
         }
 
         // make sure to end on the target point
@@ -282,8 +253,6 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed) {
         tempState[yindex] = yscale*y;
         tempState[zindex] = zscale*z;
         np.addState(State(tempState));
-        //        D=sqrt(xscale*x*xscale*x+yscale*y*yscale*y+zscale*z*zscale*z);
-        //        printf("\n D:%f",D);
 
     } else {
         //make the ramp up .
@@ -300,10 +269,6 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed) {
             tempState[xindex] = xscale*norm_x*coef*i*i;
             tempState[yindex] = yscale*norm_y*coef*i*i;
             tempState[zindex] = zscale*norm_z*coef*i*i;
-            //            D=sqrt(norm_x*xscale*(coef*i*i)*norm_x*xscale*(coef*i*i)
-            //                   + norm_y*yscale*(coef*i*i)*norm_y*yscale*(coef*i*i)
-            //                   + norm_z*zscale*(coef*i*i)*norm_z*zscale*(coef*i*i));
-            //            printf("\nD:%f",D);
             np.addState(State(tempState));
         }
 
@@ -314,8 +279,7 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed) {
         tempState[yindex] = x2*norm_y*yscale;
         tempState[zindex] = x2*norm_z*zscale;
         np.addState(State(tempState));
-        //        D=x2;
-        //        printf("\n\nD:%f\n",D);
+
 
         //Ramp down
         for (int i=1; i < timesteps; i++) {
@@ -324,10 +288,7 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed) {
             tempState[yindex] = norm_y*yscale*(x2+speed*i*dt-coef*i*i);//(2.0*i-1.0);
             tempState[zindex] = norm_z*zscale*(x2+speed*i*dt-coef*i*i);//(2.0*i-1.0);
             np.addState(State(tempState));
-            //            D=sqrt(norm_x*xscale*(x2+speed*i*dt-coef*i*i)*norm_x*xscale*(x2+speed*i*dt-coef*i*i)
-            //                   + norm_y*yscale*(x2+speed*i*dt-coef*i*i)*norm_y*yscale*(x2+speed*i*dt-coef*i*i)
-            //                   + norm_z*zscale*(x2+speed*i*dt-coef*i*i)*norm_z*zscale*(x2+speed*i*dt-coef*i*i));
-            //            printf("\nD:%f",D);
+
         }
         tempState[0] = 1.0/frequency_;
         tempState[xindex] = xscale*x;
@@ -335,12 +296,9 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed) {
         tempState[zindex] = zscale*z;
         np.addState(State(tempState));
         np.addState(State(tempState));
-        //        D=sqrt(xscale*x*xscale*x+yscale*y*yscale*y+zscale*z*zscale*z);
-        //        printf("\n D:%f",D);
+
     }
-    //    printf("\ndistA: %f",dist_a);
-    //    printf("\nTimeSteps:%f",timesteps);
-    //    printf("\ndt:%f",1.0/frequency_);
+
     np.toRelative();
     return np;
 }

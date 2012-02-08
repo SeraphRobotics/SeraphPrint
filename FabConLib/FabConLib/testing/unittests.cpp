@@ -1,5 +1,6 @@
 #include "unittests.h"
 #include "util.h"
+#include <QDebug>
 void testNPaths(VMPrototype *vm) {
 //     DIRECT PATHING
 
@@ -22,7 +23,7 @@ void testNPaths(VMPrototype *vm) {
 		
 //        np.setOrigin(np.lastAbsolute());
         bool t = vm->executeNPath(np);
-        printf("\n printed %s",t ? "true" : "false");
+        qDebug(" printed %s",t ? "true" : "false");
 
 
 
@@ -37,7 +38,7 @@ void testScripting(VirtualPrinter *vm) {
         { // load the source file into the DOM document
           QFile scriptFile("../../../media/TestScript.js");
           if (!scriptFile.open(QFile::ReadOnly |QIODevice::Text)) {
-              printf("\nFAILED TO LOAD SCRIPT");
+              qDebug("FAILED TO LOAD SCRIPT");
               return;
           }
           QTextStream in(&scriptFile);
@@ -46,8 +47,8 @@ void testScripting(VirtualPrinter *vm) {
         }
 
         QString errors = runScript(vm,script_);
-        printf("Script: %s",script_.toStdString().c_str());
-        printf("Script Engine Errors: %s",errors.toStdString().c_str());
+        qDebug("Script: %s",script_.toStdString().c_str());
+        qDebug("Script Engine Errors: %s",errors.toStdString().c_str());
 }
 
 void testVoxels(VMPrototype *vm) {
@@ -71,7 +72,7 @@ void testVoxels(VMPrototype *vm) {
         vm->executeNPath(voxpath);
 //        voxpath.setOrigin(voxpath.lastAbsolute());
 //        vm->executeNPath(voxpath);
-//        printf("\n");
+//        qDebug("");
 //        voxpath.toAbsolute();
 //        //voxpath.setOrigin(voxpath.lastAbsolute());
 //        voxpath.toRelative();
@@ -80,7 +81,7 @@ void testVoxels(VMPrototype *vm) {
 
 void testXDFLPaths(VMPrototype *vm) {
 //    XDFL PATH
-        printf("\ntesting XDFL paths directly");
+        qDebug("testing XDFL paths directly");
         XDFLPath path1;
         NPath pathed1;
         FabPoint p1,p2,p3;
@@ -111,11 +112,11 @@ void testXDFLPaths(VMPrototype *vm) {
         pathed1 = vm->bays[0]->onPath(path1);
 
 //        pathed1 = vm->xyzmotion->pathAlong(path1,30);
-        printf("\npaths calculated");
+        qDebug("paths calculated");
         vm->moveTo(p1.x,p1.y,p1.z,30);
 //        vm->moveTo(0,0,-1,10);
         vm->executeRelativeNPath(pathed1);
-        printf("\nexecuted paths");
+        qDebug("executed paths");
 
     }
 
@@ -126,7 +127,7 @@ void testXDFLParsing(VMPrototype *vm) {
     {
       QFile xdflFile(xdflFilePath);
       if (!xdflFile.open(QFile::ReadOnly)) {
-          printf("\nFAILED TO OPEN XDFL FILE\n");
+          qDebug("FAILED TO OPEN XDFL FILE");
           return;
       }
       xdflDom.setContent(&xdflFile);
@@ -137,7 +138,7 @@ void testXDFLParsing(VMPrototype *vm) {
 //    handler->setVM(vm);
 //    handler->loadFromDom(xdflDom);
 
-    printf("\nHandler made; DOM loaded.");
+    qDebug("Handler made; DOM loaded.");
 
     QMap<int,Material> testing = handler->getMaterials();
     vm->bays[0]->setMaterial(testing[1]);

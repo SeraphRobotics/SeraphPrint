@@ -20,7 +20,7 @@ int DlPathPoints(QString* error_string);
 int AddStates(HzPath statelist);
 int DlSev(QString* error_string, int pointcount, byte tempId, long int pointBuffer[]);
 int GetNextPoints(int stateVariableIndex,long int pointBuffer[],int bufferLength);
-
+int StartPathMode(QString* error_string);
 
 
 /**

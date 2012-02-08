@@ -1,4 +1,5 @@
 #include "testerforci.h"
+#include <QDebug>
 
 testerforci::testerforci():connected_(false){
     ci = new CoreInterface();
@@ -25,13 +26,13 @@ void testerforci::makeConnections(){
 
 
 void testerforci::setConfig(){
-    printf("\nattemping to make a connection...");
+    qDebug("attemping to make a connection...");
     QString configFilePath="../../../media/JrKerr-Single-deposition.config";
     QDomDocument document;
     {
       QFile configFile(configFilePath);
       if (!configFile.open(QFile::ReadOnly)) {
-          printf("\nFAILED TO OPEN CONFIG FILE\n");
+          qDebug("FAILED TO OPEN CONFIG FILE");
           return;
       }
       document.setContent(&configFile);
@@ -42,13 +43,13 @@ void testerforci::setConfig(){
 
 void testerforci::chagedState(int state){
     if ((state== CoreInterface::Connected)&&!connected_){
-        printf("\nstate is connected");
+        qDebug("state is connected");
         connected_=true;
 //        ci->move(0,-80,0,80);
 //        disconnect(ci,SIGNAL(currentPosition(double,double,double)),this,SLOT(updatedPosition(double,double,double)));
         loadXDFL();
     }else if (state == CoreInterface::FileLoaded){
-        printf("\nfile loaded");
+        qDebug("file loaded");
         int materialid =1;
         int bayid = 0;
         ci->setMaterial(bayid,materialid);
@@ -58,7 +59,7 @@ void testerforci::chagedState(int state){
     }else if(state ==CoreInterface::Printing){
 //        ci->move(100,0,0,100);
 //
-        printf("\nPRINTING");
+        qDebug("PRINTING");
         QTimer::singleShot(1000,ci,SLOT(pausePrint()));
         QTimer::singleShot(15000,ci,SLOT(resumePrint()));
 //        QTimer::singleShot(9000,ci,SLOT(cancelPrint()));
@@ -66,10 +67,10 @@ void testerforci::chagedState(int state){
 }
 
 void testerforci::updatedPosition(double x, double y, double z){
-    printf("\nNew Position is %f,%f,%f",x,y,z);
+    qDebug("New Position is %f,%f,%f",x,y,z);
 }
 void testerforci::moving(){
-    printf("\nmoving");
+    qDebug("moving");
 }
 
 void testerforci::loadXDFL(){
@@ -79,7 +80,7 @@ void testerforci::loadXDFL(){
     {
       QFile xdflFile(xdflFilePath);
       if (!xdflFile.open(QFile::ReadOnly)) {
-          printf("\nFAILED TO OPEN XDFL FILE\n");
+          qDebug("FAILED TO OPEN XDFL FILE");
           return;
       }
       xdflDom.setContent(&xdflFile);
@@ -91,28 +92,28 @@ void testerforci::loadXDFL(){
 }
 
 void testerforci::estimated(double t, double v){
-    printf("\nTime = %f\tVolume = %f",t,v);
+    qDebug("Time = %f\tVolume = %f",t,v);
 }
 
 void testerforci::materialsAvailable(QMap<int,Material> ms){
     materials_ = ms;
-    printf("\nThe following materials are avalible");
+    qDebug("The following materials are avalible");
     QMapIterator<int,Material> i(ms);
     while(i.hasNext()){
         i.next();
-        printf("\n\t%s, id:%i",i.value().name.toStdString().c_str(),i.key());
+        qDebug("\t%s, id:%i",i.value().name.toStdString().c_str(),i.key());
     }
 }
 
 void testerforci::bayMaterial(int bayid, int materialid){
-    printf("\nbay %i is equiped with material %s with id %i",bayid,
+    qDebug("bay %i is equiped with material %s with id %i",bayid,
            materials_[materialid].name.toStdString().c_str(),materialid);
 }
 
 void testerforci::currentCommand(int cmd){
-    printf("\nCurrent command is %i",cmd);
+    qDebug("Current command is %i",cmd);
 }
 
 void testerforci::needMaterialLoaded(int i){
-    printf("\nNeed Material id:%i %s",i,materials_[i].name.toStdString().c_str());
+    qDebug("Need Material id:%i %s",i,materials_[i].name.toStdString().c_str());
 }

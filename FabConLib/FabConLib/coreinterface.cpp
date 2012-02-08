@@ -113,6 +113,7 @@ void CoreInterface::requestBayMaterial(int bayid){
 void CoreInterface::setMaterial(int bayid,int materialid){
     if ((state_!=FileLoaded) && (state_!= Printing)){
         emit outOfStateCall();
+        qDebug()<<"Set Material failed, wrong state of machine";
         return;
     }
     if((bayid>(vm_->bays.size()+1)) || !(idMaterialMap_.contains(materialid))){ // TODO: there should be a check for bayid validity here
@@ -146,6 +147,7 @@ void CoreInterface::pausePrint(){
 }
 
 void CoreInterface::resumePrint(){
+    vm_->moveToThread(handler_);
     QTimer::singleShot(0,handler_,SLOT(resume()));
 }
 

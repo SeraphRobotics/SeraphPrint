@@ -2,9 +2,11 @@
 #include "qextserialenumerator.h"
 #include "qextserialport.h"
 
+#include <QDebug>
+
 ComportDetector::ComportDetector()
 {
-    printf("\nworking");
+    qDebug("\nworking");
     foreach(QextPortInfo port, QextSerialEnumerator::getPorts())
         {
             // Display the port's FriendName in the GUI portBox;
@@ -19,8 +21,8 @@ ComportDetector::ComportDetector()
 
             if (!port.friendName.isEmpty())
             {
-                printf("\n%s",port.friendName.toStdString().c_str());
-                printf("\n%s",port.portName.toStdString().c_str());
+                qDebug("\n%s",port.friendName.toStdString().c_str());
+                qDebug("\n%s",port.portName.toStdString().c_str());
             }
         }
 

@@ -9,6 +9,7 @@
 #include <QTextStream>
 
 #include <QFile>
+#include <QDebug>
 
 namespace NP {
 //---------------------------------------------------------------------------
@@ -106,14 +107,9 @@ int DlPathPoints(QString* error_string){
     long int pointBuffer[7];  //set of up to 7 pathpoints
     int pointcount=0;
     byte tempId = 1;
-    int test;
-    int testingPts;
-    byte testingStat;
-    int testingNumStates = states_.numberOfStates();
     int testingBuffer = bufsize;
-    int testingCurseg = curseg_;
-    int testingSpaceLeft = ServoGetNPoints(tempId);//actually a misnomer - it's the number of points in the buffer
     bool testingReadStat;
+    bool inpathmode;
 
     //retrieve status from each of the motors, return -2 if failure
     //this is basically a nice, final check that the motors are online, but it's superfluous, since each attempt to send points
@@ -129,115 +125,85 @@ int DlPathPoints(QString* error_string){
         }
     }
 
-    //tempId = (byte)motors_[1]; //start with motor 1
 
     //if not in path mode
-    testingStat = ServoGetAux((byte)motors_[1]);
     testingReadStat = NmcReadStatus(leader_, SEND_NPOINTS,error_string);
-    if ( !(ServoGetAux(leader_) & PATH_MODE) ){
+    testingBuffer = ServoGetNPoints(leader_);
+    qDebug()<<"number of points in buffer"<<ServoGetNPoints(leader_);
+
+
+    if ( !(ServoGetAux(leader_) & PATH_MODE) || (ServoGetNPoints(leader_)==0) ){
         //normally, we should not be in pathmode and should enter this part once
+
+//        qDebug("NOT in pathmode");
+
         if (ServoGetNPoints(leader_)>bufsize) { //if there are more points in the buffer than that buffer size, stop
-            testingPts = ServoGetNPoints(leader_);
             QTextStream ss(error_string, QIODevice::WriteOnly);
             ss<<"Buffer is overflowing with joy... I mean points";
             return(-2); //something is wrong, stop executing
         }
 
         //if total number of points is less than bufsize, download all points
-        testingReadStat = NmcReadStatus(leader_, SEND_NPOINTS,error_string);
-        testingNumStates = states_.numberOfStates();
-        testingBuffer = bufsize;
+        NmcReadStatus(leader_, SEND_NPOINTS,error_string);
         if (states_.numberOfStates() <= bufsize){
+            qDebug("total number of points is less than bufsize, download all points");
             while(curseg_ < states_.numberOfStates()){
-                testingCurseg = curseg_;
-                testingNumStates = states_.numberOfStates();
-                testingReadStat = NmcReadStatus(leader_, SEND_NPOINTS,error_string);
-                testingSpaceLeft = ServoGetNPoints(leader_);
-                test = DlSev(error_string, pointcount, leader_, pointBuffer);
+                 DlSev(error_string, pointcount, leader_, pointBuffer);
             }
         }
         //else download points to fill half of the buffer
         else {
+//            qDebug("download points to fill half of the buffer");
             while(curseg_ < bufsize/2){
-                testingCurseg = curseg_;
-                testingNumStates = states_.numberOfStates();
-                testingReadStat = NmcReadStatus(leader_, SEND_NPOINTS,error_string);
-                testingSpaceLeft = ServoGetNPoints(leader_);
-                test = DlSev(error_string, pointcount, leader_, pointBuffer);
+//                  qDebug("downloading 7 points");
+                  DlSev(error_string, pointcount, leader_, pointBuffer);
+            }
+//            qDebug("done downloading");
+        }
+
+        //Start pathmode, If fail return
+        if (StartPathMode(error_string)==-2){return -2;}
+
+    }
+
+    if ( (ServoGetAux(leader_) & PATH_MODE)){
+//        qDebug("in pathmode, Downloading the rest of the points in the path");
+        NmcReadStatus(leader_, SEND_NPOINTS,error_string);
+//        qDebug()<<"Number of points in buffer:"<<ServoGetNPoints(leader_);
+
+        int numberOfAttempts=0;
+        while((curseg_ < states_.numberOfStates())&&(numberOfAttempts<100)){
+            //if there is no space in the buffer, nap for 50 ms
+            NmcNoOp(leader_,error_string);   //force the leader to return the current status so that we can read the number of points in the buffer
+
+            //            NmcReadStatus(leader_, SEND_NPOINTS,error_string);
+            //            qDebug()<<"Number of points in buffer:"<<ServoGetNPoints(leader_);
+            inpathmode = ServoGetAux(leader_) & PATH_MODE;
+            //            qDebug()<< inpathmode;
+            if (!inpathmode){
+                if (StartPathMode(error_string)==-2){return -2;}
+                numberOfAttempts=0;
+            }
+
+            if(ServoGetNPoints(leader_)>=(bufsize-7)){
+//                qDebug("not enough space in buffer");
+                nap(50);
+                numberOfAttempts++;
+            }
+            //else add 7 points
+            else{
+                numberOfAttempts =0;
+//                qDebug("downloading 7 points");
+                DlSev(error_string, pointcount, leader_, pointBuffer);
             }
         }
-        testingCurseg = curseg_;
-        testingReadStat = NmcReadStatus(leader_, SEND_NPOINTS,error_string);
-        testingSpaceLeft = ServoGetNPoints(leader_);
-        //start path mode
-        bool check = true;
-        int numattempts = 0;
-        while (check){
-            if (!ServoStartPathMode(group_, leader_,error_string)){
-                numattempts++;
-                if (numattempts>=maxattempts_) {
-                    QTextStream ss(error_string, QIODevice::WriteOnly);
-                    ss<<maxattempts_<<" number of communication attempts failed.";
-                    check=false;
-                    return(-2);
-                }
-            }
-
-            else { check = false;}
-        }
+        return (-1); //done downloading all points
     }
-//    testingCurseg = curseg_;
-//    testingReadStat = NmcReadStatus(tempId, SEND_NPOINTS,error_string);
-//    testingSpaceLeft = ServoGetNPoints(tempId);
-
-    //in path mode! Download the rest of the points in the path, if there are more to download
-    while(curseg_ < states_.numberOfStates()){
-        //if there is no space in the buffer, nap for 50 ms
-//        testingReadStat = NmcReadStatus(tempId, SEND_NPOINTS,error_string);
-//        testingSpaceLeft = ServoGetNPoints(tempId);
-//        testingCurseg = curseg_;
-        NmcNoOp(leader_,error_string);   //force the leader to return the current status so that we can read the number of points in the buffer
-        if(ServoGetNPoints(leader_)>=(bufsize-7)){
-            nap(50);
-            //I see no reason for this next block of code - I've commented it out
-//            if (!ServoStartPathMode(group_, leader_,error_string)){
-//                ServoStartPathMode(group_, leader_,error_string);
-//                testingReadStat = NmcReadStatus(tempId, SEND_NPOINTS,error_string);
-//                testingSpaceLeft = ServoGetNPoints(tempId);
-//                testingCurseg = curseg_;
-//            }
-        }
-        //else add 7 points
-        else{
-//            testingReadStat = NmcReadStatus(tempId, SEND_NPOINTS,error_string);
-//            testingSpaceLeft = ServoGetNPoints(tempId);
-//            testingCurseg = curseg_;
-            test = DlSev(error_string, pointcount, leader_, pointBuffer);
-//            testingReadStat = NmcReadStatus(tempId, SEND_NPOINTS,error_string);
-//            testingSpaceLeft = ServoGetNPoints(tempId);
-//            testingCurseg = curseg_;
-//            if (!ServoStartPathMode(group_, leader_,error_string)){
-//                ServoStartPathMode(group_, leader_,error_string);
-//                testingReadStat = NmcReadStatus(tempId, SEND_NPOINTS,error_string);
-//                testingSpaceLeft = ServoGetNPoints(tempId);
-//                testingCurseg = curseg_;
-//            }
-        }
+    else{
+        qDebug("ERROR!!!!");
+        return(-2);
     }
-//    testingReadStat = NmcReadStatus(tempId, SEND_NPOINTS,error_string);
-//    testingSpaceLeft = ServoGetNPoints(tempId);
-//    testingCurseg = curseg_;
-    //I see no reason for this next block of code - we've already started path mode, so we don't need to re-start again. In fact, if we DO need to restart, this is probably indicative of some error
-//    if (!ServoStartPathMode(group_, leader_,error_string)){
-//        ServoStartPathMode(group_, leader_,error_string);
-//        testingReadStat = NmcReadStatus(tempId, SEND_NPOINTS,error_string);
-//        testingSpaceLeft = ServoGetNPoints(tempId);
-//        testingCurseg = curseg_;
-//    }
-
-    return (-1); //done downloading all points
 }
-
 //Downloads 7 points to all motors. Returns the number of points added, and updates curseg_
 int DlSev(QString* error_string, int pointcount, byte tempId, long int pointBuffer[]){
     QMapIterator<int,int> i(motors_);
@@ -253,6 +219,28 @@ int DlSev(QString* error_string, int pointcount, byte tempId, long int pointBuff
     curseg_+=pointcount;
     return pointcount;
 }
+
+int StartPathMode(QString* error_string){
+    //start path mode
+    qDebug("START PATH");
+    bool check = true;
+    int numattempts = 0;
+    qDebug("starting pathmode");
+    while (check){
+        if (!ServoStartPathMode(group_, leader_,error_string)){
+            numattempts++;
+            if (numattempts>=maxattempts_) {
+                QTextStream ss(error_string, QIODevice::WriteOnly);
+                ss<<maxattempts_<<" number of communication attempts failed.";
+                check=false;
+                return(-2);
+            }
+        }
+        else { check = false;}
+    }
+    return -1;
+}
+
 
 int GetNextPoints(int stateVariableIndex,long int pointBuffer[],int bufferLength){
 

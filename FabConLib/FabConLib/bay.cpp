@@ -110,6 +110,7 @@ const Material Bay::getMaterial() const{
 }
 
 void Bay::setMaterial(Material material) {
+    qDebug()<<"Set Material to "<< material.name;
     material_ = material;
     QScriptValue v = engine_->toScriptValue(material_);
     engine_->globalObject().setProperty("material",v);

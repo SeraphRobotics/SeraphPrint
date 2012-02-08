@@ -4,7 +4,7 @@
 #include <QDebug>
 
 XDFLHandler::XDFLHandler():handlerstate_(XDFLHandler::Stopped),estimationDone_(false),
-    estimatedTime_(0),estimatedVolume_(0),current_material_(0),current_command_(0)
+    estimatedTime_(0),estimatedVolume_(0),current_material_(0),current_command_(0),needMaterial_(false)
 
 {
     last_end_point_ = FabPoint();
@@ -39,13 +39,6 @@ double XDFLHandler::getEstimatedVolume() {
 }
 
 QMap<int,Material> XDFLHandler::getMaterials() {
-//    QMapIterator<int,Material> keys(mat_map);
-//    QList<Material> materials;
-//    while(keys.hasNext()) {
-//        keys.next();
-//        materials.append(keys.value());
-//    }
-//    return materials;
     return mat_map;
 }
 
@@ -57,6 +50,7 @@ void XDFLHandler::pause() {
         qDebug()<<"Pausing...";
         handlerstate_ = XDFLHandler::Paused;
     }
+    vm_->moveToThread(QApplication::instance()->thread());
 
     // (mutex automatically released upon locker destruction)
 }
@@ -64,12 +58,16 @@ void XDFLHandler::pause() {
 // Threadsafe slot. Processing can only be resumed if it currently paused.
 void XDFLHandler::resume() {
     QMutexLocker locker(&mutex_);
-
+    ///UPDATE THE MATERIAL MAPINGS
+    updateInfo();
     if (handlerstate_ == XDFLHandler::Paused) {
         qDebug()<<"Resuming...";
         handlerstate_ = XDFLHandler::Running;
         resumed_.wakeAll();
     }
+
+
+
 
     // (mutex automatically released upon locker destruction)
 }
@@ -248,9 +246,7 @@ void XDFLHandler::run()
     last_end_point_ = FabPoint();
     if (handlerstate_ == XDFLHandler::Ready) {
         // Set up for processing.
-        foreach (Bay* b,vm_->bays) {
-            material_bay_mapping_[b->getMaterial().id] = b;
-        }
+        updateInfo();
         handlerstate_ = XDFLHandler::Running;
     }
     else {
@@ -284,7 +280,7 @@ void XDFLHandler::run()
     // Stop processing and reset progress.
     laststate_        = vm_->currentState();
 
-//    qDebug()<<"\nExiting the XDFL handler thread.";
+    //    qDebug()<<"\nExiting the XDFL handler thread.";
     vm_->moveToThread(QApplication::instance()->thread());
     // (mutex automatically released upon locker destruction)
 }
@@ -380,8 +376,15 @@ void XDFLHandler::runNPath(NPath n) {
     n.setOrigin(laststate_);
     laststate_ = n.lastAbsolute();
     vm_->executeNPath(n);
-//    emit doNPath(n);
 }
+
+
+void XDFLHandler::updateInfo(){
+    foreach (Bay* b,vm_->bays) {
+        material_bay_mapping_[b->getMaterial().id] = b;
+    }
+}
+
 
 bool XDFLHandler::setMaterial(int id) {
     if (0==id){return true;}
@@ -392,9 +395,10 @@ bool XDFLHandler::setMaterial(int id) {
             pause();
             return false;
     }else if(!material_bay_mapping_.keys().contains(id)) {
-        qDebug()<<"Material not loaded";
+        qDebug()<<"Material "<<id<<" not loaded";
         emit needMaterialChange(id);
         pause();
+
         return false;
     }
 
