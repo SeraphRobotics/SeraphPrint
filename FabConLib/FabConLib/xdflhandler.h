@@ -79,6 +79,8 @@ public slots:
      */
     void cancel();
 
+    void forceStop();
+
 signals:
 
     /**

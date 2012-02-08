@@ -91,6 +91,15 @@ void XDFLHandler::cancel() {
     // (mutex automatically released upon locker destruction)
 }
 
+void XDFLHandler::forceStop(){
+    vm_->moveToThread(QApplication::instance()->thread());
+//    cancel();
+//    deleteLater();
+//    quit();
+    terminate();
+
+}
+
 int XDFLHandler::getNumberOfCommands() {
     return commands_.length();
 }
@@ -275,7 +284,7 @@ void XDFLHandler::run()
     // Stop processing and reset progress.
     laststate_        = vm_->currentState();
 
-    qDebug()<<"\nExiting the XDFL handler thread.";
+//    qDebug()<<"\nExiting the XDFL handler thread.";
     vm_->moveToThread(QApplication::instance()->thread());
     // (mutex automatically released upon locker destruction)
 }
@@ -401,7 +410,7 @@ bool XDFLHandler::setMaterial(int id) {
         FabPoint delta = subtractpoints(Pnew,Pold);
         double speed = material_bay_mapping_[id]->getMaterial().property["pathspeed"].toDouble();
         current_material_ = id;
-        qDebug()<<"\nChanging materials.";
+        qDebug()<<"Changing materials.";
         runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
 
     }

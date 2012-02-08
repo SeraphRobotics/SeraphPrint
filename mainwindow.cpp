@@ -73,7 +73,7 @@ void MainWindow::onStateChaged(int i){
     qDebug()<<"Machine State changed to "<<i;
     machineState = i;
     if(i==CoreInterface::NotInitialized){
-        qDebug()<<"connection lost...";
+        current_state=0;
         haveValidFile = false;
         isConnected = false;
         materialsInitialized = false;
@@ -92,6 +92,8 @@ void MainWindow::onStateChaged(int i){
         qDebug()<<"Printing...";
         haveValidFile = true;
         isConnected = true;
+    }else{
+        qDebug()<<"WTF"<<machineState;
     }
     updateState();
 }
@@ -109,7 +111,10 @@ void MainWindow::materialNeeded(int){
  */
 void MainWindow::updateState()
 {
-    ui->currentWidget->hide();
+    int i;
+    qDebug()<<"STATE UPDATED";
+
+    if(!(ui->currentWidget->isHidden())){ui->currentWidget->hide();}
 
     // NOTE: If jumping around in the state is permitted, back and forward buttons must be enabled/disabled everywhere
     qDebug()<<"\nCurrent View State: "<<current_state;
@@ -117,18 +122,9 @@ void MainWindow::updateState()
     switch (current_state)
     {
     case CONNECT:
-
-//        if (machineState!=CoreInterface::NotInitialized){
-//            current_state = JOB;
-
-//            updateState();
-//        }else{
             ui->backButton->setEnabled(false);
             ui->currentWidget = connectWidget;
-//            this->gamepad_container->show();
             enableOne(CONNECT);
-//        }
-
         break;
     case JOB:
         ui->backButton->setEnabled(true);
@@ -235,7 +231,7 @@ void MainWindow::setUpWidgets()
 }
 
 void MainWindow::printDone(){
-    if(current_state !=JOB){
+    if((current_state !=JOB)&&(current_state !=CONNECT)){
         current_state = JOB;
         QMessageBox::information(this,"Print Complete","Your print has finished");
         updateState();

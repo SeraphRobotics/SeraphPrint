@@ -214,7 +214,7 @@ bool Motor::cleanUp()
     bool result;
     if(initialized_)
     {
-        result = ServoStopMotor(ADDRESS, STOP_ABRUPT | MOTOR_OFF,&error_) == 1 && NmcHardReset(ADDRESS,&error_) == 1;
+        result = ServoStopMotor(ADDRESS, STOP_ABRUPT | MOTOR_OFF,&error_) == 1;// && NmcHardReset(ADDRESS,&error_) == 1;// HAHAH dont reset!!
         if(result)
         {
             initialized_ = false;

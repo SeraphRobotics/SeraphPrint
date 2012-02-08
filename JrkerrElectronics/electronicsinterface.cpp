@@ -21,6 +21,7 @@ bool ElectronicsInterface::cleanUp()
         if (result)
         {
             error_string_="";
+            NmcHardReset(0xFF,&error_string_);
             NmcShutdown(&error_string_);
         }
     }
@@ -58,6 +59,7 @@ void ElectronicsInterface::forceStop(){
     foreach(Motor* m,getMotors()){
         m->stop();
     }
+
     initialized_=false;
 }
 

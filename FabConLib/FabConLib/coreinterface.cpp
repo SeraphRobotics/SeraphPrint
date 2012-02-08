@@ -152,9 +152,16 @@ void CoreInterface::cancelPrint(){
 }
 
 void CoreInterface::forceStop(){
-    vm_->forceStop();
-//    positionTimer_.disconnect();
-    setState(NotInitialized);
+
+    if(vm_->isInitialized()){
+        vm_->forceStop();
+        handler_->forceStop();
+        handler_->deleteLater();
+    //    positionTimer_.disconnect();
+        setState(NotInitialized);
+    }else{
+        qDebug("CALLED");
+    }
 }
 
 
