@@ -108,7 +108,7 @@ void PrintWidget::on_stopButton_clicked()
     isPrinting = false;
     isPaused = true;
     }else{
-        ui->label_info->setText("Printing canceled. Please reconnect to the printer.");
+        ui->label_info->setText("Printing canceled.");
         isPrinting = false;
         isPaused = true;
         emit cancel();
@@ -130,15 +130,17 @@ void PrintWidget::setPaused(){
 void PrintWidget::updateButtons(){
     if (isPrinting && isPaused)
     {
-        ui->label_info->setText("Paused...");
+        //If the printer is printing and is paused, We
+//        ui->label_info->setText("Paused...");
         ui->playButton->setText("Resume");
         ui->stopButton->setText("Cancel");
     }else if (isPrinting && !isPaused){
-        ui->playButton->setText("Resume");
+        ui->playButton->setText("Pause");
         ui->stopButton->setText("ForceStop");
-    }else if (!isPrinting && !isPaused){
-        ui->playButton->setText("Start");
+    }else if (!isPrinting && isPaused){
+        ui->playButton->setText("Pause");
         ui->stopButton->setText("ForceStop");
+
     }else if (!isPrinting && !isPaused){
         ui->playButton->setText("Start");
         ui->stopButton->setText("ForceStop");

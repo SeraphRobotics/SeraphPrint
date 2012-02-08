@@ -23,7 +23,7 @@ void LoadConfigThread::setConfig(QDomDocument config){
 }
 
 void LoadConfigThread::checkReady(){
-    if (!vm_->isInitialized() &&config_.isNull()){//
+    if (config_.isNull()){//!vm_->isInitialized() &&
         ready_ = true;
         emit ready();
     }
