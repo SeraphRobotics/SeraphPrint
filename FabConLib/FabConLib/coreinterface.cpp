@@ -22,8 +22,8 @@ void CoreInterface::setConfig(QString configFile,QString comport){
     // load the config file into the DOM document
     QDomDocument document;
     document.setContent(configFile);
-    config_ = configFile;
-    comport_=comport;
+    config_ = QString(configFile);
+    comport_=QString(comport);
     if(""!=comport){vm_->setComPort(comport);}
 
 
