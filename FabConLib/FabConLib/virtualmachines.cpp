@@ -102,12 +102,12 @@ QScriptEngine* VMPrototype::makeEngine(){
 
 
 void VMPrototype::loadConfig(QDomDocument document) {
-
     QDomElement root = document.documentElement();
 
     // BAYS
     QDomNode tools = root.namedItem("tool");
     QDomNodeList toolChildren  = tools.childNodes();
+    bays = QList<Bay*>();
     for (unsigned int k = 0; k < toolChildren.length(); k++) {
         if ("bay"==toolChildren.at(k).nodeName().toLower()) {
             bays.append(new Bay(toolChildren.at(k)));

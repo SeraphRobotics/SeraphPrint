@@ -210,6 +210,8 @@ private:
     SystemState state_;
     QMap<int,Material> idMaterialMap_;
     QTimer positionTimer_;
+    QString config_;
+    QString comport_;
 };
 
 #endif // COREINTERFACE_H

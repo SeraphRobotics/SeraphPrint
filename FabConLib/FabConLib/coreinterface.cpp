@@ -22,6 +22,8 @@ void CoreInterface::setConfig(QString configFile,QString comport){
     // load the config file into the DOM document
     QDomDocument document;
     document.setContent(configFile);
+    config_ = configFile;
+    comport_=comport;
     if(""!=comport){vm_->setComPort(comport);}
 
 
@@ -56,6 +58,7 @@ void CoreInterface::moveTo(double x, double y, double z, double speed){
 void CoreInterface::move(double x, double y, double z, double speed){
     if((state_==NotInitialized) || (state_==Printing)){
         emit outOfStateCall();
+        qDebug()<<"ERROR OUT OF STATE";
         return;
     }
     emit moving();
@@ -157,8 +160,10 @@ void CoreInterface::forceStop(){
         vm_->forceStop();
         handler_->forceStop();
         handler_->deleteLater();
+        vm_ = new VirtualPrinter();
+        setConfig(config_,comport_);
     //    positionTimer_.disconnect();
-        setState(NotInitialized);
+//        setState(NotInitialized);
     }else{
         qDebug("CALLED");
     }
@@ -186,6 +191,6 @@ void CoreInterface::configLoaded(){
 void CoreInterface::donePrinting(){
 //    setState(Connected);
 //    getCurrentPosition();
-    configLoaded();
+//    configLoaded();
     emit printsComplete();
 }
