@@ -134,7 +134,8 @@ void CoreInterface::moveBayMotor(int bayid, double amount, double time){
     if ((state_==NotInitialized) || (state_==Printing)){return;}
     // THIS SUCKS we need to rethink this
     qDebug()<<"Ordered Bay to Move";
-    vm_->bays[bayid]->jogActuators(amount,time);
+    NPath n = vm_->bays[bayid]->jogActuators(amount,time);
+    vm_->executeRelativeNPath(n);
 }
 
 void CoreInterface::startPrint(){
