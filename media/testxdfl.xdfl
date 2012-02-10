@@ -6,7 +6,7 @@
       <id>1</id>
       <PathWidth>0.4</PathWidth>
       <PathHeight>4</PathHeight>
-      <PathSpeed>60</PathSpeed>
+      <PathSpeed>30</PathSpeed>
       <AreaConstant>1</AreaConstant>
       <CompressionVolume>10</CompressionVolume>
       <property>

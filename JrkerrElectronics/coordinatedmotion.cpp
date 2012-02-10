@@ -109,6 +109,11 @@ bool CoordinatedMotion::moveAlongPath(NPath states,int startPointIndex){
     return true;
 }
 
+bool CoordinatedMotion::resetPosition(){
+
+    pathbegan_=(bool) NP::InitPath(&error_string);
+    return pathbegan_;
+}
 
 
 QString CoordinatedMotion::getErrors(){
@@ -139,10 +144,12 @@ bool CoordinatedMotion::validateNPath(NPath path){
             if (v>maxv){
                 QTextStream ss(&error_string,QIODevice::ReadOnly);
                 ss<<"\t V>Vmax V is"<<v<<"VMax is "<<maxv<<"\t State: "<<j;
+                qDebug()<<"\t V>Vmax V is"<<v<<"VMax is "<<maxv<<"\t State: "<<j;
                 return false;}
             if (a>maxa){
                 QTextStream ss(&error_string,QIODevice::ReadOnly);
                 ss<<"\t A>Amax A is"<<a<<"AMax is "<<maxa<<"\t State:"<<j;
+                qDebug()<<"\t A>Amax A is"<<a<<"AMax is "<<maxa<<"\t State:"<<j;
                 return false;}
         }
     }

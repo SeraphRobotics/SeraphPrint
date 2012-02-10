@@ -111,8 +111,6 @@ void MainWindow::materialNeeded(int){
  */
 void MainWindow::updateState()
 {
-    int i;
-    qDebug()<<"STATE UPDATED";
 
     if(!(ui->currentWidget->isHidden())){ui->currentWidget->hide();}
 

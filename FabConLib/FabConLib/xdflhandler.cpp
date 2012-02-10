@@ -51,7 +51,6 @@ void XDFLHandler::pause() {
         handlerstate_ = XDFLHandler::Paused;
     }
     vm_->moveToThread(QApplication::instance()->thread());
-
     // (mutex automatically released upon locker destruction)
 }
 
@@ -65,10 +64,6 @@ void XDFLHandler::resume() {
         handlerstate_ = XDFLHandler::Running;
         resumed_.wakeAll();
     }
-
-
-
-
     // (mutex automatically released upon locker destruction)
 }
 
@@ -243,7 +238,8 @@ void XDFLHandler::run()
     QMutexLocker locker(&mutex_);
     current_command_ = 0;
     current_material_ = 0;
-    last_end_point_ = FabPoint();
+//    last_end_point_ = FabPoint();
+    updateInfo();
     if (handlerstate_ == XDFLHandler::Ready) {
         // Set up for processing.
         updateInfo();
@@ -373,27 +369,41 @@ NPath XDFLHandler::dwell(double time_in_ms) {
 }
 
 void XDFLHandler::runNPath(NPath n) {
+//    qDebug()<<">>System laststate in XDFL handler is "<<laststate_;
+//    qDebug()<<">>Last state of the printer is "<<vm_->currentState();
     n.setOrigin(laststate_);
+//    State test = n.getState(0);
+//    qDebug()<<">>Path first State is "<<test;
     laststate_ = n.lastAbsolute();
     vm_->executeNPath(n);
 }
 
 
 void XDFLHandler::updateInfo(){
+    material_bay_mapping_.clear();
     foreach (Bay* b,vm_->bays) {
         material_bay_mapping_[b->getMaterial().id] = b;
     }
+    laststate_ = vm_->currentState();
+    last_end_point_ = pointFromQVector(vm_->currentPosition());
+//    current_material_=0;
+
 }
 
 
 bool XDFLHandler::setMaterial(int id) {
     if (0==id){return true;}
+//    foreach (Bay* b,vm_->bays) {
+//        material_bay_mapping_[b->getMaterial().id] = b;
+//    }
+
     if (!mat_map.keys().contains(id)) {
             qDebug()<<"Material not found in XDFL";
             emit needMaterialChange(id);
             // This should be checked at loading of commands
             pause();
             return false;
+
     }else if(!material_bay_mapping_.keys().contains(id)) {
         qDebug()<<"Material "<<id<<" not loaded";
         emit needMaterialChange(id);

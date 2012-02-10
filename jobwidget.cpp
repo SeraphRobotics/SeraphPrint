@@ -62,17 +62,19 @@ void JobWidget::setAndSaveFile(QString filePath, bool doSave)
 }
 
 void JobWidget::estimatesLoaded(double time, double volume, int numcmd){
+    int hours=0,min=0,sec=0;
+    double vol=0;
     QString timeString;
     QString volumeString;
     QTextStream vs(&volumeString,QIODevice::WriteOnly);
     QTextStream ts(&timeString,QIODevice::WriteOnly);
-    int hours = floor(time/3600.0);
+    hours = floor(time/3600.0);
     time = time - hours*3600;
-    int min = floor(time/60.0);
-    int sec =floor(time - min*60)+1;
+    min = floor(time/60.0);
+    sec =floor(time - min*60)+1;
     ts<<hours<<":"<<min<<":"<<sec;
-    volume = volume/1000.0;
-    vs<<volume<<"cc";
+    vol = volume/1000.0;
+    vs<<vol<<"cc";
     ui->label_time->setText(timeString);
     ui->label_volume->setText(volumeString);
 }

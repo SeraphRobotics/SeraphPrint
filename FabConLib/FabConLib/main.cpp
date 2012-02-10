@@ -48,8 +48,8 @@ int main(int argc, char *argv[]) {
 //        printf("\nDone\n")*/;
 
 
-//    testerforci *tester = new testerforci();
-//    QTimer::singleShot(0,tester,SLOT(setConfig()));
+    testerforci *tester = new testerforci();
+    QTimer::singleShot(0,tester,SLOT(setConfig()));
 
 //    JsCiTest *jstester = new JsCiTest();
 //    QTimer::singleShot(0,jstester,SLOT(test()));

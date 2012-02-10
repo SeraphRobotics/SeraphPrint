@@ -5,7 +5,8 @@
 
 MaterialsWidget::MaterialsWidget(QWidget *parent, CoreInterface *ci) :
     QWidget(parent),
-    ui(new Ui::MaterialsWidget)
+    ui(new Ui::MaterialsWidget),
+    numBays(0)
 {
     ui->setupUi(this);
     ci_ = ci;

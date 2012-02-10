@@ -100,6 +100,7 @@ signals:
      */
     void startingCommand(int cmd);
 
+
 private:
     void updateState();
     void estimate();

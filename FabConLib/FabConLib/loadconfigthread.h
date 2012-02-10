@@ -17,12 +17,12 @@ public:
    /**
     * Overide constructor which will set the vm and the config DomDocument at construction
     */
-   LoadConfigThread(VirtualPrinter* vm,QDomDocument config);
+   LoadConfigThread(VMPrototype* vm,QDomDocument config);//VirtualPrinter* vm,QDomDocument config);
 
    /**
     * sets the VM of the system
     */
-   void setVM(VirtualPrinter* vm);
+   void setVM(VMPrototype* vm);
 
    /**
     * sets the config file Dom to be loaded
@@ -54,7 +54,7 @@ private:
    void checkReady();
 
 private:
-   VirtualPrinter* vm_;
+   VMPrototype* vm_;
    QDomDocument config_;
    bool ready_;
    QThread* vmThread_;

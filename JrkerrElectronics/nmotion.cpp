@@ -1,9 +1,10 @@
 #include "nmotion.h"
 
 #include <math.h>
-#include "./Windows/nmccom.h"
-#include "./Windows/sio_util.h"
-#include "./Windows/picservo.h"
+#include "nmccom.h"
+#include "sio_util.h"
+#include "picservo.h"
+
 
 #include <QMapIterator>
 #include <QTextStream>
@@ -26,12 +27,35 @@ byte leader_ = 0x00;			//group leader address for coordinated controllers
 
 
 
-int stateSize;
+int stateSize=0;
 QMap<int,double> scales_;
 QMap<int,int> motors_;
 HzPath states_;
 
 int maxattempts_ = 30;      //the max num attempts for dl path
+
+
+void resetStates(){
+    states_=HzPath(stateSize);
+    curseg_=0;
+}
+
+void makeTest(){
+    HzPath testPath(stateSize,true);
+    for(int i=0;i<states_.numberOfStates();i++){
+        State temp = states_.getState(i);
+        State newstate(states_.stateSize());
+        for (int j=0; j<states_.stateSize();j++){
+            newstate[j] = temp.at(j);
+        }
+        testPath.addState(newstate);
+    }
+    int j= curseg_;
+    int k;
+
+
+}
+
 
 //---------------------------------------------------------------------------
 //Initialize various parameters for this path generation module
@@ -111,6 +135,8 @@ int DlPathPoints(QString* error_string){
     bool testingReadStat;
     bool inpathmode;
 
+
+
     //retrieve status from each of the motors, return -2 if failure
     //this is basically a nice, final check that the motors are online, but it's superfluous, since each attempt to send points
     //that will be done below basically does the same thing.
@@ -129,13 +155,13 @@ int DlPathPoints(QString* error_string){
     //if not in path mode
     testingReadStat = NmcReadStatus(leader_, SEND_NPOINTS,error_string);
     testingBuffer = ServoGetNPoints(leader_);
-    qDebug()<<"number of points in buffer"<<ServoGetNPoints(leader_);
+//    qDebug()<<"number of points in buffer"<<ServoGetNPoints(leader_);
 
 
     if ( !(ServoGetAux(leader_) & PATH_MODE) || (ServoGetNPoints(leader_)==0) ){
         //normally, we should not be in pathmode and should enter this part once
 
-//        qDebug("NOT in pathmode");
+        //qDebug("NOT in pathmode");
 
         if (ServoGetNPoints(leader_)>bufsize) { //if there are more points in the buffer than that buffer size, stop
             QTextStream ss(error_string, QIODevice::WriteOnly);
@@ -146,19 +172,19 @@ int DlPathPoints(QString* error_string){
         //if total number of points is less than bufsize, download all points
         NmcReadStatus(leader_, SEND_NPOINTS,error_string);
         if (states_.numberOfStates() <= bufsize){
-            qDebug("total number of points is less than bufsize, download all points");
+//            qDebug("total number of points is less than bufsize, download all points");
             while(curseg_ < states_.numberOfStates()){
                  DlSev(error_string, pointcount, leader_, pointBuffer);
             }
         }
         //else download points to fill half of the buffer
         else {
-//            qDebug("download points to fill half of the buffer");
+            //qDebug("download points to fill half of the buffer");
             while(curseg_ < bufsize/2){
-//                  qDebug("downloading 7 points");
+                  //qDebug("downloading 7 points");
                   DlSev(error_string, pointcount, leader_, pointBuffer);
             }
-//            qDebug("done downloading");
+            //qDebug("done downloading");
         }
 
         //Start pathmode, If fail return
@@ -206,6 +232,7 @@ int DlPathPoints(QString* error_string){
 }
 //Downloads 7 points to all motors. Returns the number of points added, and updates curseg_
 int DlSev(QString* error_string, int pointcount, byte tempId, long int pointBuffer[]){
+//    qDebug()<<">>>>>>>>>>>>>Point<<<<<<<<<<<<";
     QMapIterator<int,int> i(motors_);
     while(i.hasNext()){
         i.next();
@@ -222,10 +249,10 @@ int DlSev(QString* error_string, int pointcount, byte tempId, long int pointBuff
 
 int StartPathMode(QString* error_string){
     //start path mode
-    qDebug("START PATH");
+//    qDebug("START PATH");
     bool check = true;
     int numattempts = 0;
-    qDebug("starting pathmode");
+//    qDebug("starting pathmode");
     while (check){
         if (!ServoStartPathMode(group_, leader_,error_string)){
             numattempts++;
@@ -251,12 +278,13 @@ int GetNextPoints(int stateVariableIndex,long int pointBuffer[],int bufferLength
     {
         pointcount = (states_.numberOfStates()-curseg_);
     }
-
+//    qDebug()<<"axis "<<stateVariableIndex;
     for (int i=0;i<pointcount;++i){
         v= states_.getState(curseg_+i);
         double distanceinrev = v.at(stateVariableIndex-1);//do account for HzPath not having a dt as the first state variable
         double distanceincounts = distanceinrev*scales_[stateVariableIndex];
         pointBuffer[i]= (long int)distanceincounts;
+//        qDebug()<<" "<<i<<":"<<distanceincounts;
 
     }
     return pointcount;
@@ -268,7 +296,7 @@ int GetNextPoints(int stateVariableIndex,long int pointBuffer[],int bufferLength
 //Returns: 0 if it fails
 //         1 of it works
 int AddStates(HzPath statelist){
-    if (states_.numberOfStates()==0){
+    if (states_.numberOfStates()<2){//==0){
         states_=statelist;
         return 1;
     }else if(states_.stateSize()!=statelist.stateSize()){

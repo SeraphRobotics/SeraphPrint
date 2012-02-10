@@ -69,6 +69,11 @@ public:
 
 
     /**
+     * Resets the position of the system;
+     */
+    bool resetPosition();
+
+    /**
      * @returns true if the NPath is valid for the motor configuration
      * Uses the NPath in relative coordinates
      **/

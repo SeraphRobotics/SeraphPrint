@@ -7,11 +7,11 @@ LoadConfigThread::LoadConfigThread():ready_(false)
 }
 
 
-LoadConfigThread::LoadConfigThread(VirtualPrinter* vm,QDomDocument config):ready_(false){
+LoadConfigThread::LoadConfigThread(VMPrototype* vm,QDomDocument config):ready_(false){
     setVM(vm);
     setConfig(config);
 }
-void LoadConfigThread::setVM(VirtualPrinter* vm){
+void LoadConfigThread::setVM(VMPrototype* vm){
     vm_ = vm;
     vmThread_ = vm->thread();
     checkReady();

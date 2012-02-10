@@ -6,6 +6,7 @@
 
 #include "nmccom.h"
 #include "motor.h"
+#include "nmotion.h"
 #include "coordinatedmotion.h"
 
 

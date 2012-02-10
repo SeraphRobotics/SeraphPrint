@@ -25,6 +25,11 @@ signals:
      */
     void outOfStateCall();
 
+    /**
+     * emits when a non-fatal error occurs
+     */
+    void error(QString);
+
     // Connection
     /**
      * emits when the system ditects comport for printers
@@ -82,6 +87,7 @@ signals:
      * emits when a print is done or canceled
      */
     void printsComplete();
+
 
 public slots:
 
@@ -201,9 +207,9 @@ private slots:
     void needMaterial(int i);//ONLY FOR XDFLHANDLER
 
 
-
 public:
-    VirtualPrinter *vm_;
+//    VirtualPrinter *vm_;
+    VMPrototype *vm_;
 private:
 
     XDFLHandler *handler_;

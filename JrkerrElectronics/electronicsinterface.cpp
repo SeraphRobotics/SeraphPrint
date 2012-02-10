@@ -1,6 +1,7 @@
 #include "electronicsinterface.h"
 #include <QTextStream>
 #include <QMap>
+#include <QDebug>
 
 ElectronicsInterface::ElectronicsInterface():initialized_(false),BUFF_SIZE(10)
 {
@@ -53,6 +54,10 @@ void ElectronicsInterface::resetPosition(){
     foreach(Motor* m,getMotors()){
         m->resetPosition();
     }
+
+    cmotion_.resetPosition();
+    NP::resetStates();
+    qDebug()<<"motors reset";
 }
 
 void ElectronicsInterface::forceStop(){

@@ -1,6 +1,6 @@
 #include "npath.h"
 
-NPath::NPath():state_size_(0),allStates_(false)
+NPath::NPath():state_size_(0),allStates_(false),states_(state_size_)
 {
 }
 

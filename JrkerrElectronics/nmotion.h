@@ -22,6 +22,8 @@ int DlSev(QString* error_string, int pointcount, byte tempId, long int pointBuff
 int GetNextPoints(int stateVariableIndex,long int pointBuffer[],int bufferLength);
 int StartPathMode(QString* error_string);
 
+void resetStates();
+
 
 /**
  * returns an absolute hzpath from the npath

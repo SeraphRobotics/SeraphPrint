@@ -7,7 +7,7 @@
 #include <QDebug>
 
 CoreInterface::CoreInterface():state_(NotInitialized){
-    vm_ = new VirtualPrinter();
+    vm_ = new VirtualPrinter();//VirtualPrinter();
 }
 
 
@@ -41,6 +41,7 @@ void CoreInterface::resetPosition(){
         return;
     }
     vm_->resetPosition();
+    qDebug()<<">>RESET:\n>>Position is"<<getCurrentPosition()<<"\nReset to state"<<vm_->currentState();
     getCurrentPosition();
 }
 
@@ -62,8 +63,11 @@ void CoreInterface::move(double x, double y, double z, double speed){
         return;
     }
     emit moving();
-    vm_->move(x,y,z,speed);
-    getCurrentPosition();
+    if(vm_->move(x,y,z,speed)){
+        getCurrentPosition();
+    }else{
+        emit error(vm_->getErrors());
+    }
 }
  QVector<double> CoreInterface::getCurrentPosition(){
      if ((state_==NotInitialized)||(state_==Printing)){return QVector<double>(3,0);}
@@ -177,10 +181,13 @@ void CoreInterface::processingCommand(int i){
 }
 
 void CoreInterface::needMaterial(int i){
-//    pausePrint();
     emit needMaterialLoaded(i);
-
 }
+
+
+
+
+
 
 void CoreInterface::configLoaded(){
     setState(Connected);
@@ -194,5 +201,6 @@ void CoreInterface::donePrinting(){
 //    setState(Connected);
 //    getCurrentPosition();
 //    configLoaded();
+    vm_->dumpstates();
     emit printsComplete();
 }

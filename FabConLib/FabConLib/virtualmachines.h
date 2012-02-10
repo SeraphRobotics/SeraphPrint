@@ -39,7 +39,7 @@ class VMPrototype:public QObject
          * Builds a virtual machine based on the QDomDocument.
          * Allows the document to be build by a handler program rather than a file.
          */
-        void loadConfig(QDomDocument document);
+        virtual void loadConfig(QDomDocument document);
         /**
          * @return a string of all errors.
          */
@@ -66,6 +66,8 @@ class VMPrototype:public QObject
         virtual void resetPosition();
 
     public:
+
+        ElectronicsInterface eInterface;// this should be private. Its only here to alow for loadconfig thread to work
         QList<Bay*> bays;
         XYZMotion* xyzmotion;
 
@@ -101,8 +103,8 @@ public slots:
     void resetPosition();
 
 
-public:
-    ElectronicsInterface eInterface; //TODO: this should be private. Nothing above VM should access it.
+//public:
+//    ElectronicsInterface eInterface; //TODO: this should be private. Nothing above VM should access it.
 };
 
 

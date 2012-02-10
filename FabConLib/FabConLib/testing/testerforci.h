@@ -21,11 +21,15 @@ public slots:
     void updatedPosition(double x, double y, double z);
     void chagedState(int state);
     void moving();
-    void estimated(double t, double v);
+    void estimated(double t, double v, int cmds);
     void materialsAvailable(QMap<int,Material> ms);
     void bayMaterial(int bayid, int materialid);
     void currentCommand(int c);
     void needMaterialLoaded(int i);
+
+
+    void onPaused();
+
 
 public:
     void loadXDFL();

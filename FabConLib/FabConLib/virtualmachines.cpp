@@ -67,6 +67,7 @@ bool VMPrototype::forceStop(){
 }
 
 void VMPrototype::resetPosition(){
+    laststate_= State(statesize_,0.0);
     return;
 }
 
@@ -100,6 +101,15 @@ QScriptEngine* VMPrototype::makeEngine(){
 
 void VMPrototype::loadConfig(QDomDocument document) {
     QDomElement root = document.documentElement();
+
+    frequency_ = 30;
+    idtostatemap_.clear();
+    idtostatemap_[0]=1;
+    idtostatemap_[1]=2;
+    idtostatemap_[2]=3;
+    idtostatemap_[3]=4;
+    statesize_ = 5;
+
 
 
     // XYZMOTION
@@ -197,6 +207,9 @@ QString VirtualPrinter::getErrors(){
 }
 
 bool VirtualPrinter::executeNPath(NPath path) {
+//    State test = path.getState(0);
+//    qDebug()<<"VP Start State is "<<test;
+
     if(!initialized_) {return false;}
     eInterface.getCoordinatedMotion()->initializePathMode();
     laststate_ = path.lastAbsolute();
@@ -204,6 +217,7 @@ bool VirtualPrinter::executeNPath(NPath path) {
 }
 
 bool VirtualPrinter::executeRelativeNPath(NPath path) {
+    qDebug()<<"Moving relative";
     path.setOrigin(laststate_);
     return executeNPath(path);
 }
@@ -229,11 +243,14 @@ bool VirtualPrinter::forceStop(){
 
 void VirtualPrinter::resetPosition(){
     eInterface.resetPosition();
+    laststate_= State(statesize_,0.0);
+
 }
 
 ///////////////////////////////////////////////////////
 
 TestPrinter::TestPrinter():VMPrototype() {
+    statesize_=5;
     totalprintcommands_.append(NPath(statesize_,false));
 }
 
@@ -270,6 +287,7 @@ bool TestPrinter::executeRelativeNPath(NPath path) {
 }
 
 void TestPrinter::dumpstates() {
+    qDebug("dumping");
     for(int i=0;i<totalprintcommands_.size();i++) {
         QString s("");
         QTextStream ss(&s,QFile::WriteOnly);
@@ -285,7 +303,7 @@ State TestPrinter::currentState() {
 void TestPrinter::resetPosition(){
     laststate_ = State(statesize_,0.0);
     NPath n(statesize_,false);
-    n.addState(laststate_);
+//    n.addState(laststate_);
     totalprintcommands_.append(n);
 }
 
