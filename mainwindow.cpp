@@ -37,10 +37,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QCoreApplication::applicationName());
     QString app_data_path = QFileInfo(ini.fileName()).absolutePath();
 
-    //For Testing
-    /*QSettings theSettings("Creative Machines Lab", "FabPrint");
-    theSettings.clear();*/
-
     //Create new folder (if one does not exist) and store in default path variable
     QDir app_data_dir = QDir(app_data_path);
     app_data_dir.mkdir("FabAtHome");
@@ -342,6 +338,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//Changes default config file directory
 void MainWindow::on_actionChange_Directory_triggered()
 { 
     //Change the default directory for config files using a file chooser dialog

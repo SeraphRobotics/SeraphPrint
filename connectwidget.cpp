@@ -66,6 +66,7 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
     QSettings theSettings("Creative Machines Lab", "FabPrint");
     configFileDirectory = QDir(theSettings.value("config_dir", default_config_path).toString());
 
+    //OLD CODE FOR CONFIG DIRECTORY
     /*if (true) // OS is UNIX-like
     {   
         configFileDirectory = QDir(QDir::homePath() + "/" + FAB_CONFIG_DIRECTORY_NAME_UNIX + "/");
@@ -242,6 +243,7 @@ void ConnectWidget::loading(bool load){
     ui->configButton->setEnabled(load);
 }
 
+//Deletes a config file upon user request
 void ConnectWidget::on_deleteButton_clicked()
 {
     QMessageBox msgBox;
@@ -265,11 +267,9 @@ void ConnectWidget::on_deleteButton_clicked()
            // Cancel or close button was clicked
            break;
      }
-
-
-
 }
 
+//reloads config files after user changes the default config file directory
 void ConnectWidget::reLoadConfigFiles()
 {
     //QSetting to grab config directory
