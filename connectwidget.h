@@ -22,6 +22,7 @@ public:
 
 public slots:
     void loading(bool load);
+    void reLoadConfigFiles();
 
 signals:
     void atemptConnect();
@@ -29,6 +30,7 @@ signals:
 private:
     void loadFiles();
     void addConfig(QString path);
+    void removeConfig(QString path);
 
 private:
     Ui::ConnectWidget *ui;
@@ -36,13 +38,12 @@ private:
     QStringList portList;
     QFileInfoList configList;
     QDir configFileDirectory;
-
-
-
+    QString default_config_path;
 
 private slots:
     void on_configButton_clicked();
     void on_connectButton_clicked();
+    void on_deleteButton_clicked();
 };
 
 #endif // CONNECTWIDGET_H

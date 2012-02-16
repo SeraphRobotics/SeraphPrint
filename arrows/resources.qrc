@@ -12,5 +12,6 @@
         <file>path.png</file>
         <file>arrow_left.svg</file>
         <file>arrow_right.svg</file>
+        <file>FabPrintLogo.png</file>
     </qresource>
 </RCC>
