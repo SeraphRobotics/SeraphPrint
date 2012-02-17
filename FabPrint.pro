@@ -47,3 +47,18 @@ include(FabConLib/FabConLib/include.pro)
 
 RESOURCES += \
     arrows/resources.qrc
+
+OTHER_FILES += \
+    media/testConfig.config \
+    media/testxdfl-test.xdfl \
+    media/testxdfl-mid.xdfl \
+    media/testxdfl.xdfl \
+    ../FabPrint-build-desktop-Qt_4_7_4_for_Desktop_-_MinGW_4_4__Qt_SDK__Release/JrKerr-Single-deposition.config \
+    ../FabPrint-build-desktop-Qt_4_7_4_for_Desktop_-_MinGW_4_4__Qt_SDK__Release/JrKerr-Single-deposition.config \
+    media/JrKerr-Single-deposition.config
+
+
+
+
+
+

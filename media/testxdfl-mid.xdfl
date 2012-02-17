@@ -1,34 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <xdfl>
 <Palette>
-   <material>
-      <name>silicone</name>
-      <id>1</id>
-      <PathWidth>0.4</PathWidth>
-      <PathHeight>4</PathHeight>
-      <PathSpeed>30</PathSpeed>
-      <AreaConstant>1</AreaConstant>
-      <CompressionVolume>10</CompressionVolume>
-      <property>
-         <name>conductivity</name>
-         <value>1</value>
-      </property>
-   </material>
-   <material>
-      <name>silicone</name>
-      <id>2</id>
-      <PathWidth>0.4</PathWidth>
-      <PathHeight>4</PathHeight>
-      <PathSpeed>10</PathSpeed>
-      <AreaConstant>1</AreaConstant>
-      <CompressionVolume>10</CompressionVolume>
-      <property>
-         <name>conductivity</name>
-         <value>1</value>
-      </property>
-   </material>
+    <material>
+       <name>silicone</name>
+       <id>1</id>
+       <PathWidth>0.8</PathWidth>
+       <PathHeight>0.8</PathHeight>
+       <PathSpeed>30</PathSpeed>
+       <AreaConstant>1</AreaConstant>
+       <CompressionVolume>30</CompressionVolume>
+       <property>
+          <name>conductivity</name>
+          <value>1</value>
+       </property>
+    </material>
 </Palette>
 <commands>
+    <path>
+        <speed>30</speed>
+        <point>
+           <x>0</x>
+           <y>0</y>
+           <z>0</z>
+        </point>
+        <point>
+           <x>-19.438842</x>
+           <y>27.243119</y>
+           <z>10.800000</z>
+        </point>
+        <point>
+           <x>-19.438842</x>
+           <y>27.243119</y>
+           <z>0.800000</z>
+        </point>
+   </path>
    <path>
       <materialID>1</materialID>
       <point>

@@ -4,31 +4,37 @@
    <material>
       <name>silicone</name>
       <id>1</id>
-      <PathWidth>0.4</PathWidth>
-      <PathHeight>4</PathHeight>
+      <PathWidth>0.8</PathWidth>
+      <PathHeight>0.5</PathHeight>
       <PathSpeed>30</PathSpeed>
       <AreaConstant>1</AreaConstant>
-      <CompressionVolume>10</CompressionVolume>
+      <CompressionVolume>30</CompressionVolume>
       <property>
          <name>conductivity</name>
          <value>1</value>
       </property>
    </material>
-   <material>
-      <name>silicone</name>
-      <id>2</id>
-      <PathWidth>0.4</PathWidth>
-      <PathHeight>4</PathHeight>
-     <PathSpeed>60</PathSpeed>
-      <AreaConstant>1</AreaConstant>
-      <CompressionVolume>10</CompressionVolume>
-      <property>
-         <name>conductivity</name>
-         <value>1</value>
-      </property>
-   </material>
+
 </Palette>
 <commands>
+    <path>
+       <speed>30</speed>
+       <point>
+          <x>0</x>
+          <y>0</y>
+          <z>0</z>
+       </point>
+       <point>
+          <x>29.508851</x>
+          <y>12.515153</y>
+          <z>10.500000</z>
+       </point>
+       <point>
+          <x>29.508851</x>
+          <y>12.515153</y>
+          <z>0.500000</z>
+       </point>
+   </path>
    <path>
       <materialID>1</materialID>
       <point>
@@ -2944,6 +2950,7 @@
       <point>
          <x>14.794961</x>
          <y>39.687347</y>
+
          <z>0.500000</z>
       </point>
       <point>
@@ -17720,6 +17727,7 @@
          <z>1.500000</z>
       </point>
       <point>
+
          <x>42.609451</x>
          <y>14.557332</y>
          <z>1.500000</z>
@@ -53164,6 +53172,7 @@
       </point>
       <point>
          <x>37.604720</x>
+
          <y>17.718121</y>
          <z>5.500000</z>
       </point>

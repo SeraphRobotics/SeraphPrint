@@ -67,7 +67,6 @@ bool CoordinatedMotion::initializePathMode()
 
         tempInitialized = tempInitialized && j.value()->setGroup(X_Y_Z_GROUP_ADDRESS,(j.key()==1));// the i.key()==1 sets id 1 as the group leader
     }
-    int temp = BUFF_SIZE;
     initialized_= tempInitialized &&
                   NP::SetPathParams(
                     getNumberOfAxes(),
