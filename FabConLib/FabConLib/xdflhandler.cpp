@@ -144,6 +144,8 @@ void XDFLHandler::loadFromDom(QDomDocument xdfl) {
     }
     current_command_ = 0;
 
+
+    mat_map.clear();
     QDomNodeList materialTags  = paletteNode.childNodes();
     for (unsigned int k = 0; k < materialTags.length(); k++) {
         if ("material"==materialTags.at(k).nodeName().toLower()) {
@@ -152,6 +154,7 @@ void XDFLHandler::loadFromDom(QDomDocument xdfl) {
         }
     }
     updateState();
+    estimate();
 }
 
 /**
@@ -172,6 +175,9 @@ void XDFLHandler::estimate() {
     estimatedTime_   = 0;
     estimatedVolume_ = 0;
 
+
+
+    qDebug()<<"current cmds"<<current_command_est;
     while (current_command_est < commands_.length()) {
 
         QDomElement commandTag = commands_.at(current_command_est).toElement();
@@ -210,7 +216,6 @@ void XDFLHandler::estimate() {
             last_end_point_est = p.end();
 
         } else if ("voxel" == commandTag.nodeName().toLower()) {
-
             // If the XDFL voxel is not close to the end of the last movement,
             // we need to move between the points.
             // TODO: Add the transition path time.
@@ -237,6 +242,7 @@ void XDFLHandler::estimate() {
         current_command_est++;
     }
     estimationDone_ = true;
+    emit estimated(estimatedTime_, estimatedVolume_, commands_.length());
 }
 
 void XDFLHandler::run()

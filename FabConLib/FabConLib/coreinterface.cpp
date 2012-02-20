@@ -92,13 +92,17 @@ void CoreInterface::setXDFL(QString xdfl){
     connect(handler_,SIGNAL(finished()),handler_,SLOT(deleteLater()));
     connect(handler_,SIGNAL(startingCommand(int)),this,SLOT(processingCommand(int)));
     connect(handler_,SIGNAL(needMaterialChange(int)),this,SLOT(needMaterial(int)));
+    connect(handler_,SIGNAL(estimated(double,double,int)),this,SLOT(XDFLestimated(double,double,int)));
     // Make other needed connections here
 
     //everything here after should be handled by a seperate slot called by the xdflhandler while its running but not printing.
-    double t = handler_->getEstimatedTime();
-    double v = handler_->getEstimatedVolume();
-    int numCommands = handler_->getNumberOfCommands();
-    emit estimated(t,v,numCommands);
+//    double t = handler_->getEstimatedTime();
+//    double v = handler_->getEstimatedVolume();
+//    int numCommands = handler_->getNumberOfCommands();
+//    qDebug()<<"Time:"<<t<<" Vol:"<<v<<" Numcmd"<<numCommands;
+//    emit estimated(t,v,numCommands);
+    handler_->estimate();
+    idMaterialMap_.clear();
     idMaterialMap_ = handler_->getMaterials();
     emit materialsAvailable(idMaterialMap_);
     // Goes at the end
@@ -189,7 +193,10 @@ void CoreInterface::needMaterial(int i){
     emit needMaterialLoaded(i);
 }
 
-
+void CoreInterface::XDFLestimated(double t, double v, int cmd){
+    qDebug()<<"Time:"<<t<<" Vol:"<<v<<" Numcmd"<<cmd;
+    emit estimated(t, v, cmd);
+}
 
 
 

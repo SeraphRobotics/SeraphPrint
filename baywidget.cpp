@@ -27,6 +27,9 @@ void BayWidget::setMaterials(QMap<int,Material> materials){
     QStringList materialList;
     materialList.append(QString());
 
+    materialMap_.clear();
+    idtomaterials_.clear();
+
     QMapIterator<int,Material> i(materials);
     while (i.hasNext()){
         i.next();
@@ -40,6 +43,7 @@ void BayWidget::setMaterials(QMap<int,Material> materials){
         idtomaterials_[name]=i.key();
         materialList.append(name);
     }
+    ui->materialCombo->clear();
     ui->materialCombo->addItems(materialList);
 }
 

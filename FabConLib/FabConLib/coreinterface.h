@@ -206,6 +206,7 @@ private slots:
      */
     void needMaterial(int i);//ONLY FOR XDFLHANDLER
 
+    void XDFLestimated(double t, double v, int cmd);
 
 public:
 //    VirtualPrinter *vm_;

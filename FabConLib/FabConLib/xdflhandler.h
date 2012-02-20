@@ -36,6 +36,8 @@ public:
     XDFLHandler(VMPrototype* vm, QDomDocument xdfl);
 
 
+    void estimate();
+
     /**
      * returns the estimated time of a print job will take
      */
@@ -61,6 +63,8 @@ public:
      */
     void loadFromDom(QDomDocument xdfl);
 
+
+
     int getState();
 
     void setState(HandlerState i);
@@ -84,7 +88,12 @@ public slots:
 
     void forceStop();
 
+
 signals:
+    /**
+     * emited when estimation is completed
+     */
+    void estimated(double t, double v, int ncmd);
 
     /**
      * emited when a material in the XDFL file is needed and not loaded in a bay
@@ -106,7 +115,7 @@ signals:
 
 private:
     void updateState();
-    void estimate();
+
     void run(); // Reimplemented from QThread: called by start(). When it exits the thread is finished.
     void processCommand(); // This function will be called every time handling is started or resumed.
     NPath dwell(double time_in_ms);

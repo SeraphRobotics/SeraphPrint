@@ -64,6 +64,7 @@ void JobWidget::setAndSaveFile(QString filePath, bool doSave)
 void JobWidget::estimatesLoaded(double time, double volume, int numcmd){
     int hours=0,min=0,sec=0;
     double vol=0;
+
     QString timeString;
     QString volumeString;
     QTextStream vs(&volumeString,QIODevice::WriteOnly);
