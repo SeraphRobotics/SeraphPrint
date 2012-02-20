@@ -36,13 +36,13 @@ private:
     CoreInterface *ci_;
     int currentPath;
     int totalPaths;
-    bool isPrinting; // true once "Start" has been pressed (i.e. true even while paused)
     bool isPaused;
 
 private slots:
-    void updateButtons();
     void on_stopButton_clicked();
     void on_playButton_clicked();
+    void on_cancelButton_clicked();
+    void on_pauseButton_clicked();
 };
 
 #endif // PRINTWIDGET_H

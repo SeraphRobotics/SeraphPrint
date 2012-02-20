@@ -67,19 +67,15 @@ MainWindow::MainWindow(QWidget *parent) :
  * Friday - will be updated to use a custom-
  * designed progress bar.
  */
-void MainWindow::forwardClicked()
-{
-    if (current_state < 4)
-    {
+void MainWindow::forwardClicked(){
+    if (current_state < 4){
         current_state++;
         updateState();
     }
 }
 
-void MainWindow::backClicked()
-{
-    if (current_state > 0)
-    {
+void MainWindow::backClicked(){
+    if (current_state > 0){
         current_state--;
         updateState();
     }
@@ -175,7 +171,6 @@ void MainWindow::updateState()
 }
 
 
-
 void MainWindow::setUpConnections()
 {
     //CoreInterface
@@ -187,6 +182,7 @@ void MainWindow::setUpConnections()
     connect(printWidget, SIGNAL(go()), this, SLOT(setGo()));
     connect(printWidget, SIGNAL(pause()), this, SLOT(setPause()));
     connect(printWidget, SIGNAL(stop()), this, SLOT(setStop()));
+    connect(printWidget, SIGNAL(cancel()), this, SLOT(setStop()));
     connect(printWidget, SIGNAL(resume()), this, SLOT(setResume()));
 
     connect(this, SIGNAL(sendReloadConfigCommand()), connectWidget, SLOT(reLoadConfigFiles()));
@@ -277,10 +273,8 @@ void MainWindow::setGo()
 
 void MainWindow::setPause()
 {
-
     ui->mainVLayout->addWidget(this->materialsWidget);
     this->materialsWidget->show();
-
 }
 
 void MainWindow::setResume()
@@ -292,6 +286,7 @@ void MainWindow::setResume()
 void MainWindow::setStop()
 {
     showGamePad();
+    ui->mainVLayout->removeWidget(this->materialsWidget);
     this->materialsWidget->hide();
 }
 

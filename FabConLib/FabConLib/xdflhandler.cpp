@@ -80,7 +80,9 @@ void XDFLHandler::cancel() {
         // Additionally wake the thread so that it can be stopped.
         resumed_.wakeAll();
     }
-
+//    vm_->moveToThread(QApplication::instance()->thread());
+//    exit(0);
+    //    terminate();
     // (mutex automatically released upon locker destruction)
 }
 
@@ -90,7 +92,15 @@ void XDFLHandler::forceStop(){
 //    deleteLater();
 //    quit();
     terminate();
+}
 
+
+int  XDFLHandler::getState(){
+    return handlerstate_;
+}
+
+void  XDFLHandler::setState(HandlerState i){
+    handlerstate_ =i;
 }
 
 int XDFLHandler::getNumberOfCommands() {

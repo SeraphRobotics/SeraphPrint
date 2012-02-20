@@ -13,6 +13,8 @@ class XDFLHandler : public QThread
 {
     Q_OBJECT
 
+
+public:
     // Accessing the handler's state must be threadsafe so it can be set during processing.
     // State transitions: Ready > Running <> Paused > Stopped > Ready
     enum HandlerState {
@@ -21,9 +23,6 @@ class XDFLHandler : public QThread
         Paused,
         Stopped
     };
-
-public:
-
     /**
      * Default constructor of the XDFL handler,
      * this will process the XDFL file and run the print job
@@ -61,6 +60,10 @@ public:
      * Set the XDFL file DOM that will be used in the print
      */
     void loadFromDom(QDomDocument xdfl);
+
+    int getState();
+
+    void setState(HandlerState i);
 
 public slots:
  // void start(); // Inherited from QThread. Calling it will start the thread and execute run().

@@ -4,21 +4,19 @@
 PrintWidget::PrintWidget(QWidget *parent, CoreInterface *ci) :
     QWidget(parent),
     ui(new Ui::PrintWidget),
-    totalPaths(0),
     currentPath(0),
-    isPrinting(false),
+    totalPaths(0),
     isPaused(true)
 {
     ui->setupUi(this);
 
     ci_ = ci;
-    isPrinting = false;
-    isPaused = true;
 
     connect(this,SIGNAL(go()),ci_,SLOT(startPrint()));
     connect(this,SIGNAL(pause()),ci_,SLOT(pausePrint()));
     connect(this,SIGNAL(stop()),ci_,SLOT(forceStop()));
     connect(this,SIGNAL(resume()),ci_,SLOT(resumePrint()));
+    connect(this,SIGNAL(cancel()),ci_,SLOT(cancelPrint()));
 
     connect(ci_,SIGNAL(currentCommand(int)),this,SLOT(setCurrentPath(int)));
     connect(ci_,SIGNAL(estimated(double,double,int)),this,SLOT(estimated(double,double,int)));
@@ -33,13 +31,11 @@ PrintWidget::~PrintWidget()
 
 void PrintWidget::printDone(){
     ui->label_info->setText("Done Printing");
-//    ui->playButton->setText("Start");
-    updateButtons();
     currentPath = 0;
     totalPaths = 0;
-    isPrinting = false;
-    isPaused = true;
-
+    isPaused = false;
+    ui->pauseButton->setText("Pause");
+    ui->stackedWidget->setCurrentIndex(0);
 }
 
 void PrintWidget::estimated(double time, double volume, int numCmd){
@@ -58,52 +54,34 @@ void PrintWidget::setTotalPaths(int num){
     totalPaths = num;
 }
 
-void PrintWidget::on_playButton_clicked()
-{
-    ui->stopButton->setEnabled(true);
-
-    if (isPrinting)
-    {
-        if (isPaused)
-        {
-            // Resume print job (!= Start print job)
-            emit resume();
-        }
-        else
-        {
-            // pausing hte print
-            emit pause();
-            ui->label_info->setText("Paused.");
-        }
-        isPaused = !isPaused;
-    }
-    else
-    {
-        // Start print job
-        emit go();
-        isPrinting = true;
-        isPaused = false;
-    }
-    updateButtons();
+void PrintWidget::on_playButton_clicked(){
+    // Start print job
+    emit go();
+    ui->stackedWidget->setCurrentIndex(1);
+    isPaused=false;
 }
 
-void PrintWidget::on_stopButton_clicked()
-{
-    if (isPrinting && !isPaused){
-        //CALLED for forced stop, system is printing and isnt paused
-        emit stop();
-        ui->label_info->setText("FORCED STOP Please reconnect to the printer.");
+void PrintWidget::on_cancelButton_clicked(){
+    // Cancelling the print
+    ui->label_info->setText("Printing canceled");
+    emit cancel();
+}
 
-        isPrinting = false;
-        isPaused = true;
+void PrintWidget::on_pauseButton_clicked(){
+    if (!isPaused){// pausing the print
+        emit pause();
+        setPaused();
     }else{
-        // Cancelling the print
-        ui->label_info->setText("Printing canceled.");
-        isPrinting = false;
-        isPaused = true;
-        emit cancel();
+        emit resume();
+        ui->label_info->setText("Resuming");
+        isPaused=false;
     }
-    updateButtons();
+}
+
+void PrintWidget::on_stopButton_clicked(){
+    //CALLED for forced stop, system is printing and isnt paused
+    emit stop();
+    ui->label_info->setText("FORCED STOP Please reconnect to the printer.");
 }
 
 void PrintWidget::getPrinterProgress(int currPath, QString status)
@@ -112,27 +90,10 @@ void PrintWidget::getPrinterProgress(int currPath, QString status)
     ui->label_progress->setText(status);
 }
 
+
 void PrintWidget::setPaused(){
-    isPaused = false;
-    isPrinting = true;
+    ui->pauseButton->setText("Resume");
+    ui->label_info->setText("Paused");
+    isPaused=true;
 }
 
-void PrintWidget::updateButtons(){
-    if (isPrinting && isPaused)
-    {
-        //If the printer is printing and is paused, We
-//        ui->label_info->setText("Paused...");
-        ui->playButton->setText("Resume");
-        ui->stopButton->setText("Cancel");
-    }else if (isPrinting && !isPaused){
-        ui->playButton->setText("Pause");
-        ui->stopButton->setText("ForceStop");
-    }else if (!isPrinting && isPaused){
-        ui->playButton->setText("Pause");
-        ui->stopButton->setText("ForceStop");
-
-    }else if (!isPrinting && !isPaused){
-        ui->playButton->setText("Start");
-        ui->stopButton->setText("ForceStop");
-    }
-}

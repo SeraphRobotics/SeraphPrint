@@ -157,8 +157,12 @@ void CoreInterface::resumePrint(){
 }
 
 void CoreInterface::cancelPrint(){
-    QTimer::singleShot(0,handler_,SLOT(cancel()));
-
+    if (handler_->getState() != XDFLHandler::Paused){
+        QTimer::singleShot(10,handler_,SLOT(cancel()));
+    }else{
+        handler_->setState(XDFLHandler::Stopped);
+        handler_->quit();
+    }
 }
 
 void CoreInterface::forceStop(){
