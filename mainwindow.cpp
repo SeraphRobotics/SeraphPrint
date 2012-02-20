@@ -40,7 +40,10 @@ MainWindow::MainWindow(QWidget *parent) :
     //Create new folder (if one does not exist) and store in default path variable
     QDir app_data_dir = QDir(app_data_path);
     app_data_dir.mkdir("FabAtHome");
+
     default_config_path = app_data_path + QString("/FabAtHome");
+    default_config_path = QDir::toNativeSeparators(default_config_path);
+    //std::cout << default_config_path.toStdString() << std::endl;
 
     // Setup UI
     ui->setupUi(this);

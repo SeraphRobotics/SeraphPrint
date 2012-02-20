@@ -191,8 +191,17 @@
      <x>0</x>
      <y>0</y>
      <width>531</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
+   </property>
+   <property name="mouseTracking">
+    <bool>true</bool>
+   </property>
+   <property name="defaultUp">
+    <bool>true</bool>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
    </property>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -219,15 +228,24 @@
    <property name="text">
     <string>Change Directory</string>
    </property>
+   <property name="shortcut">
+    <string>D</string>
+   </property>
   </action>
   <action name="actionAbout_FabPrint">
    <property name="text">
     <string>About FabPrint</string>
    </property>
+   <property name="shortcut">
+    <string>A</string>
+   </property>
   </action>
   <action name="actionVisit_FabAtHome_org">
    <property name="text">
     <string>Visit FabAtHome.org</string>
+   </property>
+   <property name="shortcut">
+    <string>V</string>
    </property>
   </action>
  </widget>
