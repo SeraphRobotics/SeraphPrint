@@ -200,8 +200,9 @@ void CoreInterface::configLoaded(){
 
 void CoreInterface::donePrinting(){
 //    setState(Connected);
-//    getCurrentPosition();
+    getCurrentPosition();
 //    configLoaded();
+    setState(Connected);
     vm_->dumpstates();
     emit printsComplete();
 }

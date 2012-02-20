@@ -12,6 +12,7 @@ MaterialsWidget::MaterialsWidget(QWidget *parent, CoreInterface *ci) :
     ci_ = ci;
     connect(ci_,SIGNAL(materialsAvailable(QMap<int,Material>)),this,SLOT(setMaterials(QMap<int,Material>)));
     connect(ci_,SIGNAL(needMaterialLoaded(int)),this,SLOT(materialNeeded(int)));
+    connect(ci_,SIGNAL(stateChaged(int)),this,SLOT(updateState(int)));
     updateBays();
 
 }
@@ -23,10 +24,16 @@ MaterialsWidget::~MaterialsWidget()
 
 }
 
+void MaterialsWidget::updateState(int i){
+    if (i==CoreInterface::Connected){
+        updateBays();
+    }
+}
+
 
 void MaterialsWidget::updateBays(){
     numBays = ci_->vm_->bays.size();
-
+    qDebug()<<"numBAys ="<<numBays;
     cleanUpBays();
     for (int x = 0; x < numBays; x++){
         BayWidget* b = new BayWidget(this,ci_,x);
@@ -39,8 +46,10 @@ void MaterialsWidget::updateBays(){
 void  MaterialsWidget::cleanUpBays(){
     foreach(BayWidget* b,bayWidgets){
         ui->horizontalLayout->removeWidget(b);
-        //delete b;
+        b->hide();
+        delete b;
     }
+    bayWidgets.clear();
 }
 
 void MaterialsWidget::setMaterials(QMap<int,Material> materials){

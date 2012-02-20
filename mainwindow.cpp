@@ -49,11 +49,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->jobButton->setStyleSheet(INCOMPLETE);
     ui->materialsButton->setStyleSheet(INCOMPLETE);
     ui->printButton->setStyleSheet(INCOMPLETE);
-    this->setGeometry(120, 120, 531, 260);
-    this->setFixedSize(this->size());
+//    this->setGeometry(120, 120, 531, 260);
+//    this->setFixedSize(this->size());
     connect(ui->forwardButton, SIGNAL(clicked()), this, SLOT(forwardClicked()));
     connect(ui->backButton, SIGNAL(clicked()), this, SLOT(backClicked()));
 
+
+    ui->menuBar->setEnabled(true);
     this->setUpWidgets();
 
     setUpConnections();
@@ -127,8 +129,6 @@ void MainWindow::materialNeeded(int){
 void MainWindow::updateState()
 {
 
-    if(!(ui->currentWidget->isHidden())){ui->currentWidget->hide();}
-
     // NOTE: If jumping around in the state is permitted, back and forward buttons must be enabled/disabled everywhere
     qDebug()<<"\nCurrent View State: "<<current_state;
 
@@ -136,8 +136,10 @@ void MainWindow::updateState()
     {
     case CONNECT:
             ui->backButton->setEnabled(false);
-            ui->currentWidget = connectWidget;
-            enableOne(CONNECT);
+            ui->connectButton->setStyleSheet(ACTIVE);
+            ui->jobButton->setStyleSheet(INCOMPLETE);
+            ui->materialsButton->setStyleSheet(INCOMPLETE);
+            ui->printButton->setStyleSheet(INCOMPLETE);
         break;
     case JOB:
         ui->backButton->setEnabled(true);
@@ -147,64 +149,33 @@ void MainWindow::updateState()
         else{
             ui->forwardButton->setEnabled(false);
         }
-        ui->currentWidget = jobWidget;
-        this->gamepad_container->show();
-        enableOne(JOB);
-        break;
-    case MATERIALS:
-        ui->forwardButton->setEnabled(true);
-        ui->currentWidget = materialsWidget;
-        materialsWidget->updateBays();
-        this->gamepad_container->show();
-        enableOne(MATERIALS);
-        break;
-    case PRINT:
-        ui->forwardButton->setEnabled(false);
-        ui->currentWidget = printWidget;
-        enableOne(PRINT);
-        this->gamepad_container->show();
-        break;
-    }
-    ui->currentWidget->show();
-    qDebug()<<"Current View State is now:"<<current_state;
-}
-
-
-
-
-void MainWindow::enableOne(int newActiveButton)
-{
-    switch (newActiveButton)
-    {
-    case CONNECT:
-        ui->connectButton->setStyleSheet(ACTIVE);
-        ui->jobButton->setStyleSheet(INCOMPLETE);
-        ui->materialsButton->setStyleSheet(INCOMPLETE);
-        ui->printButton->setStyleSheet(INCOMPLETE);
-        break;
-
-    case JOB:
         ui->connectButton->setStyleSheet(DONE);
         ui->jobButton->setStyleSheet(ACTIVE);
         ui->materialsButton->setStyleSheet(INCOMPLETE);
         ui->printButton->setStyleSheet(INCOMPLETE);
         break;
-
     case MATERIALS:
+        ui->forwardButton->setEnabled(true);
         ui->connectButton->setStyleSheet(DONE);
         ui->jobButton->setStyleSheet(DONE);
         ui->materialsButton->setStyleSheet(ACTIVE);
         ui->printButton->setStyleSheet(INCOMPLETE);
+        this->materialsWidget->show();
         break;
-
     case PRINT:
+        ui->forwardButton->setEnabled(false);
         ui->connectButton->setStyleSheet(DONE);
         ui->jobButton->setStyleSheet(DONE);
         ui->materialsButton->setStyleSheet(DONE);
         ui->printButton->setStyleSheet(ACTIVE);
         break;
     }
+    ui->stackedWidget->setCurrentIndex(current_state);
+    showGamePad();
 }
+
+
+
 void MainWindow::setUpConnections()
 {
     //CoreInterface
@@ -224,24 +195,20 @@ void MainWindow::setUpConnections()
 void MainWindow::setUpWidgets()
 {
     connectWidget = new ConnectWidget(this,ci_);
-
-    //Job widget
     jobWidget = new JobWidget(this, ci_);
-    jobWidget->hide();
-//    if (use_file_arg)
-//    {
-//        jobWidget->preloadedFabFile();
-//    }
     materialsWidget = new MaterialsWidget(this,ci_);
-    materialsWidget->hide();
-
     printWidget = new PrintWidget(this,ci_);
-    printWidget->hide();
 
-    ui->currentWidget = connectWidget;
+    ui->stackedWidget->removeWidget(ui->stackedWidget->currentWidget());
+    ui->stackedWidget->removeWidget(ui->stackedWidget->currentWidget());
+
+    ui->stackedWidget->insertWidget(CONNECT,connectWidget);
+    ui->stackedWidget->insertWidget(JOB,jobWidget);
+    ui->stackedWidget->insertWidget(MATERIALS,materialsWidget);
+    ui->stackedWidget->insertWidget(PRINT,printWidget);
 
     gamepad_container = new GamePad(this,ci_);
-    gamepad_container->move(0, 260);
+
     gamepad_container->hide();
 }
 
@@ -273,9 +240,11 @@ void MainWindow::printerConnected(){
 //        settings.setValue("config",config_path);
 //        cout << settings.value("config").toString().toStdString() << std::endl;
 //        settings.sync();
-        this->setFixedHeight(471);
-        this->setFixedWidth(531);
-        this->gamepad_container->show();
+//        this->setFixedHeight(471);
+//        this->setFixedWidth(531);
+//        this->gamepad_container->show();
+//        ui->mainVLayout->addWidget(this->gamepad_container);
+        showGamePad();
         ui->forwardButton->setEnabled(true);
         isConnected = true;
     }
@@ -288,49 +257,42 @@ void MainWindow::printerConnected(){
 
 }
 
+
+void MainWindow::hideGamePad(){
+    this->gamepad_container->hide();
+    ui->mainVLayout->removeWidget(this->gamepad_container);
+}
+
+void MainWindow::showGamePad(){
+    this->gamepad_container->show();
+    ui->mainVLayout->addWidget(this->gamepad_container);
+}
+
 void MainWindow::setGo()
 {
     // TODO: Use current/total path display (not implemented in Interface)
     // This will eventually require periodically polling the current path.
-
-    this->setFixedHeight(260);
-
-    this->gamepad_container->move(0, 260);
-    this->materialsWidget->move(0, 0);
-    this->materialsWidget->hide();
-    this->gamepad_container->hide();
+    hideGamePad();
 }
 
 void MainWindow::setPause()
 {
 
-    this->setFixedHeight(612);
-
-    this->gamepad_container->move(0, 400);
-    this->materialsWidget->move(0, 200);
+    ui->mainVLayout->addWidget(this->materialsWidget);
     this->materialsWidget->show();
-    this->gamepad_container->hide();//show();
 
 }
 
 void MainWindow::setResume()
 {
-
-    this->setFixedHeight(260);
-
-    this->gamepad_container->move(0, 260);
-    this->materialsWidget->move(0, 0);
+    ui->mainVLayout->removeWidget(this->materialsWidget);
     this->materialsWidget->hide();
-    this->gamepad_container->hide();
 }
 
 void MainWindow::setStop()
 {
-    this->setFixedHeight(471);
-    this->gamepad_container->move(0, 260);
-    this->materialsWidget->move(0, 0);
+    showGamePad();
     this->materialsWidget->hide();
-    this->gamepad_container->show();
 }
 
 MainWindow::~MainWindow()

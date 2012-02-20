@@ -59,9 +59,11 @@ private slots:
 
     void on_actionVisit_FabAtHome_org_triggered();
 
+    void hideGamePad();
+    void showGamePad();
+
 private:
     void updateState();
-    void enableOne(int);
     void setUpWidgets();
     void setUpConnections();
 

@@ -49,7 +49,7 @@ void BayWidget::on_editButton_clicked()
     dialog->show();
 }
 
-BayWidget::~BayWidget()
+BayWidget::~  BayWidget()
 {
     delete ui;
 }
