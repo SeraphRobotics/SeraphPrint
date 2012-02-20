@@ -4,6 +4,10 @@
 #include "iostream"
 #include <QMessageBox>
 #include <QDebug>
+#include <QFileDialog>
+// for opening web browser
+#include <QDesktopServices>
+#include <QUrl>
 
 
 // Edit these stylesheets to change the appearance of the progress bar
@@ -26,6 +30,17 @@ MainWindow::MainWindow(QWidget *parent) :
     // Setup Internal States
     ci_ = new CoreInterface();
 
+    //Settings for Config file default directory path
+    //Find OS specific app_data filepath
+    QSettings ini(QSettings::IniFormat, QSettings::UserScope,
+    QCoreApplication::organizationName(),
+    QCoreApplication::applicationName());
+    QString app_data_path = QFileInfo(ini.fileName()).absolutePath();
+
+    //Create new folder (if one does not exist) and store in default path variable
+    QDir app_data_dir = QDir(app_data_path);
+    app_data_dir.mkdir("FabAtHome");
+    default_config_path = app_data_path + QString("/FabAtHome");
 
     // Setup UI
     ui->setupUi(this);
@@ -202,6 +217,8 @@ void MainWindow::setUpConnections()
     connect(printWidget, SIGNAL(pause()), this, SLOT(setPause()));
     connect(printWidget, SIGNAL(stop()), this, SLOT(setStop()));
     connect(printWidget, SIGNAL(resume()), this, SLOT(setResume()));
+
+    connect(this, SIGNAL(sendReloadConfigCommand()), connectWidget, SLOT(reLoadConfigFiles()));
 }
 
 void MainWindow::setUpWidgets()
@@ -319,4 +336,34 @@ void MainWindow::setStop()
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+//Changes default config file directory
+void MainWindow::on_actionChange_Directory_triggered()
+{ 
+    //Change the default directory for config files using a file chooser dialog
+    QSettings theSettings("Creative Machines Lab", "FabPrint");
+    QString current_path = (theSettings.value("config_dir", default_config_path)).toString();
+    QString new_path = QFileDialog::getExistingDirectory(this, tr("Directory"), current_path);
+
+    /*As long as the user does not press "cancel", change the path*/
+    if (!new_path.isNull())
+    {
+       theSettings.setValue("config_dir", new_path);
+       theSettings.sync();
+    }
+
+    //Signal to connectwidget to reload config files in drop down
+    sendReloadConfigCommand();
+}
+
+void MainWindow::on_actionAbout_FabPrint_triggered()
+{
+    AboutDialog dialog;
+    dialog.exec();
+}
+
+void MainWindow::on_actionVisit_FabAtHome_org_triggered()
+{
+    QDesktopServices::openUrl(QUrl("http://www.fabathome.org/"));
 }

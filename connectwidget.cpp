@@ -19,6 +19,14 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
     ui->setupUi(this);
     ci_ = ci;
 
+    //Set up default directory
+    //Settings for Config file default directory path
+    //Find OS specific app_data filepath
+    QSettings ini(QSettings::IniFormat, QSettings::UserScope,
+    QCoreApplication::organizationName(),
+    QCoreApplication::applicationName());
+    default_config_path = QFileInfo(ini.fileName()).absolutePath() + "/FabAtHome";
+
     // Populate portList and ui->portBox.
     foreach(QextPortInfo port, QextSerialEnumerator::getPorts())
     {
@@ -54,8 +62,13 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
 
     QString verifyDirectoryExistsCommand;
 
-    if (true /* OS is UNIX-like */)
-    {
+    //QSetting to grab config directory
+    QSettings theSettings("Creative Machines Lab", "FabPrint");
+    configFileDirectory = QDir(theSettings.value("config_dir", default_config_path).toString());
+
+    //OLD CODE FOR CONFIG DIRECTORY
+    /*if (true) // OS is UNIX-like
+    {   
         configFileDirectory = QDir(QDir::homePath() + "/" + FAB_CONFIG_DIRECTORY_NAME_UNIX + "/");
 
         if(!configFileDirectory.exists()){
@@ -71,15 +84,15 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
         }
         // Code to make sure the directory exists on Windows...
         // configFileDirectory = whatever I want it to be on Windows
-    }
+    }*/
 
     system(verifyDirectoryExistsCommand.toStdString().c_str());
 
     loadFiles();
 
-    QSettings theSettings("Creative Machines Lab", "FabPrint");
+    //REMOVED REDECLARATION
+    //QSettings theSettings("Creative Machines Lab", "FabPrint");
     ui->configBox->setCurrentIndex(theSettings.value("load config next time index", 0).toInt());
-
 
 //SAMPLE getPorts() OUTPUT (MAC OS)
 //Starting /Applications/D:/fab@home/FabPrint/FabPrint-build-desktop/FabPrint.app/Contents/MacOS/FabPrint...
@@ -112,6 +125,7 @@ void ConnectWidget::loadFiles()
     // Cloud-leveraged parameter-widgetized Qmagic to load the files into the config list
     configList = configFileDirectory.entryInfoList(QStringList("*.config"), QDir::Files);
 
+    //std::cout << configList.at(0).absoluteFilePath().toStdString() << std::endl;
     // Clear the entries currently in the config combo box
     ui->configBox->clear();
 
@@ -119,8 +133,6 @@ void ConnectWidget::loadFiles()
     foreach(QFileInfo config, configList){
         ui->configBox->addItem(config.baseName());
     }
-
-
 }
 
 ConnectWidget::~ConnectWidget()
@@ -151,6 +163,12 @@ void ConnectWidget::addConfig(QString path)
     else{
         qDebug()<<"Error opening the file.";
     }
+}
+
+void ConnectWidget::removeConfig(QString path)
+{
+    QFile::remove(path);
+    loadFiles();
 }
 
 /*
@@ -223,4 +241,39 @@ void ConnectWidget::loading(bool load){
     ui->portBox->setEnabled(load);
     ui->configBox->setEnabled(load);
     ui->configButton->setEnabled(load);
+}
+
+//Deletes a config file upon user request
+void ConnectWidget::on_deleteButton_clicked()
+{
+    QMessageBox msgBox;
+    msgBox.setText("The chosen file will be permanently deleted.");
+    msgBox.setInformativeText("Are you sure you wish to delete?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ans = msgBox.exec();
+
+    switch (ans)
+    {
+       case QMessageBox::Yes:
+       {
+           // Yes was clicked
+           int configIndex = ui->configBox->currentIndex();
+           QString config_path = configList.at(configIndex).filePath();
+           removeConfig(config_path);
+           break;
+       }
+       default:
+           // Cancel or close button was clicked
+           break;
+     }
+}
+
+//reloads config files after user changes the default config file directory
+void ConnectWidget::reLoadConfigFiles()
+{
+    //QSetting to grab config directory
+    QSettings theSettings("Creative Machines Lab", "FabPrint");
+    configFileDirectory = QDir(theSettings.value("config_dir", default_config_path).toString());
+    loadFiles();
 }

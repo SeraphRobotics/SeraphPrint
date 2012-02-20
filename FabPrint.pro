@@ -19,8 +19,9 @@ SOURCES += main.cpp\
         baywidget.cpp \
         materialswidget.cpp \
         mainwindow.cpp \
-    gamepad.cpp \
-    motordialog.cpp
+        gamepad.cpp \
+        motordialog.cpp \
+        aboutdialog.cpp
 
 HEADERS  += mainwindow.h \
         connectwidget.h \
@@ -29,8 +30,9 @@ HEADERS  += mainwindow.h \
         baydialog.h \
         baywidget.h \
         materialswidget.h \
-    gamepad.h \
-    motordialog.h
+        gamepad.h \
+        motordialog.h \
+        aboutdialog.h
 
 FORMS    += mainwindow.ui \
         connectwidget.ui \
@@ -39,8 +41,9 @@ FORMS    += mainwindow.ui \
         baydialog.ui \
         baywidget.ui \
         materialswidget.ui \
-    gamepad.ui \
-    motordialog.ui
+        gamepad.ui \
+        motordialog.ui \
+        aboutdialog.ui
 
 INCLUDEPATH += FabConLib
 include(FabConLib/FabConLib/include.pro)

@@ -8,6 +8,7 @@
 #include "jobwidget.h"
 #include "printwidget.h"
 #include "gamepad.h"
+#include "aboutdialog.h"
 #include "FabConLib/xdflhandler.h"
 #include "FabConLib/virtualmachines.h"
 #include "FabConLib/coreinterface.h"
@@ -47,8 +48,16 @@ public slots:
 signals:
     //Connect
     void sendPreloadedConfig(QString preloaded_path);
+    void sendReloadConfigCommand();
     //Job
     void sendPreloadedFabFile();
+
+private slots:
+    void on_actionChange_Directory_triggered();
+
+    void on_actionAbout_FabPrint_triggered();
+
+    void on_actionVisit_FabAtHome_org_triggered();
 
 private:
     void updateState();
@@ -69,6 +78,8 @@ private:
 
     int current_state;
     QString file_arg;
+    QString config_dir_path;
+    QString default_config_path;
     bool use_file_arg;
 
     bool haveValidFile;

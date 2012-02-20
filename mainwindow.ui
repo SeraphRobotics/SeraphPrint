@@ -191,13 +191,43 @@
      <x>0</x>
      <y>0</y>
      <width>531</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionChange_Directory"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout_FabPrint"/>
+    <addaction name="actionVisit_FabAtHome_org"/>
+   </widget>
+   <addaction name="menuOptions"/>
+   <addaction name="menuHelp"/>
   </widget>
   <action name="actionBlah">
    <property name="text">
     <string>blah</string>
+   </property>
+  </action>
+  <action name="actionChange_Directory">
+   <property name="text">
+    <string>Change Directory</string>
+   </property>
+  </action>
+  <action name="actionAbout_FabPrint">
+   <property name="text">
+    <string>About FabPrint</string>
+   </property>
+  </action>
+  <action name="actionVisit_FabAtHome_org">
+   <property name="text">
+    <string>Visit FabAtHome.org</string>
    </property>
   </action>
  </widget>
