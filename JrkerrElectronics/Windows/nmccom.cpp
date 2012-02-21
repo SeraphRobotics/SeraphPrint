@@ -320,10 +320,6 @@ outstr[n+3] = cksum;
 
 SioClrInbuf(ComPort,error_string);  //Get rid of any old input chars
 SioPutChars(ComPort, (char *)outstr, n+4,error_string); //Send the command string
-/**I think this is where we should put a look to keeps sending the command until it either it is received
-  or it fails upper-limit number of allowed times.
-  BUT ISN'T THAT ALREADY IMPLEMENTED BELOW?
-  */
 
 if (stataddr == 0)		//If a group command w/ no leader, add delay then exit
 	{

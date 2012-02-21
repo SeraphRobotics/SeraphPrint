@@ -66,8 +66,8 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
     QSettings theSettings("Creative Machines Lab", "FabPrint");
     configFileDirectory = QDir(theSettings.value("config_dir", default_config_path).toString());
 
-    //OLD CODE FOR CONFIG DIRECTORY
-    /*if (true) // OS is UNIX-like
+    /*//OLD CODE FOR CONFIG DIRECTORY
+    if (true) // OS is UNIX-like
     {   
         configFileDirectory = QDir(QDir::homePath() + "/" + FAB_CONFIG_DIRECTORY_NAME_UNIX + "/");
 
@@ -133,6 +133,7 @@ void ConnectWidget::loadFiles()
     foreach(QFileInfo config, configList){
         ui->configBox->addItem(config.baseName());
     }
+    ui->configBox->setCurrentIndex(1);
 }
 
 ConnectWidget::~ConnectWidget()
