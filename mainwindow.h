@@ -12,6 +12,7 @@
 #include "FabConLib/xdflhandler.h"
 #include "FabConLib/virtualmachines.h"
 #include "FabConLib/coreinterface.h"
+#include "qextserialenumerator.h"
 
 namespace Ui {
     class MainWindow;
@@ -44,6 +45,8 @@ public slots:
     void onStateChaged(int i);
     void materialNeeded(int i);
     void printDone();
+    void deviceAdded(QextPortInfo i);
+    void deviceRemoved(QextPortInfo i);
 
 signals:
     //Connect
@@ -75,6 +78,7 @@ private:
     MaterialsWidget* materialsWidget;
     PrintWidget* printWidget;
     GamePad* gamepad_container;
+    QextSerialEnumerator* enumerator;
 
     QSettings settings;
 

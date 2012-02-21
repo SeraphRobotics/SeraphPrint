@@ -8,6 +8,7 @@
 // for opening web browser
 #include <QDesktopServices>
 #include <QUrl>
+#include "qextserialenumerator.h"
 
 
 // Edit these stylesheets to change the appearance of the progress bar
@@ -36,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QCoreApplication::organizationName(),
     QCoreApplication::applicationName());
     QString app_data_path = QFileInfo(ini.fileName()).absolutePath();
-
+    enumerator = new QextSerialEnumerator();
     //Create new folder (if one does not exist) and store in default path variable
     QDir app_data_dir = QDir(app_data_path);
     app_data_dir.mkdir("FabAtHome");
@@ -62,6 +63,22 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setUpWidgets();
 
     setUpConnections();
+    this->enumerator->setUpNotifications();
+}
+
+/*
+ *
+ *
+ This is comport detection code
+ *
+ */
+
+void MainWindow::deviceAdded(QextPortInfo i){
+
+}
+
+void MainWindow::deviceRemoved(QextPortInfo i){
+
 }
 
 /**
@@ -176,6 +193,10 @@ void MainWindow::updateState()
 
 void MainWindow::setUpConnections()
 {
+    //COMPORTS
+    connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)),this,SLOT(deviceAdded(QextPortInfo)));
+    connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)),this,SLOT(deviceAdded(QextPortInfo)));
+
     //CoreInterface
     connect(ci_,SIGNAL(stateChaged(int)),this,SLOT(onStateChaged(int)));
     connect(ci_,SIGNAL(needMaterialLoaded(int)),this,SLOT(materialNeeded(int)));
@@ -187,6 +208,7 @@ void MainWindow::setUpConnections()
     connect(printWidget, SIGNAL(stop()), this, SLOT(setStop()));
     connect(printWidget, SIGNAL(cancel()), this, SLOT(setStop()));
     connect(printWidget, SIGNAL(resume()), this, SLOT(setResume()));
+
 
     connect(this, SIGNAL(sendReloadConfigCommand()), connectWidget, SLOT(reLoadConfigFiles()));
 }
