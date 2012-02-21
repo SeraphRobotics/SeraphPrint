@@ -145,7 +145,7 @@ void CoreInterface::moveBayMotor(int bayid, double amount, double time){
 void CoreInterface::startPrint(){
     if (state_!=FileLoaded){return;}
 //    positionTimer_.disconnect();
-//    positionTimer_.setInterval(10000000);
+    positionTimer_.stop();
     vm_->moveToThread(handler_);
     setState(Printing);
     QTimer::singleShot(0,handler_,SLOT(start()));
@@ -204,16 +204,15 @@ void CoreInterface::XDFLestimated(double t, double v, int cmd){
 void CoreInterface::configLoaded(){
     setState(Connected);
     getCurrentPosition();
-//    connect(&positionTimer_,SIGNAL(timeout()),this,SLOT(getCurrentPosition()));
-//    positionTimer_.setInterval(1000);
-//    positionTimer_.start();
+    connect(&positionTimer_,SIGNAL(timeout()),this,SLOT(getCurrentPosition()));
+    positionTimer_.setInterval(1000);
+    positionTimer_.start();
 }
 
 void CoreInterface::donePrinting(){
-//    setState(Connected);
     getCurrentPosition();
-//    configLoaded();
     setState(Connected);
     vm_->dumpstates();
+    positionTimer_.start();
     emit printsComplete();
 }

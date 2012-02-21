@@ -108,7 +108,7 @@ void GamePad::on_toOriginButton_clicked()
 {
     //move to origin
     double v = sqrt(XVelocity*XVelocity+YVelocity*YVelocity+ZVelocity*ZVelocity);
-    ci_->moveTo(-ui->xPositionSpin->value(), -ui->yPositionSpin->value(), -ui->zPositionSpin->value(),v);
+    ci_->moveTo(0,0,0,v);
 }
 
 void GamePad::on_originButton_clicked()
@@ -125,7 +125,7 @@ void GamePad::on_moveButton_clicked()
 {
     //move to commanded
     double v = sqrt(XVelocity*XVelocity+YVelocity*YVelocity+ZVelocity*ZVelocity);
-    ci_->moveTo(ui->xCommandSpin->value() - ui->xPositionSpin->value(), ui->yCommandSpin->value() - ui->yPositionSpin->value(), ui->zCommandSpin->value() - ui->zPositionSpin->value(),v);
+    ci_->moveTo(ui->xCommandSpin->value(), ui->yCommandSpin->value(), ui->zCommandSpin->value(),v);
 }
 
 void GamePad::onPositionChanged(double xPos, double yPos, double zPos) {
