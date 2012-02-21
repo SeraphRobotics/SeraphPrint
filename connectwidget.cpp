@@ -136,6 +136,52 @@ void ConnectWidget::loadFiles()
     ui->configBox->setCurrentIndex(1);
 }
 
+
+/**
+ *
+ *
+ Slots for comport detection.
+ *
+ deviceAdded(QextPortInfo) responds to the presence of a new comport detected.
+ deviceRemoved(QextPortInfo) responds to the removal of a comport previously detected.
+ */
+
+
+void ConnectWidget::deviceAdded(QextPortInfo i){
+    qDebug()<<"Device added named: " + i.portName+  ". Calling response code.";
+
+    bool usb = i.friendName.contains("usb",Qt::CaseInsensitive);
+
+    if (usb)//!port.friendName.isEmpty())
+    {
+        portList.append(i.portName);
+        ui->portBox->addItem(i.friendName);
+        /**
+            TODO: Check for duplicates
+        **/
+    }
+}
+
+void ConnectWidget::deviceRemoved(QextPortInfo i){
+    qDebug()<<"Device removed named: " + i.portName + ". Calling response code.";
+    bool usb = i.friendName.contains("usb",Qt::CaseInsensitive);
+
+    if (usb)//!port.friendName.isEmpty())
+    {
+
+        portList.removeAt(portList.indexOf(i.portName));
+        ui->portBox->removeItem(ui->portBox->findText(i.friendName));
+        /**
+            TODO: Alert other stages to changes, display warning of some kind.
+        **/
+    }
+}
+
+/**
+  End of comport detection slots.
+  */
+
+
 ConnectWidget::~ConnectWidget()
 {
     delete ui;
@@ -228,10 +274,10 @@ void ConnectWidget::on_connectButton_clicked(){
           configFile.close();
         }
         configString = configDom.toString();
-
+        portName = portList.at(portIndex);
 
         // ATTEMPT THE CONNECTION
-        ci_->setConfig(configString,portList.at(portIndex));
+        ci_->setConfig(configString,portName);
         emit atemptConnect();
         /// Need an mechanism for checking errors
     }

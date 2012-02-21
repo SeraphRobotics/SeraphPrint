@@ -6,7 +6,7 @@
 #include <QFileInfoList>
 #include <QDir>
 #include "FabConLib/coreinterface.h"
-
+#include "qextserialenumerator.h"
 namespace Ui
 {
     class ConnectWidget;
@@ -23,6 +23,8 @@ public:
 public slots:
     void loading(bool load);
     void reLoadConfigFiles();
+    void deviceAdded(QextPortInfo i);
+    void deviceRemoved(QextPortInfo i);
 
 signals:
     void atemptConnect();
@@ -36,6 +38,8 @@ private:
     Ui::ConnectWidget *ui;
     CoreInterface *ci_;
     QStringList portList;
+    QString portName;
+    int portItem;
     QFileInfoList configList;
     QDir configFileDirectory;
     QString default_config_path;

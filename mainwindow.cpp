@@ -66,20 +66,6 @@ MainWindow::MainWindow(QWidget *parent) :
     this->enumerator->setUpNotifications();
 }
 
-/*
- *
- *
- This is comport detection code
- *
- */
-
-void MainWindow::deviceAdded(QextPortInfo i){
-
-}
-
-void MainWindow::deviceRemoved(QextPortInfo i){
-
-}
 
 /**
  * This is an absolutely horrific kludge to get a
@@ -194,8 +180,8 @@ void MainWindow::updateState()
 void MainWindow::setUpConnections()
 {
     //COMPORTS
-    connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)),this,SLOT(deviceAdded(QextPortInfo)));
-    connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)),this,SLOT(deviceAdded(QextPortInfo)));
+    connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)),connectWidget,SLOT(deviceAdded(QextPortInfo)));
+    connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)),connectWidget,SLOT(deviceRemoved(QextPortInfo)));
 
     //CoreInterface
     connect(ci_,SIGNAL(stateChaged(int)),this,SLOT(onStateChaged(int)));

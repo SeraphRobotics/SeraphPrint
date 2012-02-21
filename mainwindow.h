@@ -45,8 +45,6 @@ public slots:
     void onStateChaged(int i);
     void materialNeeded(int i);
     void printDone();
-    void deviceAdded(QextPortInfo i);
-    void deviceRemoved(QextPortInfo i);
 
 signals:
     //Connect
