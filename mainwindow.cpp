@@ -176,13 +176,17 @@ void MainWindow::updateState()
     showGamePad();
 }
 
+void MainWindow::terminate(){
+    //ToDo end app or deal with lack of printer here.
+}
+
 
 void MainWindow::setUpConnections()
 {
     //COMPORTS
     connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)),connectWidget,SLOT(deviceAdded(QextPortInfo)));
     connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)),connectWidget,SLOT(deviceRemoved(QextPortInfo)));
-
+    connect(connectWidget,SIGNAL(mainDeviceRemoved),this,SLOT(terminate));
     //CoreInterface
     connect(ci_,SIGNAL(stateChaged(int)),this,SLOT(onStateChaged(int)));
     connect(ci_,SIGNAL(needMaterialLoaded(int)),this,SLOT(materialNeeded(int)));

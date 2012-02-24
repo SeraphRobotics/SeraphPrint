@@ -174,6 +174,9 @@ void ConnectWidget::deviceRemoved(QextPortInfo i){
         /**
             TODO: Alert other stages to changes, display warning of some kind.
         **/
+        if(i.portName == portName){
+            mainDeviceRemoved();
+        }
     }
 }
 

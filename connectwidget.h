@@ -28,6 +28,7 @@ public slots:
 
 signals:
     void atemptConnect();
+    void mainDeviceRemoved();
 
 private:
     void loadFiles();

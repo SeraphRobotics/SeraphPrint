@@ -45,6 +45,7 @@ public slots:
     void onStateChaged(int i);
     void materialNeeded(int i);
     void printDone();
+    void terminate();
 
 signals:
     //Connect
