@@ -79,8 +79,6 @@ private:
     GamePad* gamepad_container;
     QextSerialEnumerator* enumerator;
 
-    QSettings settings;
-
     int current_state;
     QString file_arg;
     QString config_dir_path;

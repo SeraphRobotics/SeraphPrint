@@ -6,7 +6,6 @@
 #include <QDebug>
 #include <iostream>
 #include <QDir>
-#include <QSettings>
 #include <QFile>
 #include <QFileInfo>
 #include <QDebug>
@@ -19,13 +18,12 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
     ui->setupUi(this);
     ci_ = ci;
 
-    //Set up default directory
-    //Settings for Config file default directory path
-    //Find OS specific app_data filepath
-    QSettings ini(QSettings::IniFormat, QSettings::UserScope,
-    QCoreApplication::organizationName(),
-    QCoreApplication::applicationName());
-    default_config_path = QFileInfo(ini.fileName()).absolutePath() + "/FabAtHome";
+    // Set up default directory
+    // Settings for Config file default directory path
+    // Find OS specific app_data filepath
+    // QSettings constructor values were specified in main.cpp.
+    QSettings settings;
+    default_config_path = QFileInfo(settings.fileName()).absolutePath() + "/FabAtHome";
 
     // Populate portList and ui->portBox.
     foreach(QextPortInfo port, QextSerialEnumerator::getPorts())
@@ -58,13 +56,12 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
     // NOTE: Since the selected file is retrieved by its combobox index
     //       (because base name may not be unique), it is important that
     //       the order of configBox items be maintained.
-    // The selected  config path is retrieved by configList.at(ui->configBox->currentIndex()).
+    // The selected config path is retrieved by configList.at(ui->configBox->currentIndex()).
 
     QString verifyDirectoryExistsCommand;
 
-    //QSetting to grab config directory
-    QSettings theSettings("Creative Machines Lab", "FabPrint");
-    configFileDirectory = QDir(theSettings.value("config_dir", default_config_path).toString());
+    // Find the config directory from QSettings
+    configFileDirectory = QDir(settings.value("config_dir", default_config_path).toString());
 
     /*//OLD CODE FOR CONFIG DIRECTORY
     if (true) // OS is UNIX-like
@@ -90,9 +87,7 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
 
     loadFiles();
 
-    //REMOVED REDECLARATION
-    //QSettings theSettings("Creative Machines Lab", "FabPrint");
-    ui->configBox->setCurrentIndex(theSettings.value("load config next time index", 0).toInt());
+    ui->configBox->setCurrentIndex(settings.value("load config next time index", 0).toInt());
 
 //SAMPLE getPorts() OUTPUT (MAC OS)
 //Starting /Applications/D:/fab@home/FabPrint/FabPrint-build-desktop/FabPrint.app/Contents/MacOS/FabPrint...
@@ -122,33 +117,38 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
 // Reload .config files from the appropriate directory for the given platform
 void ConnectWidget::loadFiles()
 {
-    // Cloud-leveraged parameter-widgetized Qmagic to load the files into the config list
     configList = configFileDirectory.entryInfoList(QStringList("*.config"), QDir::Files);
 
     //std::cout << configList.at(0).absoluteFilePath().toStdString() << std::endl;
     // Clear the entries currently in the config combo box
     ui->configBox->clear();
 
-    // Add all of the files from the configList to the combo box
-    foreach(QFileInfo config, configList){
-        ui->configBox->addItem(config.baseName());
+    // If there are no config files, disable deletion
+    if (configList.isEmpty()) {
+        ui->deleteButton->setEnabled(false);
     }
-    ui->configBox->setCurrentIndex(1);
+    else {
+        ui->deleteButton->setEnabled(true);
+
+        // Add all of the files from the configList to the combo box
+        foreach(QFileInfo config, configList){
+            ui->configBox->addItem(config.baseName());
+        }
+    }
+
+    ui->configBox->setCurrentIndex(0);
 }
 
 
 /**
- *
- *
- Slots for comport detection.
- *
- deviceAdded(QextPortInfo) responds to the presence of a new comport detected.
- deviceRemoved(QextPortInfo) responds to the removal of a comport previously detected.
- */
+ Slots for COM port detection.
 
+ deviceAdded(QextPortInfo) responds to the presence of a newly detected COM port.
+ deviceRemoved(QextPortInfo) responds to the removal of a previously detected COM port.
+ **/
 
 void ConnectWidget::deviceAdded(QextPortInfo i){
-    qDebug()<<"Device added named: " + i.portName+  ". Calling response code.";
+    qDebug() << "Device added named: " + i.portName + ". Calling response code.";
 
     bool usb = i.friendName.contains("usb",Qt::CaseInsensitive);
 
@@ -254,10 +254,11 @@ void ConnectWidget::on_connectButton_clicked(){
         canConnect = false;
     }
 
-    if (canConnect||true){
-        QSettings theSettings("Creative Machines Lab", "FabPrint");
-        theSettings.setValue("load config next time index", ui->configBox->currentIndex());
-        theSettings.sync();
+    if (canConnect){
+        // QSettings constructor values were specified in main.cpp.
+        QSettings settings;
+        settings.setValue("load config next time index", ui->configBox->currentIndex());
+        settings.sync();
 
 
         // LOAD THE FILE
@@ -269,7 +270,7 @@ void ConnectWidget::on_connectButton_clicked(){
         {
           QFile configFile(config_path);
           if (!configFile.open(QFile::ReadOnly)) {
-              qDebug()<<"FAILED TO OPEN CONFIG FILE";
+              qDebug() << "Failed to open config file.";
               QMessageBox::warning(this,tr("Config Error"),tr("Cound not open config file"));
               return;
           }
@@ -297,8 +298,8 @@ void ConnectWidget::loading(bool load){
 void ConnectWidget::on_deleteButton_clicked()
 {
     QMessageBox msgBox;
-    msgBox.setText("The chosen file will be permanently deleted.");
-    msgBox.setInformativeText("Are you sure you wish to delete?");
+    msgBox.setText("The currently selected configuration will be permanently deleted.");
+    msgBox.setInformativeText("Are you sure you want to delete?");
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Yes);
     int ans = msgBox.exec();
@@ -322,8 +323,9 @@ void ConnectWidget::on_deleteButton_clicked()
 //reloads config files after user changes the default config file directory
 void ConnectWidget::reLoadConfigFiles()
 {
-    //QSetting to grab config directory
-    QSettings theSettings("Creative Machines Lab", "FabPrint");
-    configFileDirectory = QDir(theSettings.value("config_dir", default_config_path).toString());
+    // QSetting to grab config directory
+    // QSettings constructor values were specified in main.cpp.
+    QSettings settings;
+    configFileDirectory = QDir(settings.value("config_dir", default_config_path).toString());
     loadFiles();
 }

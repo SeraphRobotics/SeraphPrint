@@ -31,12 +31,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // Setup Internal States
     ci_ = new CoreInterface();
 
-    //Settings for Config file default directory path
-    //Find OS specific app_data filepath
-    QSettings ini(QSettings::IniFormat, QSettings::UserScope,
-    QCoreApplication::organizationName(),
-    QCoreApplication::applicationName());
-    QString app_data_path = QFileInfo(ini.fileName()).absolutePath();
+    // Settings for config file default directory path
+    // Find OS-specific app_data filepath
+    // QSettings constructor values were specified in main.cpp.
+    QSettings settings;
+    QString app_data_path = QFileInfo(settings.fileName()).absolutePath();
     enumerator = new QextSerialEnumerator();
     //Create new folder (if one does not exist) and store in default path variable
     QDir app_data_dir = QDir(app_data_path);
@@ -177,7 +176,8 @@ void MainWindow::updateState()
 }
 
 void MainWindow::terminate(){
-    //ToDo end app or deal with lack of printer here.
+    // Todo: end app or deal with lack of printer here.
+    qDebug() << "MainWindow::terminate(): not written";
 }
 
 
@@ -186,7 +186,7 @@ void MainWindow::setUpConnections()
     //COMPORTS
     connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)),connectWidget,SLOT(deviceAdded(QextPortInfo)));
     connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)),connectWidget,SLOT(deviceRemoved(QextPortInfo)));
-    connect(connectWidget,SIGNAL(mainDeviceRemoved),this,SLOT(terminate));
+    connect(connectWidget,SIGNAL(mainDeviceRemoved()),this,SLOT(terminate()));
     //CoreInterface
     connect(ci_,SIGNAL(stateChaged(int)),this,SLOT(onStateChaged(int)));
     connect(ci_,SIGNAL(needMaterialLoaded(int)),this,SLOT(materialNeeded(int)));
@@ -247,7 +247,7 @@ void MainWindow::printerConnected(){
     if (ci_->vm_->isInitialized())
     {
         qDebug()<<"Config file loaded successfully";
-//        QSettings settings("Creative Machines Lab", "FabPrint");
+//        QSettings settings;
 //        settings.setValue("config",config_path);
 //        cout << settings.value("config").toString().toStdString() << std::endl;
 //        settings.sync();
@@ -313,16 +313,17 @@ MainWindow::~MainWindow()
 //Changes default config file directory
 void MainWindow::on_actionChange_Directory_triggered()
 { 
-    //Change the default directory for config files using a file chooser dialog
-    QSettings theSettings("Creative Machines Lab", "FabPrint");
-    QString current_path = (theSettings.value("config_dir", default_config_path)).toString();
+    // Change the default directory for config files using a file chooser dialog
+    // QSettings constructor values were specified in main.cpp.
+    QSettings settings;
+    QString current_path = (settings.value("config_dir", default_config_path)).toString();
     QString new_path = QFileDialog::getExistingDirectory(this, tr("Directory"), current_path);
 
     /*As long as the user does not press "cancel", change the path*/
     if (!new_path.isNull())
     {
-       theSettings.setValue("config_dir", new_path);
-       theSettings.sync();
+       settings.setValue("config_dir", new_path);
+       settings.sync();
     }
 
     //Signal to connectwidget to reload config files in drop down

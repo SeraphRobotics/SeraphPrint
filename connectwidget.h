@@ -34,8 +34,6 @@ private:
     void loadFiles();
     void addConfig(QString path);
     void removeConfig(QString path);
-
-private:
     Ui::ConnectWidget *ui;
     CoreInterface *ci_;
     QStringList portList;

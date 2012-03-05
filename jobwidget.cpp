@@ -2,7 +2,6 @@
 #include "ui_jobwidget.h"
 #include <QFileDialog>
 #include <QDir>
-#include <QSettings>
 #include <qdebug>
 #include <QMessageBox>
 #include <math.h>
@@ -26,10 +25,11 @@ JobWidget::~JobWidget()
 void JobWidget::doInitialLoad()
 {
     // Load the saved file path into the box
-    QSettings theSettings("Creative Machines Lab", "FabPrint");
-    QString savedPath = theSettings.value("last used fab file", "").toString();
+    // QSettings constructor values were specified in main.cpp.
+    QSettings settings;
+    QString savedPath = settings.value("last used fab file", "").toString();
 
-    qDebug() << "Initial load called - from settings: " << savedPath;
+    qDebug() << "JobWidget::doInitialLoad() has last used fab file" << savedPath;
 
     if (savedPath != "")
     {
@@ -53,9 +53,10 @@ void JobWidget::setAndSaveFile(QString filePath, bool doSave)
     {
         if (doSave)
         {
-            QSettings theSettings("Creative Machines Lab", "FabPrint");
-            theSettings.setValue("last used fab file", filePath);
-            theSettings.sync();
+            // QSettings constructor values were specified in main.cpp.
+            QSettings settings;
+            settings.setValue("last used fab file", filePath);
+            settings.sync();
         }
         LoadFile(filePath);
     }
