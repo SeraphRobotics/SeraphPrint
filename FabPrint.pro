@@ -4,64 +4,56 @@
 #
 #-------------------------------------------------
 
-QT       += core gui\
-          xml\
-          script
+QT += \
+    core \
+    gui \
+    xml \
+    script
 
 TARGET = FabPrint
 TEMPLATE = app
 
-SOURCES += main.cpp\
-        connectwidget.cpp \
-        jobwidget.cpp \
-        printwidget.cpp \
-        baydialog.cpp \
-        baywidget.cpp \
-        materialswidget.cpp \
-        mainwindow.cpp \
-        gamepad.cpp \
-        motordialog.cpp \
-        aboutdialog.cpp
+SOURCES += \
+    main.cpp \
+    connectwidget.cpp \
+    jobwidget.cpp \
+    printwidget.cpp \
+    baydialog.cpp \
+    baywidget.cpp \
+    materialswidget.cpp \
+    mainwindow.cpp \
+    gamepad.cpp \
+    motordialog.cpp \
+    aboutdialog.cpp
 
-HEADERS  += mainwindow.h \
-        connectwidget.h \
-        jobwidget.h \
-        printwidget.h \
-        baydialog.h \
-        baywidget.h \
-        materialswidget.h \
-        gamepad.h \
-        motordialog.h \
-        aboutdialog.h
+HEADERS += \
+    mainwindow.h \
+    connectwidget.h \
+    jobwidget.h \
+    printwidget.h \
+    baydialog.h \
+    baywidget.h \
+    materialswidget.h \
+    gamepad.h \
+    motordialog.h \
+    aboutdialog.h
 
-FORMS    += mainwindow.ui \
-        connectwidget.ui \
-        jobwidget.ui \
-        printwidget.ui \
-        baydialog.ui \
-        baywidget.ui \
-        materialswidget.ui \
-        gamepad.ui \
-        motordialog.ui \
-        aboutdialog.ui
+FORMS += \
+    mainwindow.ui \
+    connectwidget.ui \
+    jobwidget.ui \
+    printwidget.ui \
+    baydialog.ui \
+    baywidget.ui \
+    materialswidget.ui \
+    gamepad.ui \
+    motordialog.ui \
+    aboutdialog.ui
 
 INCLUDEPATH += FabConLib
 include(FabConLib/FabConLib/include.pro)
 
 RESOURCES += \
-    arrows/resources.qrc
+    fabprint.qrc
 
-OTHER_FILES += \
-    media/testConfig.config \
-    media/testxdfl-test.xdfl \
-    media/testxdfl-mid.xdfl \
-    media/testxdfl.xdfl \
-    ../FabPrint-build-desktop-Qt_4_7_4_for_Desktop_-_MinGW_4_4__Qt_SDK__Release/JrKerr-Single-deposition.config \
-    ../FabPrint-build-desktop-Qt_4_7_4_for_Desktop_-_MinGW_4_4__Qt_SDK__Release/JrKerr-Single-deposition.config \
-    media/JrKerr-Single-deposition.config
-
-
-
-
-
-
+# OTHER_FILES should be referenced in include.pro.
