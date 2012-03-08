@@ -177,7 +177,11 @@ void MainWindow::updateState()
 
 void MainWindow::terminate(){
     // Todo: end app or deal with lack of printer here.
-    qDebug() << "MainWindow::terminate(): not written";
+
+    qDebug() << "Attempting shutdown.";
+    if(current_state != CONNECT){
+        abort();
+    }
 }
 
 

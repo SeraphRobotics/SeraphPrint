@@ -262,8 +262,9 @@ void ConnectWidget::on_connectButton_clicked(){
 
 
         // LOAD THE FILE
-//        QString config_path = configList.at(configIndex).filePath();
-        QString config_path = "JrKerr-Single-deposition.config";
+        QString config_path = configList.at(configIndex).filePath();
+        qDebug() << "Loading: " + config_path;
+        //QString config_path = "JrKerr-Single-deposition.config";
         QString configString;
         QDomDocument configDom;
         // load the config file into the DOM document
@@ -277,10 +278,15 @@ void ConnectWidget::on_connectButton_clicked(){
           configDom.setContent(&configFile);
           configFile.close();
         }
+
+        qDebug() << "Configuring config";
         configString = configDom.toString();
+        qDebug() << "Configuring port";
         portName = portList.at(portIndex);
 
         // ATTEMPT THE CONNECTION
+
+        qDebug() << "Attempting connection";
         ci_->setConfig(configString,portName);
         emit atemptConnect();
         /// Need an mechanism for checking errors
