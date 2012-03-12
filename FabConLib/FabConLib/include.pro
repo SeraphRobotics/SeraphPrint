@@ -1,4 +1,5 @@
-SOURCES += FabConLib/FabConLib/bay.cpp \
+SOURCES += \
+    FabConLib/FabConLib/bay.cpp \
     FabConLib/FabConLib/xdflpath.cpp \
     FabConLib/FabConLib/xdflvoxel.cpp \
     FabConLib/FabConLib/material.cpp \
@@ -16,7 +17,8 @@ SOURCES += FabConLib/FabConLib/bay.cpp \
     FabConLib/FabConLib/testing/jscitest.cpp \
     FabConLib/FabConLib/comportdetector.cpp
 
-HEADERS += FabConLib/FabConLib/bay.h \
+HEADERS += \
+    FabConLib/FabConLib/bay.h \
     FabConLib/FabConLib/xdflpath.h \
     FabConLib/FabConLib/xdflvoxel.h \
     FabConLib/FabConLib/material.h \

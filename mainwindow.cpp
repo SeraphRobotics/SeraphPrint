@@ -8,6 +8,9 @@
 // for opening web browser
 #include <QDesktopServices>
 #include <QUrl>
+#include <QDateTime>
+
+#include "qextserialenumerator.h"
 
 
 // Edit these stylesheets to change the appearance of the progress bar
@@ -27,33 +30,43 @@ MainWindow::MainWindow(QWidget *parent) :
     materialsInitialized(false),
     machineState(0)
 {
+    QDateTime curdt = QDateTime::currentDateTime();
+    QDateTime settime = QDateTime(QDate::fromString("12:06:2012", "d':'MM':'yyyy"),QTime(0,0));
+
+    if (curdt>settime){
+      QMessageBox::information(this->centralWidget(),"info","Your version has expired. please contact Seraph Robotics");
+      QTimer::singleShot(0,this,SLOT(close()));
+    }
+
+
     // Setup Internal States
     ci_ = new CoreInterface();
 
-    //Settings for Config file default directory path
-    //Find OS specific app_data filepath
-    QSettings ini(QSettings::IniFormat, QSettings::UserScope,
-    QCoreApplication::organizationName(),
-    QCoreApplication::applicationName());
-    QString app_data_path = QFileInfo(ini.fileName()).absolutePath();
-
+    // Settings for config file default directory path
+    // Find OS-specific app_data filepath
+    // QSettings constructor values were specified in main.cpp.
+    QSettings settings;
+    QString app_data_path = QFileInfo(settings.fileName()).absolutePath();
+    enumerator = new QextSerialEnumerator();
     //Create new folder (if one does not exist) and store in default path variable
     QDir app_data_dir = QDir(app_data_path);
-    app_data_dir.mkdir("FabAtHome");
+    app_data_dir.mkdir("Seraph");
 
-    default_config_path = app_data_path + QString("/FabAtHome");
+    default_config_path = app_data_path ;//+ QString("/Seraph");
     default_config_path = QDir::toNativeSeparators(default_config_path);
-    //std::cout << default_config_path.toStdString() << std::endl;
+
+    if(!QDir(default_config_path).exists()){
+        QDir().mkdir(default_config_path);
+    }
+
 
     // Setup UI
     ui->setupUi(this);
-    this->setWindowTitle("FabPrint");
+    this->setWindowTitle("SeraphPrint");
     ui->connectButton->setStyleSheet(ACTIVE);
     ui->jobButton->setStyleSheet(INCOMPLETE);
     ui->materialsButton->setStyleSheet(INCOMPLETE);
     ui->printButton->setStyleSheet(INCOMPLETE);
-//    this->setGeometry(120, 120, 531, 260);
-//    this->setFixedSize(this->size());
     connect(ui->forwardButton, SIGNAL(clicked()), this, SLOT(forwardClicked()));
     connect(ui->backButton, SIGNAL(clicked()), this, SLOT(backClicked()));
 
@@ -62,7 +75,9 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setUpWidgets();
 
     setUpConnections();
+    this->enumerator->setUpNotifications();
 }
+
 
 /**
  * This is an absolutely horrific kludge to get a
@@ -173,9 +188,22 @@ void MainWindow::updateState()
     showGamePad();
 }
 
+void MainWindow::terminate(){
+    // Todo: end app or deal with lack of printer here.
+
+    qDebug() << "Attempting shutdown.";
+    if(current_state != CONNECT){
+        abort();
+    }
+}
+
 
 void MainWindow::setUpConnections()
 {
+    //COMPORTS
+    connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)),connectWidget,SLOT(deviceAdded(QextPortInfo)));
+    connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)),connectWidget,SLOT(deviceRemoved(QextPortInfo)));
+    connect(connectWidget,SIGNAL(mainDeviceRemoved()),this,SLOT(terminate()));
     //CoreInterface
     connect(ci_,SIGNAL(stateChaged(int)),this,SLOT(onStateChaged(int)));
     connect(ci_,SIGNAL(needMaterialLoaded(int)),this,SLOT(materialNeeded(int)));
@@ -187,6 +215,7 @@ void MainWindow::setUpConnections()
     connect(printWidget, SIGNAL(stop()), this, SLOT(setStop()));
     connect(printWidget, SIGNAL(cancel()), this, SLOT(setStop()));
     connect(printWidget, SIGNAL(resume()), this, SLOT(setResume()));
+
 
     connect(this, SIGNAL(sendReloadConfigCommand()), connectWidget, SLOT(reLoadConfigFiles()));
 }
@@ -228,6 +257,15 @@ void MainWindow::setFileArg(QString theFile)
 {
     use_file_arg = true;
     file_arg = theFile;
+    QSettings settings;
+    settings.setValue("last used fab file", theFile);
+    settings.sync();
+    jobWidget->updatePreloadedFabFile();
+}
+
+QString MainWindow::getFileArg(){
+    if(use_file_arg){return file_arg;}
+    else{return QString("");}
 }
 
 void MainWindow::printerConnected(){
@@ -235,14 +273,6 @@ void MainWindow::printerConnected(){
     if (ci_->vm_->isInitialized())
     {
         qDebug()<<"Config file loaded successfully";
-//        QSettings settings("Creative Machines Lab", "FabPrint");
-//        settings.setValue("config",config_path);
-//        cout << settings.value("config").toString().toStdString() << std::endl;
-//        settings.sync();
-//        this->setFixedHeight(471);
-//        this->setFixedWidth(531);
-//        this->gamepad_container->show();
-//        ui->mainVLayout->addWidget(this->gamepad_container);
         showGamePad();
         ui->forwardButton->setEnabled(true);
         isConnected = true;
@@ -250,7 +280,7 @@ void MainWindow::printerConnected(){
 
     else
     {
-        QMessageBox::information(this, "FabPrint", tr("Error: invalid config file"));
+        QMessageBox::information(this, "SeraphPrint", tr("Error: invalid config file"));
         isConnected = false;
     }
 
@@ -301,16 +331,17 @@ MainWindow::~MainWindow()
 //Changes default config file directory
 void MainWindow::on_actionChange_Directory_triggered()
 { 
-    //Change the default directory for config files using a file chooser dialog
-    QSettings theSettings("Creative Machines Lab", "FabPrint");
-    QString current_path = (theSettings.value("config_dir", default_config_path)).toString();
+    // Change the default directory for config files using a file chooser dialog
+    // QSettings constructor values were specified in main.cpp.
+    QSettings settings;
+    QString current_path = (settings.value("config_dir", default_config_path)).toString();
     QString new_path = QFileDialog::getExistingDirectory(this, tr("Directory"), current_path);
 
     /*As long as the user does not press "cancel", change the path*/
     if (!new_path.isNull())
     {
-       theSettings.setValue("config_dir", new_path);
-       theSettings.sync();
+       settings.setValue("config_dir", new_path);
+       settings.sync();
     }
 
     //Signal to connectwidget to reload config files in drop down
@@ -325,5 +356,5 @@ void MainWindow::on_actionAbout_FabPrint_triggered()
 
 void MainWindow::on_actionVisit_FabAtHome_org_triggered()
 {
-    QDesktopServices::openUrl(QUrl("http://www.fabathome.org/"));
+    QDesktopServices::openUrl(QUrl("http://www.seraphrobotics.com/"));
 }

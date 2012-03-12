@@ -132,8 +132,11 @@ void XDFLHandler::loadFromDom(QDomDocument xdfl) {
     }
     QDomNode commandsNode = root.namedItem("commands");
     if (commandsNode.isNull()) {
-        qDebug()<<"NULL COMMANDS";
-        return;
+        commandsNode = root.namedItem("Commands");
+        if (commandsNode.isNull()) {
+            qDebug()<<"NULL COMMANDS";
+            return;
+        }
     }
 
     commands_ = commandsNode.childNodes();

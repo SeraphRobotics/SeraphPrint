@@ -15,9 +15,10 @@ class JobWidget : public QWidget
 public:
     explicit JobWidget(QWidget *parent, CoreInterface *ci);
     ~JobWidget();
+    void setFile();
 
 public slots:
-    void preloadedFabFile();
+    void updatePreloadedFabFile();
     void onLoadClicked();
 
     void estimatesLoaded(double time, double volume, int numcmd);

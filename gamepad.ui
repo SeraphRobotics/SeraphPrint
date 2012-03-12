@@ -48,7 +48,11 @@
         </font>
        </property>
        <property name="text">
-        <string>⇖</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="fabprint.qrc">
+         <normaloff>:/media/up-left.svg</normaloff>:/media/up-left.svg</iconset>
        </property>
        <property name="autoRepeat">
         <bool>true</bool>
@@ -90,7 +94,11 @@
         </font>
        </property>
        <property name="text">
-        <string>↑</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="fabprint.qrc">
+         <normaloff>:/media/up.svg</normaloff>:/media/up.svg</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -150,7 +158,11 @@
         </font>
        </property>
        <property name="text">
-        <string>⇗</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="fabprint.qrc">
+         <normaloff>:/media/up-right.svg</normaloff>:/media/up-right.svg</iconset>
        </property>
        <property name="autoRepeat">
         <bool>true</bool>
@@ -208,7 +220,11 @@
         </font>
        </property>
        <property name="text">
-        <string>←</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="fabprint.qrc">
+         <normaloff>:/media/left.svg</normaloff>:/media/left.svg</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -322,7 +338,11 @@ to
         </font>
        </property>
        <property name="text">
-        <string>⇙</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="fabprint.qrc">
+         <normaloff>:/media/down-left.svg</normaloff>:/media/down-left.svg</iconset>
        </property>
        <property name="autoRepeat">
         <bool>true</bool>
@@ -367,7 +387,11 @@ to
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>↓</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="fabprint.qrc">
+         <normaloff>:/media/down.svg</normaloff>:/media/down.svg</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -377,48 +401,6 @@ to
        </property>
        <property name="shortcut">
         <string>Down</string>
-       </property>
-       <property name="autoRepeat">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="3">
-      <widget class="QPushButton" name="drpushButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>50</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>50</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="baseSize">
-        <size>
-         <width>50</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>20</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>⇘</string>
        </property>
        <property name="autoRepeat">
         <bool>true</bool>
@@ -498,7 +480,11 @@ to
         </font>
        </property>
        <property name="text">
-        <string>→</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="fabprint.qrc">
+         <normaloff>:/media/right.svg</normaloff>:/media/right.svg</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -508,6 +494,52 @@ to
        </property>
        <property name="shortcut">
         <string>Right</string>
+       </property>
+       <property name="autoRepeat">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="3">
+      <widget class="QPushButton" name="drpushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>50</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="fabprint.qrc">
+         <normaloff>:/media/down-right.svg</normaloff>:/media/down-right.svg</iconset>
        </property>
        <property name="autoRepeat">
         <bool>true</bool>
@@ -1300,7 +1332,7 @@ to
           <string>Stop</string>
          </property>
          <property name="icon">
-          <iconset resource="arrows/resources.qrc">
+          <iconset>
            <normaloff>:/Arrow/Stop2.png</normaloff>:/Arrow/Stop2.png</iconset>
          </property>
          <property name="iconSize">
@@ -1365,7 +1397,7 @@ to
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="arrows/resources.qrc"/>
+  <include location="fabprint.qrc"/>
  </resources>
  <connections/>
 </ui>

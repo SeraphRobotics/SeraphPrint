@@ -33,7 +33,7 @@ void MaterialsWidget::updateState(int i){
 
 void MaterialsWidget::updateBays(){
     numBays = ci_->vm_->bays.size();
-    qDebug()<<"numBAys ="<<numBays;
+    qDebug() << "MaterialsWidget::updateBays() has numBays =" << numBays << ".";
     cleanUpBays();
     for (int x = 0; x < numBays; x++){
         BayWidget* b = new BayWidget(this,ci_,x);

@@ -22,6 +22,10 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="fabprint.qrc">
+    <normaloff>:/media/FabPrint.png</normaloff>:/media/FabPrint.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
@@ -301,7 +305,6 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout_FabPrint"/>
-    <addaction name="actionVisit_FabAtHome_org"/>
    </widget>
    <addaction name="menuOptions"/>
    <addaction name="menuHelp"/>
@@ -327,7 +330,7 @@
   </action>
   <action name="actionAbout_FabPrint">
    <property name="text">
-    <string>About FabPrint</string>
+    <string>About SeraphPrint</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
@@ -335,7 +338,7 @@
   </action>
   <action name="actionVisit_FabAtHome_org">
    <property name="text">
-    <string>Visit FabAtHome.org</string>
+    <string>Visit SeraphRobotics.com</string>
    </property>
    <property name="shortcut">
     <string>V</string>
@@ -343,6 +346,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="fabprint.qrc"/>
+ </resources>
  <connections/>
 </ui>
