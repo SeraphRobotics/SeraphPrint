@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<xdfl>
+<palette>
+  <material>
+	 <id>1</id>
+	 <areaConstant>1</areaConstant>
+	 <compressionVolume>1</compressionVolume>
+	 <name>stochasticSilicone</name>
+	 <pathHeight>0.25</pathHeight>
+	 <pathSpeed>10</pathSpeed>
+	 <pathWidth>2</pathWidth>
+  </material>
+</palette>
+<commands>
+	<voxel>
+		<materialID>1</materialID> 
+		<volume units = "mm^3">20</volume>  
+		<x>0</x> 
+		<y>0</y> 
+		<z>1</z>  
+	</voxel> 
+	<voxel>
+		<materialID>1</materialID> 
+		<volume units = "mm^3">20</volume>  
+		<x>0</x> 
+		<y>20</y> 
+		<z>1</z>  
+	</voxel> 
+	<voxel>
+		<materialID>1</materialID> 
+		<volume units = "mm^3">20</volume>  
+		<x>20</x> 
+		<y>20</y> 
+		<z>1</z>  
+	</voxel>
+	<voxel>
+		<materialID>1</materialID> 
+		<volume units = "mm^3">20</volume>  
+		<x>20</x> 
+		<y>0</y> 
+		<z>1</z>  
+	</voxel> 	
+</commands>
+</xdfl>

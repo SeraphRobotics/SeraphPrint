@@ -148,11 +148,13 @@ NPath Bay::onPath(XDFLPath path) {
     }
 
     QMap<QString,QString> properties = material_.property;
-    volume_ += properties.value("pathwidth").toDouble()
+
+    double v = properties.value("pathwidth").toDouble()
              * properties.value("pathheight").toDouble()
              * properties.value("areaconstant").toDouble()
              * path.length();
-
+    volume_+=v;
+    qDebug()<<"PAth volume is "<<v;
     path.toRelative();
     QScriptValue pathfunction = engine_->globalObject().property("onPath");
     if(!pathfunction.isValid()) {ss<<"\n onPath: NOT VALID FUNCTION";}
