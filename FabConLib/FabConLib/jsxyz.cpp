@@ -26,7 +26,8 @@ QScriptValue JsXYZ::pathTo(QScriptValue xs,QScriptValue ys,QScriptValue zs, QScr
     NPath n = xyz_->pathTo(x,y,z,speed);
     QVector<double> distances(n.numberOfStates(),0.0);
     for (int i=0; i<n.numberOfStates();i++) {
-        distances[i] = xyz_->distanceFromState(&n.getState(i));
+        State tempState(n.getState(i));
+        distances[i] = xyz_->distanceFromState(&tempState);
     }
     QScriptValue jsnpath = matrixFromNPath(xs.engine(),n,distances);
     return jsnpath;
@@ -41,7 +42,8 @@ QScriptValue JsXYZ::pathAlong(QScriptValue JSPath,QScriptValue JSspeed) {
     NPath n = xyz_->pathAlong(xpath,speed);
     QVector<double> distances(n.numberOfStates(),0.0);
     for (int i=0; i < n.numberOfStates(); i++) {
-        distances[i] = xyz_->distanceFromState(&n.getState(i));
+        State tempState(n.getState(i));
+        distances[i] = xyz_->distanceFromState(&tempState);
     }
     QScriptValue jsnpath = matrixFromNPath(JSPath.engine(),n,distances);
     return jsnpath;

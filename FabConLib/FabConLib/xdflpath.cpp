@@ -7,7 +7,7 @@ XDFLPath::XDFLPath(int material_id,bool relative):speed(0),materialID(material_i
 
 XDFLPath::XDFLPath(const XDFLPath &path) {
     materialID = path.materialID;
-    points=QList<FabPoint>::QList(path.points);
+    points=QList<FabPoint>(path.points);
 }
 
 double XDFLPath::length() {

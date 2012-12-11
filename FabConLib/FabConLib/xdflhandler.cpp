@@ -11,7 +11,7 @@ XDFLHandler::XDFLHandler():handlerstate_(XDFLHandler::Stopped),estimationDone_(f
 }
 
 XDFLHandler::XDFLHandler(VMPrototype* vm, QDomDocument xdfl) {
-    XDFLHandler::XDFLHandler();
+    XDFLHandler();
     setVM(vm);
     loadFromDom(xdfl);
 }
