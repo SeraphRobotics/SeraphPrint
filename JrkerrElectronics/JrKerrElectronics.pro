@@ -1,8 +1,8 @@
 # -------------------------------------------------
 # Project created by QtCreator 2011-06-10T00:48:58
 # -------------------------------------------------
-DEFINES += CONFIRM_ENABLED \
-    FatHmBrd
+DEFINES += CONFIRM_ENABLED ##\
+##    FatHmBrd
 QT += xml
 QT -= gui
 TARGET = TestMotors

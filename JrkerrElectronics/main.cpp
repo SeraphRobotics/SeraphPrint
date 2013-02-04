@@ -11,8 +11,8 @@
 
 int main(int argc, char *argv[]) {
     QCoreApplication app(argc,argv);
-    QString configFilePath= "hobby-servo.config";   //"./testConfig.config";
-    QString ComPort=""; ///dev/tty.usbserial-A400gNfH";   //"tty.usbserial-A9003UF2";
+    QString configFilePath= "scanner.config"; //hobby-servo.config";   //"./testConfig.config";
+    QString ComPort="COM3"; ///dev/tty.usbserial-A400gNfH";   //"tty.usbserial-A9003UF2";
     ElectronicsInterface eInterface;
     QDomDocument document;
     // load the config file into the DOM document
@@ -34,8 +34,9 @@ int main(int argc, char *argv[]) {
     if (eInterface.isInitialized()){
         printf("\nmoving motor!@!!!!");
         // eInterface.getCoordinatedMotion()->initializePathMode();
-        // eInterface.getMotor(1)->moveAbsolute(1,1,1);
+        // eInterface.getMotor(1)->moveAbsolute(.1,.1,.1);
         // eInterface.getMotor(1)->waitMove();*/
+
         CoordinatedMotion* cmotion = eInterface.getCoordinatedMotion();
        int x = 1;
        int dx =- 1;
@@ -76,33 +77,17 @@ int main(int argc, char *argv[]) {
         v5[3]=z;
 
 
-     /*   State v3(5,0.0);
-        v3[0]=6.0; */
         NPath p1(4);
         p1.addState(v1);
         p1.addState(v2);
-       // p1.addState(v3);
-        //  p1.addState(v4);
-     //   p1.addState(v5);
-       // p1.addState(&v3);
-        //        State v4(5,0.0);
-        //        v4[0]=0;
-       /* State v5(5,0.0);
-        v5[0]=6.0;
-        v5[1]=0;
-        v5[2]=0;
-        v5[4]=1.5;
-        v5[3]=1.5;
-        State v6(5,0.0);
-        v6[0]=6.0;
-        NPath p2(5);
-        //        p2.addState(&v4);
-        p2.addState(&v5);
-        p2.addState(&v6); */
+        p1.addState(v3);
+        p1.addState(v4);
+        p1.addState(v5);
+
+
         if (cmotion->initializePathMode()){
             printf("\ntrying coordinated motion");
             cmotion->moveAlongPath(p1);
-           // cmotion->moveAlongPath(p2);
         }
     }
     eInterface.waitOnMove();
