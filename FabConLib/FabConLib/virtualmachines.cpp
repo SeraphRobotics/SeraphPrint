@@ -225,11 +225,14 @@ bool VirtualPrinter::executeRelativeNPath(NPath path) {
 State VirtualPrinter::currentState() {
 
     State cp(statesize_,0.0);
+
+    State lash = eInterface.getCoordinatedMotion()->getAppliedLash();
     QMapIterator<int,int> i(idtostatemap_);
     while(i.hasNext()) {
         i.next();
         double p = eInterface.getMotor(i.key())->getPosition();
-        cp[i.value()]=p;
+
+        cp[i.value()]=p-lash[i.value()];
     }
     return cp;
 }

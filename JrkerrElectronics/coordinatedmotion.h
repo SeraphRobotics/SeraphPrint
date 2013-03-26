@@ -79,6 +79,11 @@ public:
      **/
     bool validateNPath(NPath path);
 
+
+    void applyBacklash(NPath path);
+
+    State getAppliedLash();
+
     /**
      * returns the mapping between the motor id and the state index number
      * This is needed since not all motors need be in the coordinate motion
@@ -108,7 +113,12 @@ private:
     QMap<int,double> scales;
     QMap<int,int> addressMap;
     int frequency_;
+    State backlash_vector;
+    State previous_dx;
+    State appliedLash_;
 
 };
+
+
 
 #endif // COORDINATEDMOTION_H

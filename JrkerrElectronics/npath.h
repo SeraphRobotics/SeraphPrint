@@ -104,6 +104,11 @@ public:
      * returns the last absolute state of the machine the npath would drive the machine too.
      */
     State lastAbsolute();
+    /**
+     * returns the last relative state of the machine the npath would drive the machine too.
+     */
+    State lastRelative();
+
 
 private:
     QVector<QVector<double> > states_;

@@ -121,6 +121,12 @@ State NPath::lastAbsolute(){
     return lastabsolute;
 }
 
+State NPath::lastRelative(){
+    int i = states_.size()-2;
+    State newstate = subStates(states_[i+1],states_[i],allStates_);
+    return newstate;
+}
+
 
 State addStates(State s1, State s2, bool allStates){
     if (s1.size()!=s2.size()){return State();}

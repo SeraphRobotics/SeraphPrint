@@ -13,6 +13,7 @@ Motor::Motor(int id,const byte& address,
 initialized_(false),
 commandedPosition_(0.0),
 isReversed_(false),
+backlash_(0.0),
 id_(id),
 ADDRESS(address),
 COUNTS_PER_REV(countsPerRev),
@@ -48,6 +49,7 @@ Motor::Motor(int id, const byte &address,
 initialized_(false),
 commandedPosition_(0.0),
 isReversed_(false),
+backlash_(0.0),
 id_(id),
 ADDRESS(address),
 COUNTS_PER_REV(countsPerRev),
@@ -82,6 +84,16 @@ void Motor::setReversed(bool isReversed)
 {
     this->isReversed_ = isReversed;
 }
+
+void Motor::setBacklash(float b)
+{
+    this->backlash_=b;
+}
+float Motor::getBacklash()
+{
+    return backlash_;
+}
+
 
 double Motor::getPosition()
 {

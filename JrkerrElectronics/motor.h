@@ -83,6 +83,19 @@ public:
      */
     void setReversed(bool);
 
+    /**
+      Set the motor backlash value.
+      @param A float that gives the absolute value of the backlash
+     */
+    void setBacklash(float b);
+
+    /**
+      returns the motor backlash
+     */
+
+    float getBacklash();
+
+
 public slots: // these are slots for when the item is added to javascipt interface.
 
     /**
@@ -202,6 +215,7 @@ private:
     double velocity_, acceleration_; //The velocity and acceleration of the motor
     bool initialized_; //true is motor is initialized and ready for us, false otherwise
     bool isReversed_; //true if motor direction is to be reversed from default values on controller board
+    float backlash_;
 
     QString error_;
 

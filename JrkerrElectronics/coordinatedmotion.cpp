@@ -13,6 +13,11 @@ CoordinatedMotion::CoordinatedMotion(QMap<int,Motor*> motors):initialized_(false
 void CoordinatedMotion::setMotors(QMap<int,Motor*> motors)
 {
     motors_=motors;
+
+    backlash_vector = State(motors.size()+1,0.0);
+    previous_dx = State(motors.size()+1,0.0);
+    appliedLash_=State(motors.size()+1,0.0);
+
     //Reset position of all motors.
     QMapIterator<int,Motor*> i(motors_);
     while(i.hasNext()){
@@ -20,8 +25,46 @@ void CoordinatedMotion::setMotors(QMap<int,Motor*> motors)
         i.value()->resetPosition(); // reset motors
         addressMap[i.key()] = i.value()->getAddress(); //populate address map for integer of the state variable to the motor address
         scales[i.key()]=i.value()->getCountsPerRev(); //populate the scaling factors for the motors
+        backlash_vector[i.key()]=i.value()->getBacklash();
     }
 }
+
+State CoordinatedMotion::getAppliedLash(){
+    return State(appliedLash_);
+}
+
+
+void CoordinatedMotion::applyBacklash(NPath path){
+    /**
+     * a change of direction is when sign(Vi-1) != sign(Vi)
+     * singe sign is not dependant on the dt component due to time being unidirectional
+     * It is possible to compare signs of the delta
+     * so change of direction when sign(dXi-1) != sign(dXi)
+     **/
+
+    path.toRelative();
+    State previousState = previous_dx;
+
+
+
+    for(int i=0;i<path.numberOfStates();i++){
+        State currentState = path.getState(i);
+
+        //detect and apply backlash
+        for(int j=1;j<path.stateSize();j++){
+            int signVp = (previousState[j] > 0) - (previousState[j] < 0);
+            int signVc = (currentState[j] > 0) - (currentState[j] < 0);
+            if (signVp!=signVc){
+                currentState[j]=currentState[j]+signVc*backlash_vector[j];
+                appliedLash_[j]+=signVc*backlash_vector[j];
+            }
+        }
+
+        path.setState(i,currentState);
+    }
+
+}
+
 
 int CoordinatedMotion::getNumberOfAxes()
 {
@@ -96,6 +139,8 @@ bool CoordinatedMotion::moveAlongPath(NPath states,int startPointIndex){
         error_string+=" STATES INVALID";
         return false;
     }
+
+    applyBacklash(states);
     NP::HzPath hpath = NP::toHzPath(&states,startPointIndex);
     
     if (!pathbegan_){
@@ -105,6 +150,8 @@ bool CoordinatedMotion::moveAlongPath(NPath states,int startPointIndex){
     NP::AddStates(hpath);
     int result = NP::DlPathPoints(&error_string);   //send path points to the printer and start path
     if (result == -2) error_string += "\n error adding points";
+
+    previous_dx = states.lastRelative();
     return true;
 }
 

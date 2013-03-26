@@ -186,6 +186,7 @@ void ElectronicsInterface::createMotor(QDomNode sourceDomNode) {
 
         int ID;
         byte ADDRESS;
+        float backlash=0;
         double COUNTS_PER_REV; //Number of counts for 1 U of motion.
         double TICKS_PER_SECOND; //Number of ticks that a motor makes per second.
 
@@ -281,6 +282,10 @@ void ElectronicsInterface::createMotor(QDomNode sourceDomNode) {
                 el=achild.toElement();
                 tempString = el.text();
                 maxComAcc = tempString.toDouble();
+            }else if("backlash"==achild.nodeName()){
+                el=achild.toElement();
+                tempString = el.text();
+                backlash = tempString.toDouble();
             }else{
                 continue;
             }
@@ -290,6 +295,7 @@ void ElectronicsInterface::createMotor(QDomNode sourceDomNode) {
         motors_.append(new Motor(ID,ADDRESS,COUNTS_PER_REV,TICKS_PER_SECOND,KP,KD,KI,IL,OL,CL,EL,SR,DB,
                                  minComPos,maxComPos, minComVel, maxComVel, minComAcc, maxComAcc));
         motors_.last()->setReversed(reversed);
+        motors_.last()->setBacklash(backlash);
 }
 
 CoordinatedMotion* ElectronicsInterface::getCoordinatedMotion() {
