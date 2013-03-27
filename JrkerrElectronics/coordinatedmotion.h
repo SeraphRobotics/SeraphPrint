@@ -121,7 +121,6 @@ private:
     QMap<int,int> addressMap;
     int frequency_;
     State backlash_vector;
-    State previous_dx;
     State appliedLash_;
 
 };

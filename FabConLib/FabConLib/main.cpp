@@ -23,9 +23,9 @@ int main(int argc, char *argv[]) {
     VMTester vmtest;
     bool worked = vmtest.connectVM();
     printf("\n it %s work\n", (worked)?"did":"didnt");
-    vmtest.movementTest();
-//    vmtest.vm.eInterface.waitOnMove();
-    qDebug()<<vmtest.vm.currentState();
+//    vmtest.NPathTest();
+    vmtest.moveTest();
+
 
 
 
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 //    QTimer::singleShot(0,jstester,SLOT(test()));
 
 //    ComportDetector *cpi = new ComportDetector();
-
+    vmtest.vm.eInterface.waitOnMove();
     QTimer::singleShot(100,&app,SLOT(quit()));
     return app.exec();
 }

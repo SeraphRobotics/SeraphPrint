@@ -122,7 +122,7 @@ State NPath::lastAbsolute(){
 }
 
 State NPath::lastRelative(){
-    int i = states_.size()-2;
+    int i = states_.size()-3;
     State newstate = subStates(states_[i+1],states_[i],allStates_);
     return newstate;
 }

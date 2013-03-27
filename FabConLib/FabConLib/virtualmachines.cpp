@@ -43,13 +43,12 @@ State VMPrototype::currentState() {
 QVector<double> VMPrototype::currentPosition(){
     State cp = currentState();
     State lash = eInterface.getCoordinatedMotion()->getAppliedLash();
-
-    return xyzmotion->positionFromState(&cp);
+    State perceived = subStates(cp,lash,false);
+    return xyzmotion->positionFromState(&perceived);
 }
 
 bool VMPrototype::moveTo(double x, double y, double z, double speed) {
-    State startstate = currentState();
-    FabPoint cp = pointFromQVector(xyzmotion->positionFromState(&startstate));
+    FabPoint cp = pointFromQVector(currentPosition());
     FabPoint tp;
     tp.x = x;
     tp.y = y;
@@ -219,7 +218,6 @@ bool VirtualPrinter::executeNPath(NPath path) {
 }
 
 bool VirtualPrinter::executeRelativeNPath(NPath path) {
-    qDebug()<<"Moving relative";
     path.setOrigin(laststate_);
     return executeNPath(path);
 }

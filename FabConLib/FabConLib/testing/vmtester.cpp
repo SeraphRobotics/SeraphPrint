@@ -27,7 +27,30 @@ bool VMTester::connectVM(){
 
 }
 
-bool VMTester::movementTest(){
+bool VMTester::moveTest(){
+    if(!vm.isInitialized()){
+        qDebug()<< "not initialized";
+        return false;
+    }
+    int n = 50;
+    for(int i=0;i<n;i++){
+        vm.move(0,1,0,10);
+    }
+    vm.eInterface.waitOnMove();
+    return vm.move(-n*0,-n*1,0,10);
+}
+
+bool VMTester::moveToTest(){
+    if(!vm.isInitialized()){
+        qDebug()<< "not initialized";
+        return false;
+    }
+    vm.moveTo(10,10,0,10);
+    vm.eInterface.waitOnMove();
+    return vm.moveTo(0,0,0,10);
+}
+
+bool VMTester::NPathTest(){
     if(!vm.isInitialized()){
         qDebug()<< "not initialized";
         return false;

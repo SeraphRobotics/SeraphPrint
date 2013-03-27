@@ -10,7 +10,9 @@ public:
 
     bool connectVM();
 
-    bool movementTest();
+    bool NPathTest();
+    bool moveTest();
+    bool moveToTest();
 
 
 //    TestPrinter vm;
