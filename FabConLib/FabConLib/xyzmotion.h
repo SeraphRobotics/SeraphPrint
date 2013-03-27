@@ -3,9 +3,9 @@
 
 #include <QObject>
 #include <QMap>
-#include "motor.h"
-#include "npath.h"
-#include "nmotion.h"
+#include "../../JrkerrElectronics/motor.h"
+#include "../../JrkerrElectronics/npath.h"
+#include "../../JrkerrElectronics/nmotion.h"
 #include "xdflpath.h"
 #include <QDomNode>
 

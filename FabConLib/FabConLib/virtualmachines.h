@@ -3,8 +3,8 @@
 
 #include <QScriptEngine>
 #include <QDomDocument>
-#include "motor.h"
-#include "electronicsinterface.h"
+#include "../../JrkerrElectronics/motor.h"
+#include "../../JrkerrElectronics/electronicsinterface.h"
 #include "bay.h"
 #include "jscmotion.h"
 #include "xyzmotion.h"
@@ -72,11 +72,13 @@ class VMPrototype:public QObject
         XYZMotion* xyzmotion;
 
     protected:
-        QString comPort_;
         QString error_string_;
-        bool initialized_;
-        int statesize_;
         JsXYZ jsxyz_;
+
+        // needed at this level for the TestPrinter fuctionality
+        QString comPort_;
+        int statesize_;
+        bool initialized_;
         State laststate_;
         QMap<int,int> idtostatemap_;
         int frequency_;

@@ -2,7 +2,7 @@
 #define BAY_H
 
 #include <QObject>
-#include "motor.h"
+#include "../../JrkerrElectronics/motor.h"
 //#include "materialcalibration.h"
 #include <QDomNode>
 #include "xdflpath.h"

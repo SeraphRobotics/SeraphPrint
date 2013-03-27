@@ -26,7 +26,8 @@ SOURCES += main.cpp \
     testing/util.cpp \
     testing/unittests.cpp \
     testing/testerforci.cpp \
-    testing/jscitest.cpp
+    testing/jscitest.cpp \
+    testing/vmtester.cpp
 
 HEADERS += bay.h \
     xdflpath.h \
@@ -43,7 +44,8 @@ HEADERS += bay.h \
     testing/util.h \
     testing/unittests.h \
     testing/testerforci.h \
-    testing/jscitest.h
+    testing/jscitest.h \
+    testing/vmtester.h
 
 INCLUDEPATH += JrkerrElectronics/
 include("JrKerr_Electronics.pro")

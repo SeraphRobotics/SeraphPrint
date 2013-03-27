@@ -29,7 +29,7 @@ void testerforci::makeConnections(){
 
 void testerforci::setConfig(){
     qDebug("attemping to make a connection...");
-    QString configFilePath="../../../media/JrKerr-Single-deposition.config";
+    QString configFilePath="../../../media/blash-lead.config";
     QDomDocument document;
     {
       QFile configFile(configFilePath);
@@ -40,14 +40,14 @@ void testerforci::setConfig(){
       document.setContent(&configFile);
       configFile.close();
     }
-    ci->setConfig(document.toString(),"COM6");
+    ci->setConfig(document.toString(),"COM3");
 }
 
 void testerforci::chagedState(int state){
     if ((state== CoreInterface::Connected)&&!connected_){
         qDebug("state is connected");
         connected_=true;
-        ci->move(0,5,-20,50);
+//        ci->move(0,5,-20,50);
 //        disconnect(ci,SIGNAL(currentPosition(double,double,double)),this,SLOT(updatedPosition(double,double,double)));
 
         ci->resetPosition();

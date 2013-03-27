@@ -73,6 +73,23 @@ NPath CoordinatedMotion::applyBacklash(NPath path){
 }
 
 
+State CoordinatedMotion::currentState() {
+    State cp(getStateSize(),0.0);
+    QMapIterator<int,Motor*> i(motors_);
+    while(i.hasNext()) {
+        i.next();
+        double p = i.value()->getPosition();
+        cp[i.key()]=p;
+    }
+    return cp;
+}
+
+
+int CoordinatedMotion::getStateSize()
+{
+    return getNumberOfAxes()+1;
+}
+
 int CoordinatedMotion::getNumberOfAxes()
 {
     return motors_.size();
@@ -172,7 +189,6 @@ bool CoordinatedMotion::resetPosition(){
 QString CoordinatedMotion::getErrors(){
     return error_string;
 }
-
 
 
 bool CoordinatedMotion::validateNPath(NPath path){

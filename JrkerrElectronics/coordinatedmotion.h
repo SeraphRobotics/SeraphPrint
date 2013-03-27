@@ -98,6 +98,13 @@ public slots:// THis is uneeded
     int getNumberOfAxes();
 
     /**
+     * returns the state size for the NPaths of motion
+     */
+    int getStateSize();
+
+    State currentState();
+
+    /**
      * returns the string of errors which may have occured while being used.
      */
     QString getErrors();
