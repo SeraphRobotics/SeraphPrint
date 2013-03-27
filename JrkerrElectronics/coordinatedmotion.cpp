@@ -34,7 +34,7 @@ State CoordinatedMotion::getAppliedLash(){
 }
 
 
-void CoordinatedMotion::applyBacklash(NPath path){
+NPath CoordinatedMotion::applyBacklash(NPath path){
     /**
      * a change of direction is when sign(Vi-1) != sign(Vi)
      * singe sign is not dependant on the dt component due to time being unidirectional
@@ -44,24 +44,31 @@ void CoordinatedMotion::applyBacklash(NPath path){
 
     path.toRelative();
     State previousState = previous_dx;
-
+    NPath newpath(path.stateSize(),true);
+    newpath.setOrigin(path.origin());
 
 
     for(int i=0;i<path.numberOfStates();i++){
         State currentState = path.getState(i);
-
+        State newstate = copyState(currentState);
         //detect and apply backlash
         for(int j=1;j<path.stateSize();j++){
             int signVp = (previousState[j] > 0) - (previousState[j] < 0);
             int signVc = (currentState[j] > 0) - (currentState[j] < 0);
-            if (signVp!=signVc){
-                currentState[j]=currentState[j]+signVc*backlash_vector[j];
-                appliedLash_[j]+=signVc*backlash_vector[j];
+//            qDebug()<< "\n\tj:"<<j<<" "<<currentState[j]<<" "<<previousState[j];
+            if ((signVp!=signVc) && (fabs(currentState[j]-previousState[j])>0.0001) ){
+//                qDebug()<<" applied:"<<signVc*backlash_vector[j];
+                newstate[j]=currentState[j]+signVc*backlash_vector[j];
+                appliedLash_[j]+= signVc*backlash_vector[j];
+
             }
         }
 
-        path.setState(i,currentState);
+//        qDebug()<<"\n"<<previousState.at(2)<<" "<<currentState.at(2) << " "<< newstate.at(2);
+        previousState = currentState;
+        newpath.addState(newstate);
     }
+    return newpath;
 
 }
 
@@ -140,8 +147,8 @@ bool CoordinatedMotion::moveAlongPath(NPath states,int startPointIndex){
         return false;
     }
 
-    applyBacklash(states);
-    NP::HzPath hpath = NP::toHzPath(&states,startPointIndex);
+    NPath newstates = applyBacklash(states);
+    NP::HzPath hpath = NP::toHzPath(&newstates,startPointIndex);
     
     if (!pathbegan_){
         NP::InitPath(&error_string);
@@ -151,7 +158,7 @@ bool CoordinatedMotion::moveAlongPath(NPath states,int startPointIndex){
     int result = NP::DlPathPoints(&error_string);   //send path points to the printer and start path
     if (result == -2) error_string += "\n error adding points";
 
-    previous_dx = states.lastRelative();
+    previous_dx = newstates.lastRelative();
     return true;
 }
 
@@ -169,6 +176,8 @@ QString CoordinatedMotion::getErrors(){
 
 
 bool CoordinatedMotion::validateNPath(NPath path){
+    if (path.stateSize()!=(motors_.size()+1)){return false;}
+
     path.toRelative();
     double dt = 0;
     double v=0,a=0,v0=0;

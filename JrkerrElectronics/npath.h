@@ -121,5 +121,5 @@ private:
 
 State subStates(State s1, State s2, bool allStates);
 State addStates(State s1, State s2, bool allStates);
-
+State copyState(State s1);
 #endif // NPATH_H

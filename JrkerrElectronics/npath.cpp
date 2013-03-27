@@ -159,3 +159,13 @@ State subStates(State s1, State s2, bool allStates){
     }
     return newstate;
 }
+
+
+State copyState(State s1){
+    State copy(s1.size());
+    for(int i=0;i<s1.size();i++){
+        copy[i]=s1.at(i);
+    }
+    return copy;
+
+}

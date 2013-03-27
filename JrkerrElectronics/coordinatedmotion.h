@@ -80,7 +80,7 @@ public:
     bool validateNPath(NPath path);
 
 
-    void applyBacklash(NPath path);
+    NPath applyBacklash(NPath path);
 
     State getAppliedLash();
 
