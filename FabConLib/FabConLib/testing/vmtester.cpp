@@ -34,10 +34,10 @@ bool VMTester::moveTest(){
     }
     int n = 50;
     for(int i=0;i<n;i++){
-        vm.move(0,1,0,10);
+        vm.move(1,1,0,10);
     }
     vm.eInterface.waitOnMove();
-    return vm.move(-n*0,-n*1,0,10);
+    return vm.move(-n*1,-n*1,0,10);
 }
 
 bool VMTester::moveToTest(){

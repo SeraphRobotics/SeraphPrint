@@ -51,9 +51,20 @@ NPath CoordinatedMotion::applyBacklash(NPath path){
         State newstate = copyState(currentState);
         //detect and apply backlash
         for(int j=1;j<path.stateSize();j++){
+            /**
+             * Applied lash | Vc | Blash
+             * 0 0 0
+             * 0 + +
+             * 0 - 0
+             * + 0 0
+             * + + 0
+             * + - -
+             **/
+
+
             int signLash = (appliedLash_[j] > 0) - (appliedLash_[j] < 0);
             int signVc = (currentState[j] > 0) - (currentState[j] < 0);
-            if ((signLash!=signVc) && (fabs(signVc)>0) ){//&&(fabs(currentState[j]-previousState[j])>0.0001)
+            if (  ((signLash==0)&&(signVc>0)) ||((signLash>0)&&(signVc<0)) ){//&&(fabs(currentState[j]-previousState[j])>0.0001)
                 newstate[j]=currentState[j]+signVc*backlash_vector[j];
                 appliedLash_[j]+= signVc*backlash_vector[j];
                 qDebug()<<"\tLASH"<<j<<appliedLash_[j]<<"\t"<<currentState.at(j)<<"\t"<<newstate.at(j);
