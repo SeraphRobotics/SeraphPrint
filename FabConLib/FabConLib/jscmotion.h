@@ -2,7 +2,7 @@
 #define JSCMOTION_H
 
 #include <QObject>
-#include "../../JrkerrElectronics/coordinatedmotion.h"
+#include "coordinatedmotion.h"
 #include <QtScript>
 #include "jsnpath.h"
 

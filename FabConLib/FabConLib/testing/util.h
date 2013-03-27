@@ -4,8 +4,8 @@
 #include <QFile>
 #include <QTextStream>
 
-#include "../../JrkerrElectronics/nmotion.h"
-#include "../../JrkerrElectronics/npath.h"
+#include "nmotion.h"
+#include "npath.h"
 #include "../material.h"
 
 void testdump(NPath h,QString filename);

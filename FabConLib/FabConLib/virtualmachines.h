@@ -3,8 +3,8 @@
 
 #include <QScriptEngine>
 #include <QDomDocument>
-#include "../../JrkerrElectronics/motor.h"
-#include "../../JrkerrElectronics/electronicsinterface.h"
+#include "motor.h"
+#include "electronicsinterface.h"
 #include "bay.h"
 #include "jscmotion.h"
 #include "xyzmotion.h"

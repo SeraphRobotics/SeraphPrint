@@ -2,7 +2,7 @@
 #define JSNPATH_H
 
 #include <QtScript>
-#include "../../JrkerrElectronics/npath.h"
+#include "npath.h"
 
 
 
