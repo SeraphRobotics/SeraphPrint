@@ -9,9 +9,9 @@
 #include "printwidget.h"
 #include "gamepad.h"
 #include "aboutdialog.h"
-#include "FabConLib/xdflhandler.h"
-#include "FabConLib/virtualmachines.h"
-#include "FabConLib/coreinterface.h"
+#include "xdflhandler.h"
+#include "virtualmachines.h"
+#include "coreinterface.h"
 #include "qextserialenumerator.h"
 
 namespace Ui {

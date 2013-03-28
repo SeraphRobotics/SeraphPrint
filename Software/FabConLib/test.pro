@@ -47,7 +47,7 @@ HEADERS += bay.h \
     testing/jscitest.h \
     testing/vmtester.h
 
-INCLUDEPATH += JrkerrElectronics/
+INCLUDEPATH += ../JrkerrElectronics/
 include("JrKerr_Electronics.pro")
 
 OTHER_FILES += \

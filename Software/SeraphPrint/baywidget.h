@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <qpushbutton.h>
 #include "baydialog.h"
-#include "FabConLib/coreinterface.h"
+#include "coreinterface.h"
 
 namespace Ui {
     class BayWidget;

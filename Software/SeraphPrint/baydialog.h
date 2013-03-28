@@ -2,7 +2,7 @@
 #define BAYDIALOG_H
 
 #include <QDialog>
-#include "FabConLib/coreinterface.h"
+#include "coreinterface.h"
 
 namespace Ui {
     class BayDialog;

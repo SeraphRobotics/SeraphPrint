@@ -50,11 +50,11 @@ FORMS += \
     motordialog.ui \
     aboutdialog.ui
 
-INCLUDEPATH += FabConLib
-include(FabConLib/FabConLib/include.pro)
+INCLUDEPATH += ../FabConLib
+include(fabconlib.pro)
 
-RESOURCES += fabprint.qrc
-//OTHER_FILES += fabstudio.rc
+RESOURCES += ../../fabprint.qrc
+OTHER_FILES += fabstudio.rc
 RC_FILE = fabstudio.rc
 
 # OTHER_FILES should be referenced in include.pro.

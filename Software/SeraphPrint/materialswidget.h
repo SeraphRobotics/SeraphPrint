@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "baywidget.h"
-#include "FabConLib/coreinterface.h"
+#include "coreinterface.h"
 
 using namespace std;
 

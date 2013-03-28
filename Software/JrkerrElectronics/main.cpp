@@ -11,8 +11,8 @@
 
 int main(int argc, char *argv[]) {
     QCoreApplication app(argc,argv);
-    QString configFilePath= "JrKerr-Single-deposition.config"; //hobby-servo.config";   //"./testConfig.config";
-    QString ComPort="COM3"; ///dev/tty.usbserial-A400gNfH";   //"tty.usbserial-A9003UF2";
+    QString configFilePath= "../../media/JrKerr-Single-deposition.config";
+    QString ComPort="COM3"; //"/dev/tty.usbserial-A400gNfH";   //"tty.usbserial-A9003UF2";
     ElectronicsInterface eInterface;
     QDomDocument document;
     // load the config file into the DOM document

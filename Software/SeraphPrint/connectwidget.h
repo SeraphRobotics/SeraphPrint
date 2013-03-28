@@ -5,7 +5,7 @@
 #include <QHash>
 #include <QFileInfoList>
 #include <QDir>
-#include "FabConLib/coreinterface.h"
+#include "coreinterface.h"
 #include "qextserialenumerator.h"
 namespace Ui
 {

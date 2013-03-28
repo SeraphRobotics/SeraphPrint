@@ -2,7 +2,7 @@
 #define PRINTWIDGET_H
 
 #include <QWidget>
-#include "FabConLib/coreinterface.h"
+#include "coreinterface.h"
 
 namespace Ui {
     class PrintWidget;

@@ -2,7 +2,7 @@
 #include <QDebug>
 
 VMTester::VMTester(){
-    configFilePath="../../../media/blash-lead.config";
+    configFilePath="../../media/blash-lead.config";
     comport="COM3";
 }
 
