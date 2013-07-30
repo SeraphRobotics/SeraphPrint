@@ -198,6 +198,22 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed) {
     // see http://people.mech.kuleuven.be/~bruyninc/blender/doc/interpolation-api.html#trapezoidal-velocity
     // dx_i = x_i/dist*a^2/(v^2*f^2)*(2i-1)
 
+    XDFLPath p(0,false);
+    FabPoint o, e;
+    o.x=0;
+    o.y=0;
+    o.z=0;
+    e.x=x;
+    e.y=y;
+    e.z=z;
+    p.points.append(o);
+    p.points.append(e);
+    NPath np = pathAlong(p,speed);
+    np.toRelative();
+    return np;
+    /*
+
+
     NPath np(statesize_,false);
     double dist = sqrt(x*x+y*y+z*z);
     if (0==acceleration_ || 0==frequency_ || 0==speed || 0==dist) {return NPath(statesize_);}
@@ -301,6 +317,7 @@ NPath XYZMotion::pathTo(double x, double y, double z, double speed) {
 
     np.toRelative();
     return np;
+    */
 }
 
 State XYZMotion::positionToState(double x,double y,double z) {
@@ -311,8 +328,8 @@ State XYZMotion::positionToState(double x,double y,double z) {
     int zindex = idToStateIndex_[axismap_["z"].actuatorID];
     double zscale = axismap_["z"].revPerDist;
     State temp(statesize_,0.0);
-    temp[xindex] = x*xscale;
-    temp[yindex] = y*yscale;
+    temp[xindex] = 1*(x*xscale-y*yscale);  // [ 1 -1 ]
+    temp[yindex] = -1*(x*xscale+y*yscale);  // [ -1  -1 ]   x=A*Theta
     temp[zindex] = z*zscale;
     return temp;
 }
@@ -325,8 +342,8 @@ QVector<double> XYZMotion::positionFromState(State* state) {
     int zindex = idToStateIndex_[axismap_["z"].actuatorID];
     double zscale = axismap_["z"].revPerDist;
     QVector<double> v(3,0);
-    v[0] = state->at(xindex)/xscale;
-    v[1] = state->at(yindex)/yscale;
+    v[0] =  0.5*( 1*state->at(xindex)/xscale - state->at(yindex)/yscale);    //[ 1 -1 ]
+    v[1] = -0.5*( 1*state->at(xindex)/xscale + state->at(yindex)/yscale);    //[ -1 -1 ]    theta = A^-1 * x
     v[2] = state->at(zindex)/zscale;
     return v;
 }
