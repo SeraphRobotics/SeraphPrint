@@ -74,6 +74,7 @@ void PrintWidget::on_pauseButton_clicked(){
     }else{
         emit resume();
         ui->label_info->setText("Resuming");
+        ui->pauseButton->setText("Pause");
         isPaused=false;
     }
 }

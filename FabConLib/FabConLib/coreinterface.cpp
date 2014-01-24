@@ -135,9 +135,9 @@ void CoreInterface::setMaterial(int bayid,int materialid){
 
 }
 void CoreInterface::moveBayMotor(int bayid, double amount, double time){
-    if ((state_==NotInitialized) || (state_==Printing)){return;}
+    if ((state_==NotInitialized) ){return;}//|| (state_==Printing)
     // THIS SUCKS we need to rethink this
-    qDebug()<<"Ordered Bay to Move";
+//    qDebug()<<"Ordered Bay to Move";
     NPath n = vm_->bays[bayid]->jogActuators(amount,time);
     vm_->executeRelativeNPath(n);
 }
@@ -146,7 +146,7 @@ void CoreInterface::startPrint(){
     if (state_!=FileLoaded){return;}
 //    positionTimer_.disconnect();
     positionTimer_.stop();
-    vm_->moveToThread(handler_);
+//    vm_->moveToThread(handler_);
     setState(Printing);
     QTimer::singleShot(0,handler_,SLOT(start()));
 }
@@ -156,7 +156,7 @@ void CoreInterface::pausePrint(){
 }
 
 void CoreInterface::resumePrint(){
-    vm_->moveToThread(handler_);
+//    vm_->moveToThread(handler_);
     QTimer::singleShot(0,handler_,SLOT(resume()));
 }
 

@@ -51,8 +51,9 @@ void BayDialog::on_downButton_clicked()
 {
     double increment = ui->incrementSpin->value();
     double position = ui->positionSpin->value();
-
+//    qDebug()<<"down button";
     ci->moveBayMotor(id_,increment,increment);/// THIS IS BAD FORM: TODO add a time/speed mechanism
+
     ui->positionSpin->setValue(position+increment);
 }
 

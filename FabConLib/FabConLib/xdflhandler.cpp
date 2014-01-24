@@ -50,7 +50,7 @@ void XDFLHandler::pause() {
         qDebug()<<"Pausing...";
         handlerstate_ = XDFLHandler::Paused;
     }
-    vm_->moveToThread(QApplication::instance()->thread());
+//    vm_->moveToThread(QApplication::instance()->thread());
     // (mutex automatically released upon locker destruction)
 }
 
@@ -87,7 +87,7 @@ void XDFLHandler::cancel() {
 }
 
 void XDFLHandler::forceStop(){
-    vm_->moveToThread(QApplication::instance()->thread());
+//    vm_->moveToThread(QApplication::instance()->thread());
 //    cancel();
 //    deleteLater();
 //    quit();
@@ -296,7 +296,7 @@ void XDFLHandler::run()
     laststate_        = vm_->currentState();
 
     //    qDebug()<<"\nExiting the XDFL handler thread.";
-    vm_->moveToThread(QApplication::instance()->thread());
+//    vm_->moveToThread(QApplication::instance()->thread());
     // (mutex automatically released upon locker destruction)
 }
 
