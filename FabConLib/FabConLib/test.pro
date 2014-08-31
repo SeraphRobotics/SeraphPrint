@@ -45,8 +45,13 @@ HEADERS += bay.h \
     testing/testerforci.h \
     testing/jscitest.h
 
-INCLUDEPATH += JrkerrElectronics/
+INCLUDEPATH += ../../JrkerrElectronics/
 include("JrKerr_Electronics.pro")
+
+
+INCLUDEPATH += ../../UV_Automation
+SOURCES += ../../UV_Automation/UV.cpp
+HEADERS += ../../UV_Automation/UV.h
 
 OTHER_FILES += \
     media/testxdfl.xdfl \

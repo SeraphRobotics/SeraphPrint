@@ -5,8 +5,8 @@
 #include <QFile>
 #include <QTextStream>
 
-#include "nmotion.h"
-#include "npath.h"
+//#include "nmotion.h"
+//#include "npath.h"
 #include "testing/util.h"
 #include "testing/unittests.h"
 
@@ -14,6 +14,8 @@
 #include "testing/testerforci.h"
 #include "testing/jscitest.h"
 #include "comportdetector.h"
+
+#include "UV.h"
 
 int main(int argc, char *argv[]) {
     printf("\nStarting..");
@@ -48,15 +50,17 @@ int main(int argc, char *argv[]) {
 //        printf("\nDone\n")*/;
 
 
-    testerforci *tester = new testerforci();
-    QTimer::singleShot(0,tester,SLOT(setConfig()));
+//    testerforci *tester = new testerforci();
+//    QTimer::singleShot(0,tester,SLOT(setConfig()));
 
 //    JsCiTest *jstester = new JsCiTest();
 //    QTimer::singleShot(0,jstester,SLOT(test()));
 
 //    ComportDetector *cpi = new ComportDetector();
 
-
+    UV uv;
+    uv.setComPort("COM5");
+    uv.setValue(230);
 
 
     return app.exec();//return 0;
