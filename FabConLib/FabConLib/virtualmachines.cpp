@@ -168,6 +168,10 @@ void VirtualPrinter::loadConfig(QDomDocument document) {
     jsxyz_.setXYZ(xyzmotion);
 
 
+    QDomNode uvnode = root.namedItem("uv");
+    uv_=new UV(uvnode);
+    if(!uv_->connected and uvnode.childNodes().size()>0){error_string_+="\nError, could not open UV tool";}
+
     //BAYS
     QDomNode tools = root.namedItem("tool");
     QDomNodeList toolChildren  = tools.childNodes();
@@ -194,13 +198,24 @@ QString VirtualPrinter::getErrors(){
     QString returnstring = "";
     QTextStream ss(&returnstring,QIODevice::WriteOnly);
     foreach(Motor* m,eInterface.getMotors()) {
-        ss<<"\nMotor "<<m->getID()<<":"<<m->getErrors();
+        QString merr = m->getErrors();
+        if(!merr.isEmpty()){
+            ss<<"\nMotor "<<m->getID()<<":"<<m->getErrors();
+        }
     }
     foreach(Bay* b,bays) {
-        ss<<"\nBay "<<b->getId()<<":"<<b->getErrors();
+        QString berr = b->getErrors();
+        if(!berr.isEmpty()){
+            ss<<"\nBay "<<b->getId()<<":"<<b->getErrors();
+        }
     }
-    ss<<"\nCMotion:"<<eInterface.getCoordinatedMotion()->getErrors();
-    ss<<"\nVM:"<<error_string_;
+    QString cmerrs = eInterface.getCoordinatedMotion()->getErrors();
+    if(!cmerrs.isEmpty()){
+        ss<<"\nCMotion:"<<eInterface.getCoordinatedMotion()->getErrors();
+    }
+    if(!error_string_.isEmpty()){
+        ss<<"\nVM:"<<error_string_;
+    }
 
 
     return returnstring;

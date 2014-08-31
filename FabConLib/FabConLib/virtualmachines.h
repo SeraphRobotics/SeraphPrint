@@ -9,6 +9,7 @@
 #include "jscmotion.h"
 #include "xyzmotion.h"
 #include "jsxyz.h"
+#include "../UV_Automation/UV.h"
 
 class VMPrototype:public QObject
     {
@@ -70,6 +71,7 @@ class VMPrototype:public QObject
         ElectronicsInterface eInterface;// this should be private. Its only here to alow for loadconfig thread to work
         QList<Bay*> bays;
         XYZMotion* xyzmotion;
+        UV* uv_;
 
     protected:
         QString comPort_;

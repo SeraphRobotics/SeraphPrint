@@ -32,6 +32,7 @@ void CoreInterface::setConfig(QString configFile,QString comport){
     connect(configthread,SIGNAL(finished()),configthread,SLOT(deleteLater()));
     vm_->moveToThread(configthread);
     QTimer::singleShot(0,configthread,SLOT(start()));
+
 }
 
 
@@ -207,6 +208,7 @@ void CoreInterface::configLoaded(){
     connect(&positionTimer_,SIGNAL(timeout()),this,SLOT(getCurrentPosition()));
     positionTimer_.setInterval(1000);
     positionTimer_.start();
+    error(vm_->getErrors());
 }
 
 void CoreInterface::donePrinting(){

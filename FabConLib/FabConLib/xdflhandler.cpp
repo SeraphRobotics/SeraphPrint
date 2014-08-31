@@ -372,7 +372,12 @@ void XDFLHandler::  processCommand() {
         double dwelltime = commandTag.text().toDouble();
         runNPath(dwell(dwelltime));
 
-    } else {
+    } else if ("uv" == commandTag.nodeName().toLower()) {
+        int uv = commandTag.text().toInt();
+        qDebug()<<"UV:"<<uv;
+        vm_->uv_->setValue(uv);
+
+    }else{
     }
     current_command_++;
     return;

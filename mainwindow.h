@@ -66,10 +66,13 @@ private slots:
     void hideGamePad();
     void showGamePad();
 
+    void errors(QString errs);
+
 private:
     void updateState();
     void setUpWidgets();
     void setUpConnections();
+
 
 
 private:

@@ -26,7 +26,7 @@ int incomingByte = 0;
 
 void loop() {
   // Some example procedures showing how to display to the pixels:
-  if (Serial.available() > 7) {
+  if (Serial.available() > 0) {
                 // read the incoming byte:
                 incomingByte = Serial.read();
                 // say what you got:

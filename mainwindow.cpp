@@ -198,6 +198,12 @@ void MainWindow::terminate(){
 }
 
 
+void MainWindow::errors(QString errs){
+    if(!errs.isEmpty()){
+        QMessageBox::warning (this,"error",errs);
+    }
+}
+
 void MainWindow::setUpConnections()
 {
     //COMPORTS
@@ -208,6 +214,7 @@ void MainWindow::setUpConnections()
     connect(ci_,SIGNAL(stateChaged(int)),this,SLOT(onStateChaged(int)));
     connect(ci_,SIGNAL(needMaterialLoaded(int)),this,SLOT(materialNeeded(int)));
     connect(ci_,SIGNAL(printsComplete()),this,SLOT(printDone()));
+    connect(ci_,SIGNAL(error(QString)),this,SLOT(errors(QString)));
 
     // Print widget
     connect(printWidget, SIGNAL(go()), this, SLOT(setGo()));

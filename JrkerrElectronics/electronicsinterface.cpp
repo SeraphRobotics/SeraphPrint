@@ -321,12 +321,19 @@ void ElectronicsInterface::waitOnMove() {
 QString ElectronicsInterface::getErrors() {
     QString returnstring = "";
     QTextStream ss(&returnstring,QIODevice::WriteOnly);
-    ss<<"\nEInterface: "<<error_string_;
+    if(!error_string_.isEmpty()){
+        ss<<"\nEInterface: "<<error_string_;
+    }
     foreach(Motor* m,motors_) {
-        ss<<"\n\tMotor: "<<m->getID()<<":"<<m->getErrors();
+        QString merr = m->getErrors();
+        if(!merr.isEmpty()){
+            ss<<"\n\tMotor: "<<m->getID()<<":"<<m->getErrors();
+        }
     }
 
-    ss<<"\n\tCMotion:"<<cmotion_.getErrors();
-
+    QString cerr = cmotion_.getErrors();
+    if(!cerr.isEmpty()){
+        ss<<"\n\tCMotion:"<<cmotion_.getErrors();
+    }
     return returnstring;
 }

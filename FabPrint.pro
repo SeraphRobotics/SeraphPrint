@@ -53,6 +53,11 @@ FORMS += \
 INCLUDEPATH += FabConLib
 include(FabConLib/FabConLib/include.pro)
 
+INCLUDEPATH += UV_Automation
+SOURCES += UV_Automation/UV.cpp
+HEADERS += UV_Automation/UV.h
+
+
 RESOURCES += fabprint.qrc
 //OTHER_FILES += fabstudio.rc
 RC_FILE = fabstudio.rc
