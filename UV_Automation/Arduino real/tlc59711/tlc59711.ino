@@ -1,3 +1,5 @@
+#include <Adafruit_TLC59711.h>
+
 
 
 #include "Adafruit_TLC59711.h"
@@ -22,7 +24,7 @@ void setup() {
 }
 
 uint8_t d1=0;
-uint8_t d2=0
+uint8_t d2=0;
 uint16_t wd=0;
 
 void loop() {
@@ -34,8 +36,9 @@ void loop() {
                 wd = ((uint16_t)d2 << 8) | d1;
                 // say what you got:
                 Serial.print("I received: ");
-                Serial.println(d1);
-                serial.println(d2);
+//                Serial.println(d1);
+//                Serial.println(d2);
+                Serial.println(wd);
                 colorWipe(wd, 0, 0, 100);   // "Red" (depending on your LED wiring)
   }
 

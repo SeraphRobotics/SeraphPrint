@@ -56,10 +56,10 @@ void UV::setValue(int PWM){
 
     char fill= c.cell();
     QByteArray ba(1,fill);
-
+    ba.push_front(c.row());
 
     qint64 l = ba.length();
-
+    qDebug()<<"writing"<<ba.toHex();
     comport_->write(ba,l);
 }
 
