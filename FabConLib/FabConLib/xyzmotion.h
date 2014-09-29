@@ -33,7 +33,7 @@ public:
      * Calculates a relative path to a point(x,y,z) from the origin
      * at the given speed using the preset acceleration
      */
-    QStringList pathTo(double x, double y, double z, double speed);
+    QStringList pathTo(double x, double y, double z, double speed, bool isrelative=false);
 
     /**
      * Caclulated the relative states for movment along a XDFLPath's relative positions

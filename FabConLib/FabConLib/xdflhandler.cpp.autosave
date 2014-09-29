@@ -326,7 +326,7 @@ void XDFLHandler::  processCommand() {
         }
         new_start_point = p.start();
         if (!pointsEqual(new_start_point,last_end_point_,0.1)) { // ensures that the machine doesn't jump between points
-            FabPoint delta = subtractpoints(new_start_point,last_end_point_);
+            FabPoint delta = new_start_point;//subtractpoints(new_start_point,last_end_point_);
 //            runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
             vm_->runCmds(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
 

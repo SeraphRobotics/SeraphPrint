@@ -6,6 +6,7 @@
 
 #include "testing/util.h"
 #include "xdflvoxel.h"
+#include <QFile>
 
 VMPrototype::VMPrototype():initialized_(false){}
 
@@ -28,6 +29,8 @@ QString VMPrototype::getErrors() {
 QVector<double> VMPrototype::currentPosition(){
     return QVector<double>(3,0.0);
 }
+
+void VMPrototype::runCmds(QStringList sl){}
 
 bool VMPrototype::moveTo(double x, double y, double z, double speed) {
 
@@ -115,20 +118,11 @@ void VirtualPrinter::loadConfig(QDomDocument document) {
 
     // ELECTRONICS INTERFACE
 //    eInterface.initialize(electronics,comPort_);
-//    initialized_  = eInterface.isInitialized();
-//    idtostatemap_ = eInterface.getCoordinatedMotion()->getIdToStateIndexMap();
-//    frequency_ = eInterface.getCoordinatedMotion()->getFrequency();
-//    statesize_ = eInterface.getCoordinatedMotion()->getNumberOfAxes()+1;
-
-//    laststate_ = State(statesize_,0);
 
 
     // XYZMOTION
     QDomNode motion = root.namedItem("motion");
     xyzmotion =new XYZMotion(motion);
-
-
-
 
     //BAYS
     QDomNode tools = root.namedItem("tool");
@@ -168,31 +162,61 @@ QString VirtualPrinter::getErrors(){
     return returnstring;
 }
 
+void VirtualPrinter::runCmds(QStringList sl){
+    ai_->writeCommands(sl);
+}
 
-
-
+bool VirtualPrinter::moveTo(double x, double y, double z, double speed){
+    QStringList sl = xyzmotion->pathTo(x,y,z,speed);
+    ai_->writeCommands(sl);
+}
+bool VirtualPrinter::move(double x, double y, double z, double speed){
+    QStringList sl = xyzmotion->pathTo(x,y,z,speed,true);
+    ai_->writeCommands(sl);
+}
 
 bool VirtualPrinter::forceStop(){
+    ai_->disconnect();
     initialized_ = false;
     return true;
 }
-
 void VirtualPrinter::resetPosition(){
+    QString cmd = "G92 X0 Y0 Z0";
+    foreach (Bay* b,bays){
+        foreach(QString aname,b->actuatorNames_)
+            cmd.append(" "+aname+"0");
+    }
+    QStringList sl;
+    sl.append(cmd);
+    ai_->writeCommands(sl);
 }
-
 ///////////////////////////////////////////////////////
 
 TestPrinter::TestPrinter():VMPrototype() {
 }
 
 void TestPrinter::loadConfig(QDomDocument document) {
-//    QDomElement root = document.documentElement();
-//    QDomNode electronics = root.namedItem("electronics");
-
-    // THIS SHOULD BE BASED ON THE NODES
-
-//    totalprintcommands_ = NPath(statesize_,false);
     VMPrototype::loadConfig(document);
+    QDomElement root = document.documentElement();
+
+    // XYZMOTION
+    QDomNode motion = root.namedItem("motion");
+    xyzmotion =new XYZMotion(motion);
+
+    //BAYS
+    QDomNode tools = root.namedItem("tool");
+    QDomNodeList toolChildren  = tools.childNodes();
+
+    bays.clear();
+    bays = QList<Bay*>();
+
+    for(uint k=0; k<toolChildren.length();k++){
+        if ("bay"==toolChildren.at(k).nodeName().toLower()){
+            bays.append(new Bay(toolChildren.at(k)));
+            bays.last()->setEngine(makeEngine());
+        }
+    }
+
 	
 }
 
@@ -200,13 +224,49 @@ void TestPrinter::loadConfig(QDomDocument document) {
 
 
 
+void TestPrinter::runCmds(QStringList sl){
+    totalprintcommands_+=sl;
+}
+bool TestPrinter::moveTo(double x, double y, double z, double speed){
+    QStringList sl = xyzmotion->pathTo(x,y,z,speed);
+    totalprintcommands_+=sl;
+}
+bool TestPrinter::move(double x, double y, double z, double speed){
+    QStringList sl = xyzmotion->pathTo(x,y,z,speed,true);
+    totalprintcommands_+=sl;
+}
 
-
-
-
+bool TestPrinter::forceStop(){}
 void TestPrinter::resetPosition(){
+    QString cmd = "G92 X0 Y0 Z0";
+    foreach (Bay* b,bays){
+        foreach(QString aname,b->actuatorNames_)
+            cmd.append(" "+aname+"0");
+    }
+    QStringList sl;
+    sl.append(cmd);
+    totalprintcommands_+=sl;
+}
+
+void TestPrinter::dumpstates(){
+    QFile f("dump.gcode");
+    if(!f.open(QIODevice::WriteOnly | QIODevice::Text)){
+        qDebug()<<"could not open file";
+        foreach(QString s, totalprintcommands_){
+            qDebug()<<s;
+        }
+        return;
+    }
+    QTextStream out(&f);
+    foreach(QString s, totalprintcommands_){
+        out<<s;
+    }
+    f.close();
+    qDebug()<<"Wrote cmds";
 
 }
+
+
 
 
 QString runScript(VirtualPrinter *vm, QString script_) {

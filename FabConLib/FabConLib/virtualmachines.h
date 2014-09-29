@@ -5,6 +5,7 @@
 #include <QDomDocument>
 #include "bay.h"
 #include "xyzmotion.h"
+#include "arduinointerface.h"
 
 class VMPrototype:public QObject
     {
@@ -39,9 +40,9 @@ class VMPrototype:public QObject
          * Used to limit the reach of the upper level code.
          * @return true if path is valid and queued.
          */
-
-
         QVector<double> currentPosition();
+
+        void runCmds(QStringList sl);
 
         bool moveTo(double x, double y, double z, double speed);
         bool move(double x, double y, double z, double speed);
@@ -59,9 +60,6 @@ class VMPrototype:public QObject
         QString comPort_;
         QString error_string_;
         bool initialized_;
-        int statesize_;
-        QMap<int,int> idtostatemap_;
-        int frequency_;
     };
 
 
@@ -76,9 +74,15 @@ public slots:
     void loadConfig(QDomDocument document);
     QString getErrors();
 
+    void runCmds(QStringList sl);
+    bool moveTo(double x, double y, double z, double speed);
+    bool move(double x, double y, double z, double speed);
+
     bool forceStop();
     void resetPosition();
 
+public:
+    ArduinoInterface* ai_;
 
 //public:
 //    ElectronicsInterface eInterface; //TODO: this should be private. Nothing above VM should access it.
@@ -96,11 +100,16 @@ public:
 public slots:
     void loadConfig(QDomDocument document);
 
-//    void dumpstates();
+    void dumpstates();
     void resetPosition();
+    void runCmds(QStringList sl);
+    bool moveTo(double x, double y, double z, double speed);
+    bool move(double x, double y, double z, double speed);
+
+    bool forceStop();
 
 private:
-    QList<QString> totalprintcommands_;
+    QStringList totalprintcommands_;
 };
 
 

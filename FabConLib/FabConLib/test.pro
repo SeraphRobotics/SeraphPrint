@@ -23,6 +23,7 @@ SOURCES += main.cpp \
     testing/util.cpp \
     testing/unittests.cpp \
     testing/testerforci.cpp \
+    ../../arduinoInterface/arduinoInterface/arduinointerface.cpp
 
 HEADERS += bay.h \
     xdflpath.h \
@@ -36,6 +37,8 @@ HEADERS += bay.h \
     testing/util.h \
     testing/unittests.h \
     testing/testerforci.h \
+    ../../arduinoInterface/arduinoInterface/arduinointerface.h
+
 
 
 
@@ -50,7 +53,9 @@ OTHER_FILES += \
     media/JrKerr-Single-deposition.config \
     media/JrKerr-Duel-deposition.config
 
-
+include("../../arduinoInterface/qextserialport-1.2rc/src/qextserialport.pri")
+INCLUDEPATH += ../../arduinoInterface/qextserialport-1.2rc/
+INCLUDEPATH += ../../arduinoInterface/arduinoInterface/
 
 
 

@@ -94,12 +94,17 @@ public slots:
     void setMaterial(Material material);
 
     //Actuation
+    QStringList onStartPath();
+    QStringList onEndPath();
     /**
      * This returns a relative NPath from a relative path.
      * It uses a script function from the config file
      */
     QStringList onPath(XDFLPath path);
 
+
+    QStringList onStartVoxel();
+    QStringList onEndVoxel();
     /**
      * This returns a relative NPath from a relative voxel.
      * It uses a script function from the config file
@@ -111,6 +116,9 @@ public slots:
      * this is a hack to work with the current system and should be improved
      */
     QStringList jogActuators(double amount,double time);
+
+public:
+    QList<QString> actuatorNames_;
 
 private:
     QScriptEngine* engine_;
@@ -124,7 +132,7 @@ private:
     QVector<double> location_; //The bay systems point of contact
     Material material_;
     QMap<QString,QString> scriptSettings_;
-    QList<QString> actuatorNames_;
+//    QList<QString> actuatorNames_;
     QString script_;
     QString error_;
 };

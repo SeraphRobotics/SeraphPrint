@@ -135,6 +135,55 @@ void Bay::setEngine(QScriptEngine* engine) {
 }
 
 //Actuation
+QStringList Bay::onStartPath(){
+
+    QTextStream ss(&error_,QIODevice::WriteOnly);
+    QScriptValue pathfunction = engine_->globalObject().property("onStartPath");
+    if(!pathfunction.isValid()) {
+        ss<<"\n onStartPath: NOT VALID FUNCTION";
+        QStringList returnlist;
+        return returnlist;
+    }
+    QScriptValue jsStringList = pathfunction.call(QScriptValue(),QScriptValueList());
+    return QStringListFromStringMatrix(jsStringList);
+}
+QStringList Bay::onEndPath(){
+    QTextStream ss(&error_,QIODevice::WriteOnly);
+    QScriptValue pathfunction = engine_->globalObject().property("onEndPath");
+    if(!pathfunction.isValid()) {
+        ss<<"\n onEndPath: NOT VALID FUNCTION";
+        QStringList returnlist;
+        return returnlist;
+    }
+    QScriptValue jsStringList = pathfunction.call(QScriptValue(),QScriptValueList());
+    return QStringListFromStringMatrix(jsStringList);
+}
+
+QStringList Bay::onStartVoxel(){
+    QTextStream ss(&error_,QIODevice::WriteOnly);
+    QScriptValue pathfunction = engine_->globalObject().property("onStartVoxel");
+    if(!pathfunction.isValid()) {
+        ss<<"\n onStartVoxel: NOT VALID FUNCTION";
+        QStringList returnlist;
+        return returnlist;
+    }
+    QScriptValue jsStringList = pathfunction.call(QScriptValue(),QScriptValueList());
+    return QStringListFromStringMatrix(jsStringList);
+}
+
+QStringList Bay::onEndVoxel(){
+    QTextStream ss(&error_,QIODevice::WriteOnly);
+    QScriptValue pathfunction = engine_->globalObject().property("onEndVoxel");
+    if(!pathfunction.isValid()) {
+        ss<<"\n onEndVoxel: NOT VALID FUNCTION";
+        QStringList returnlist;
+        return returnlist;
+    }
+    QScriptValue jsStringList = pathfunction.call(QScriptValue(),QScriptValueList());
+    return QStringListFromStringMatrix(jsStringList);
+}
+
+
 QStringList Bay::onPath(XDFLPath path) {
     QStringList returnlist;
     QTextStream ss(&error_,QIODevice::WriteOnly);
@@ -164,7 +213,10 @@ QStringList Bay::onPath(XDFLPath path) {
         return returnlist;
     }
 
-    return QStringListFromStringMatrix(jsStringList);
+    returnlist+=onStartPath();
+    returnlist+=QStringListFromStringMatrix(jsStringList);
+    returnlist+=onEndPath();
+    return returnlist;
 
 }
 
@@ -184,7 +236,10 @@ QStringList Bay::onVoxel(XDFLVoxel voxel) {
         return returnlist;
     }
 
-    return QStringListFromStringMatrix(jsStringList);
+    returnlist+=onStartVoxel();
+    returnlist+=QStringListFromStringMatrix(jsStringList);
+    returnlist+=onEndVoxel();
+    return returnlist;
 }
 
 

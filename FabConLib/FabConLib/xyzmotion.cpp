@@ -48,14 +48,17 @@ QStringList XYZMotion::pathAlong(XDFLPath path,double speed) {
     return returnlist;
 }
 
-QStringList XYZMotion::pathTo(double x, double y, double z, double speed) {
+QStringList XYZMotion::pathTo(double x, double y, double z, double speed, bool isrelative) {
     QStringList returnlist;
     speed = fabs(speed);
+    if(isrelative){ returnlist.append("G91");} //to relative
     QString s = "G1 X"+QString::number(x)+
                   " Y"+QString::number(y)+
                   " Z"+QString::number(z)+
                   " F"+QString::number(speed*60.0);
     returnlist.append(s);
+    if(isrelative){ returnlist.append("G90");} //to Aboslute
+    return returnlist;
 }
 
 

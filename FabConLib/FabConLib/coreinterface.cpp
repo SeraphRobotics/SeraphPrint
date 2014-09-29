@@ -7,7 +7,7 @@
 #include <QDebug>
 
 CoreInterface::CoreInterface():state_(NotInitialized){
-    vm_ = new VirtualPrinter();//VirtualPrinter();
+    vm_ = new TestPrinter();//new VirtualPrinter();
 }
 
 
@@ -176,9 +176,9 @@ void CoreInterface::forceStop(){
         vm_->forceStop();
         handler_->forceStop();
         handler_->deleteLater();
-        vm_ = new VirtualPrinter();
+        vm_ = new TestPrinter();//new VirtualPrinter();
         setConfig(config_,comport_);
-    //    positionTimer_.disconnect();
+//        positionTimer_.disconnect();
 //        setState(NotInitialized);
     }else{
         qDebug("CALLED");
