@@ -4,7 +4,7 @@
 #include <QDebug>
 
 XDFLHandler::XDFLHandler():handlerstate_(XDFLHandler::Stopped),estimationDone_(false),
-    estimatedTime_(0),estimatedVolume_(0),current_material_(0),current_command_(0),needMaterial_(false)
+    estimatedTime_(0),estimatedVolume_(0),current_material_(0),current_command_(0),needMaterial_(false),current_bay_(-1)
 
 {
     last_end_point_ = FabPoint();
@@ -341,6 +341,12 @@ void XDFLHandler::  processCommand() {
         } else { // if it is an extrusion path we feed it to the proper bay.
 //             n = material_bay_mapping_[p.materialID]->onPath(p);
 //            n = vm_->xyzmotion->pathAlong(p,speed);
+            if(current_bay_!=material_bay_mapping_[p.materialID]->getId()){
+                current_bay_ = material_bay_mapping_[p.materialID]->getId();
+                QStringList sl;
+                sl.append("T"+QString::number(current_bay_));
+                vm_->runCmds(sl);
+            }
             n = material_bay_mapping_[p.materialID]->onPath(p);
         }
 //        runNPath(n);
@@ -369,6 +375,12 @@ void XDFLHandler::  processCommand() {
 
         //run NPATH from bay
 //        runNPath(material_bay_mapping_[v.id]->onVoxel(v));
+        if(current_bay_!=material_bay_mapping_[v.id]->getId()){
+            current_bay_ = material_bay_mapping_[v.id]->getId();
+            QStringList sl;
+            sl.append("T"+QString::number(current_bay_));
+            vm_->runCmds(sl);
+        }
         vm_->runCmds(material_bay_mapping_[v.id]->onVoxel(v));
 
         //SET LAST_END_POINT to location of voxel in ABS coordinates

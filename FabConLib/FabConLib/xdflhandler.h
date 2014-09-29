@@ -142,6 +142,7 @@ private:
     unsigned int current_command_;
     FabPoint last_end_point_;
     bool needMaterial_;
+    int current_bay_;
 };
 
 #endif // XDFLHANDLER_H

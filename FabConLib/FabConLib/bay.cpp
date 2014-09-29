@@ -259,19 +259,23 @@ QStringList Bay::onVoxel(XDFLVoxel voxel) {
 
 QStringList Bay::jogActuators(double amount,double time){
     QStringList returnlist;
-    QListIterator<QString> i(actuatorNames_);
+    QListIterator<QString> li(actuatorNames_);
     float d=0;
-    while(i.hasNext()){
-        returnlist.append("G92 "+i.next()+QString::number(0));
+
+    returnlist.append("T"+QString::number( getId() ) );
+    while(li.hasNext())
+    {
+        returnlist.append("G92 "+li.next()+QString::number(0));
         d+=amount;
     }
-    i.toFront();
-    QString s="G1 ";
-    while(i.hasNext()){
-        s.append(" "+i.next()+QString::number(0));
+
+    li.toFront();
+    while(li.hasNext()){
+        QString s="G1";
+        s.append(" "+li.next()+QString::number(0));
+        s.append(" F"+QString::number(d/time));
+        returnlist.append(s);
     }
-    s.append(" F"+QString::number(d/time));
-    returnlist.append(s);
 
     return returnlist;
 }
