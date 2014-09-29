@@ -109,9 +109,7 @@ int XDFLHandler::getNumberOfCommands() {
 
 void XDFLHandler::setVM(VMPrototype* vm) {
     vm_ = vm;
-    laststate_= State(vm_->nstatesize(),0.0);
 
-    //connect(this,SIGNAL(doNPath(NPath)),vm,SLOT(executeNPath(NPath)));
     updateState();
 }
 
@@ -293,7 +291,6 @@ void XDFLHandler::run()
     }
     // XDFLHandler::Stopped:
     // Stop processing and reset progress.
-    laststate_        = vm_->currentState();
 
     //    qDebug()<<"\nExiting the XDFL handler thread.";
 //    vm_->moveToThread(QApplication::instance()->thread());
@@ -330,16 +327,16 @@ void XDFLHandler::  processCommand() {
         new_start_point = p.start();
         if (!pointsEqual(new_start_point,last_end_point_,0.1)) { // ensures that the machine doesn't jump between points
             FabPoint delta = subtractpoints(new_start_point,last_end_point_);
-            runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
+//            runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
         }
 
-        NPath n(vm_->nstatesize(),false);
+//        NPath n(vm_->nstatesize(),false);
         if (p.materialID == 0 && p.speed != 0) { // if the path is not an extrusion path we move along it
-             n = vm_->xyzmotion->pathAlong(p,speed);
+//             n = vm_->xyzmotion->pathAlong(p,speed);
         } else { // if it is an extrusion path we feed it to the proper bay.
-             n = material_bay_mapping_[p.materialID]->onPath(p);
+//             n = material_bay_mapping_[p.materialID]->onPath(p);
         }
-        runNPath(n);
+//        runNPath(n);
         last_end_point_ = p.end();
 
     } else if ("voxel" == commandTag.nodeName().toLower()) {
@@ -362,7 +359,7 @@ void XDFLHandler::  processCommand() {
         v.z = delta.z;
 
         //run NPATH from bay
-        runNPath(material_bay_mapping_[v.id]->onVoxel(v));
+//        runNPath(material_bay_mapping_[v.id]->onVoxel(v));
 
         //SET LAST_END_POINT to location of voxel in ABS coordinates
         last_end_point_ = new_start_point;
@@ -370,37 +367,22 @@ void XDFLHandler::  processCommand() {
     } else if ("dwell" == commandTag.nodeName().toLower()) {
 
         double dwelltime = commandTag.text().toDouble();
-        runNPath(dwell(dwelltime));
+//        runNPath(dwell(dwelltime));
 
-    } else if ("uv" == commandTag.nodeName().toLower()) {
-        int uv = commandTag.text().toInt();
-        qDebug()<<"UV:"<<uv;
-        vm_->uv_->setValue(uv);
-
-    }else{
+    } else{
     }
     current_command_++;
     return;
 }
 
-NPath XDFLHandler::dwell(double time_in_ms) {
-    double nstate = vm_->nstatesize();
-    NPath n(nstate,true);
-    State tempstate(nstate,0.0);
-    tempstate[0] = time_in_ms/1000.0;
-    n.addState(tempstate);
-    return n;
+QStringList XDFLHandler::dwell(double time_in_ms) {
+    QStringList returnlist;
+    QString dwell = "G4 P"+QString::number(time_in_ms);
+    returnlist.append(dwell);
+    return returnlist;
 }
 
-void XDFLHandler::runNPath(NPath n) {
-//    qDebug()<<">>System laststate in XDFL handler is "<<laststate_;
-//    qDebug()<<">>Last state of the printer is "<<vm_->currentState();
-    n.setOrigin(laststate_);
-//    State test = n.getState(0);
-//    qDebug()<<">>Path first State is "<<test;
-    laststate_ = n.lastAbsolute();
-    vm_->executeNPath(n);
-}
+
 
 
 void XDFLHandler::updateInfo(){
@@ -408,7 +390,7 @@ void XDFLHandler::updateInfo(){
     foreach (Bay* b,vm_->bays) {
         material_bay_mapping_[b->getMaterial().id] = b;
     }
-    laststate_ = vm_->currentState();
+//    laststate_ = vm_->currentState();
     last_end_point_ = pointFromQVector(vm_->currentPosition());
 //    current_material_=0;
 
@@ -449,7 +431,7 @@ bool XDFLHandler::setMaterial(int id) {
         double speed = material_bay_mapping_[id]->getMaterial().property["pathspeed"].toDouble();
         current_material_ = id;
         qDebug()<<"Changing materials.";
-        runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
+//        runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
 
     }
     return true;

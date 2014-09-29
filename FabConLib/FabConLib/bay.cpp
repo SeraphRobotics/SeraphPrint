@@ -3,21 +3,23 @@
 #include <stdio.h>
 #include "testing/util.h"
 
-Bay::Bay():engine_(),location_(3,0.0),statesize_(0){
+Bay::Bay():engine_(),location_(3,0.0){
     material_.id = 0;
 }
 
 Bay::Bay(const QDomNode& sourceDomNode):engine_() {
     material_.id = 0;
-    statesize_=0;
     QDomNodeList bayChildren = sourceDomNode.childNodes();
     for (unsigned int i=0; i<bayChildren.length();i++) {
         QDomNode bchild = bayChildren.at(i);
         if (bchild.isComment()) {continue;}
+
         if ("id" == bchild.nodeName().toLower()) {
             id_ = bchild.nodeValue().toInt();
+
         } else if ("volume"== bchild.nodeName().toLower()) {
             max_volume_ = bchild.nodeValue().toDouble();
+
         } else if ("location"==bchild.nodeName().toLower()) {
             QVector<double> loc(3,0);
             QDomNodeList locChildren = bchild.childNodes();
@@ -35,13 +37,13 @@ Bay::Bay(const QDomNode& sourceDomNode):engine_() {
             }
         } else if ("actuation"==bchild.nodeName().toLower()) {
             QDomNodeList aChildren = bchild.childNodes();
-            QList<int> actuatorids;
+            QList<QString> actuatornames;
             for (unsigned int k = 0; k < aChildren.length(); k++) {
                 QDomNode achild = aChildren.at(k);
                 if (achild.isComment()) { continue; }
                 if ("actuatorid" == achild.nodeName().toLower()) {
                     QString value = achild.toElement().text();
-                    actuatorids.append(value.toInt());
+                    actuatornames.append(value);
 
                 } else if ("script" ==achild.nodeName().toLower()) {
                     QDomNodeList scriptChildren = achild.childNodes();
@@ -55,18 +57,14 @@ Bay::Bay(const QDomNode& sourceDomNode):engine_() {
                     scriptSettings_[achild.nodeName()]=achild.toElement().text();
                 }
             }
-            actuatorIDs_ = actuatorids;
+            actuatorNames_ = actuatornames;
         }
     }
 }
 
-void Bay::setIdMap(QMap<int,int> map) {
-    idToStateIndex_ = map;
-}
 
-void Bay::setStateSize(int statesize){
-    statesize_ = statesize;
-}
+
+
 
 void Bay::setId(int id) {
     id_ = id;
@@ -125,13 +123,11 @@ void Bay::setEngine(QScriptEngine* engine) {
          engine_->globalObject().setProperty(i.key(),scriptvalue);
      }
 
-    QScriptValue actuatorlist = engine_->newArray(actuatorIDs_.size());
-    for(int j=0;j<actuatorIDs_.length();j++) {
-        if(idToStateIndex_.contains(actuatorIDs_.at(j))) {
-            actuatorlist.setProperty(j,QScriptValue(engine_,idToStateIndex_[actuatorIDs_.at(j)]));
-        }
+    QScriptValue actuatorlist = engine_->newArray(actuatorNames_.size());
+    for(int j=0;j<actuatorNames_.length();j++) {
+        actuatorlist.setProperty(j,QScriptValue(engine_,actuatorNames_.at(j) ) );
     }
-    engine_->globalObject().setProperty("actuatorIDs",actuatorlist);
+    engine_->globalObject().setProperty("actuatorNames",actuatorlist);
     engine_->evaluate(script_);
     qScriptRegisterMetaType(engine_,objFromVoxel, voxelFromObj);
     qScriptRegisterMetaType(engine_,objFromPath, pathFromObj);
@@ -139,12 +135,12 @@ void Bay::setEngine(QScriptEngine* engine) {
 }
 
 //Actuation
-NPath Bay::onPath(XDFLPath path) {
-    NPath npath(0,true);
+QStringList Bay::onPath(XDFLPath path) {
+    QStringList returnlist;
     QTextStream ss(&error_,QIODevice::WriteOnly);
     if(material_.id != path.materialID) {
         ss << "\n onPath: Improper path sent to bay, material did not match ID.";
-        return npath;
+        return returnlist;
     }
 
     QMap<QString,QString> properties = material_.property;
@@ -154,55 +150,69 @@ NPath Bay::onPath(XDFLPath path) {
              * properties.value("areaconstant").toDouble()
              * path.length();
     volume_+=v;
-    qDebug()<<"PAth volume is "<<v;
-    path.toRelative();
+    qDebug()<<"Path volume is "<<v;
+
     QScriptValue pathfunction = engine_->globalObject().property("onPath");
     if(!pathfunction.isValid()) {ss<<"\n onPath: NOT VALID FUNCTION";}
+
     QScriptValue p = engine_->toScriptValue(path);
-    QScriptValue jsnpath = pathfunction.call(QScriptValue(),QScriptValueList()<<p);
+    QScriptValue jsStringList = pathfunction.call(QScriptValue(),QScriptValueList()<<p);
 
     ss<<"\nPath called ";
     if (engine_->hasUncaughtException()) {
         ss<<"\tERROR: %s"<<engine_->uncaughtException().toString();
-        return npath;
+        return returnlist;
     }
 
-    npathFromMatrix(jsnpath,npath);
-    npath.toRelative();
-    return npath;
+    return QStringListFromStringMatrix(jsStringList);
 
 }
 
-NPath Bay::onVoxel(XDFLVoxel voxel) {
+QStringList Bay::onVoxel(XDFLVoxel voxel) {
+    QStringList returnlist;
     volume_ += voxel.volume;
     QTextStream ss(&error_,QIODevice::ReadOnly);
-    NPath npath(0,true);
 
 
     QScriptValue voxelfunction = engine_->globalObject().property("onVoxel");
     if(!voxelfunction.isValid()) {ss<<"\n onVoxel: NOT VALID FUNCTION";}
     QScriptValue v = engine_->toScriptValue(voxel);
-    QScriptValue jsnpath = voxelfunction.call(QScriptValue(),QScriptValueList()<<v);
+    QScriptValue jsStringList = voxelfunction.call(QScriptValue(),QScriptValueList()<<v);
     ss<<"\nVoxel Returned ";
     if (engine_->hasUncaughtException()) {
         ss<<"\nERROR: %s"<<engine_->uncaughtException().toString();
-        return npath;
+        return returnlist;
     }
 
-    npathFromMatrix(jsnpath,npath);
-    return npath;
+    return QStringListFromStringMatrix(jsStringList);
 }
 
 
 QStringList Bay::jogActuators(double amount,double time){
-    QListIterator<int> i(actuatorIDs_);
-    State s(statesize_,0.0);
-    s[0] = time;
+    QStringList returnlist;
+    QListIterator<QString> i(actuatorNames_);
+    float d=0;
     while(i.hasNext()){
-        int stateid = idToStateIndex_[i.next()];
-        s[stateid]=amount;
+        returnlist.append("G92 "+i.next()+QString::number(0));
+        d+=amount;
     }
-    NPath n(statesize_,true);
-    n.addState(s);
-    return n;
+    i.toFront();
+    QString s="G1 ";
+    while(i.hasNext()){
+        s.append(" "+i.next()+QString::number(0));
+    }
+    s.append(" F"+QString::number(d/time));
+    returnlist.append(s);
+
+    return returnlist;
+}
+
+QStringList QStringListFromStringMatrix(const QScriptValue &obj) {
+    QStringList slist;
+    int len = obj.property("length").toInt32();
+    for(int i=0;i<len;i++) {
+        QScriptValue scriptvector = obj.property(i);
+        slist.append(scriptvector.toString());
+    }
+    return slist;
 }

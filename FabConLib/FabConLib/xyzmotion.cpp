@@ -1,10 +1,10 @@
 #include "xyzmotion.h"
-#include "jsnpath.h"
+//#include "jsnpath.h"
 #include <math.h>
 
 XYZMotion::XYZMotion(){}
 
-XYZMotion::XYZMotion(const QDomNode& sourceDomNode):statesize_(0) {
+XYZMotion::XYZMotion(const QDomNode& sourceDomNode) {
     QDomNodeList bayChildren = sourceDomNode.childNodes();
     for(uint i=0; i<bayChildren.length();i++){
         QDomNode bchild = bayChildren.at(i);
@@ -16,9 +16,7 @@ XYZMotion::XYZMotion(const QDomNode& sourceDomNode):statesize_(0) {
                  QDomNode achild = bchildren.at(j);
                 if (achild.isComment()) {continue;}
 
-                if ("revolutionsperdistance"==achild.nodeName().toLower()) {
-                    a.revPerDist = achild.toElement().text().toDouble();
-                } else if ("range"==achild.nodeName().toLower()) {
+                if ("range"==achild.nodeName().toLower()) {
                     a.range = achild.toElement().text().toDouble();
                 } else if ("name"== achild.nodeName().toLower()) {
                     a.name = achild.toElement().text().toLower();

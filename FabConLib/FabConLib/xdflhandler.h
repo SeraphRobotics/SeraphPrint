@@ -118,8 +118,8 @@ private:
 
     void run(); // Reimplemented from QThread: called by start(). When it exits the thread is finished.
     void processCommand(); // This function will be called every time handling is started or resumed.
-    NPath dwell(double time_in_ms);
-    void runNPath(NPath n);
+    QStringList dwell(double time_in_ms);
+
     bool setMaterial(int id);
     void updateInfo();
 
@@ -141,7 +141,6 @@ private:
     int current_material_;
     unsigned int current_command_;
     FabPoint last_end_point_;
-    State laststate_; // machine state (a vector; distinct from the handler state)
     bool needMaterial_;
 };
 

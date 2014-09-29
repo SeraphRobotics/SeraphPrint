@@ -42,7 +42,7 @@ void CoreInterface::resetPosition(){
         return;
     }
     vm_->resetPosition();
-    qDebug()<<">>RESET:\n>>Position is"<<getCurrentPosition()<<"\nReset to state"<<vm_->currentState();
+//    qDebug()<<">>RESET:\n>>Position is"<<getCurrentPosition()<<"\nReset to state"<<vm_->currentState();
     getCurrentPosition();
 }
 
@@ -139,8 +139,8 @@ void CoreInterface::moveBayMotor(int bayid, double amount, double time){
     if ((state_==NotInitialized) ){return;}//|| (state_==Printing)
     // THIS SUCKS we need to rethink this
 //    qDebug()<<"Ordered Bay to Move";
-    NPath n = vm_->bays[bayid]->jogActuators(amount,time);
-    vm_->executeRelativeNPath(n);
+//    NPath n = vm_->bays[bayid]->jogActuators(amount,time);
+//    vm_->executeRelativeNPath(n);
 }
 
 void CoreInterface::startPrint(){
@@ -214,7 +214,7 @@ void CoreInterface::configLoaded(){
 void CoreInterface::donePrinting(){
     getCurrentPosition();
     setState(Connected);
-    vm_->dumpstates();
+//    vm_->dumpstates();
     positionTimer_.start();
     emit printsComplete();
 }

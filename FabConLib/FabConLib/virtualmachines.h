@@ -3,13 +3,8 @@
 
 #include <QScriptEngine>
 #include <QDomDocument>
-#include "motor.h"
-#include "electronicsinterface.h"
 #include "bay.h"
-#include "jscmotion.h"
 #include "xyzmotion.h"
-#include "jsxyz.h"
-#include "../UV_Automation/UV.h"
 
 class VMPrototype:public QObject
     {
@@ -28,11 +23,6 @@ class VMPrototype:public QObject
          * @return true if loadConfig() succeeded.
          */
         bool isInitialized();
-        /**
-         * Used to limit the reach of the upper level code.
-         * @return the size of a valid NPath.
-         */
-        int nstatesize();
 
         /// These methods should be overriden by actual VM and test VM classes.
 
@@ -49,13 +39,7 @@ class VMPrototype:public QObject
          * Used to limit the reach of the upper level code.
          * @return true if path is valid and queued.
          */
-        virtual bool executeNPath(NPath path);
 
-        virtual void dumpstates();
-
-        virtual bool executeRelativeNPath(NPath path);
-
-        virtual State currentState();
 
         QVector<double> currentPosition();
 
@@ -68,18 +52,14 @@ class VMPrototype:public QObject
 
     public:
 
-        ElectronicsInterface eInterface;// this should be private. Its only here to alow for loadconfig thread to work
         QList<Bay*> bays;
         XYZMotion* xyzmotion;
-        UV* uv_;
 
     protected:
         QString comPort_;
         QString error_string_;
         bool initialized_;
         int statesize_;
-        JsXYZ jsxyz_;
-        State laststate_;
         QMap<int,int> idtostatemap_;
         int frequency_;
     };
@@ -95,12 +75,7 @@ public:
 public slots:
     void loadConfig(QDomDocument document);
     QString getErrors();
-    bool executeNPath(NPath path);
 
-    void dumpstates();
-
-    bool executeRelativeNPath(NPath path);
-    State currentState();
     bool forceStop();
     void resetPosition();
 
@@ -120,14 +95,12 @@ public:
 
 public slots:
     void loadConfig(QDomDocument document);
-    bool executeNPath(NPath path);
-    bool executeRelativeNPath(NPath path);
-    State currentState();
-    void dumpstates();
+
+//    void dumpstates();
     void resetPosition();
 
 private:
-    QList<NPath> totalprintcommands_;
+    QList<QString> totalprintcommands_;
 };
 
 

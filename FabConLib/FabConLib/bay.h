@@ -25,15 +25,6 @@ public:
      */
     Bay(const QDomNode& sourceDomNode);
 
-    /**
-     * sets the mapping between the motor id and the state index
-     */
-    void setIdMap(QMap<int,int> map);
-
-    /**
-     * sets the size of a state to be used in the npaths returned by the bay
-     */
-    void setStateSize(int statesize);
 
     /**
      * set the bay's id
@@ -133,11 +124,11 @@ private:
     QVector<double> location_; //The bay systems point of contact
     Material material_;
     QMap<QString,QString> scriptSettings_;
-    QList<int> actuatorIDs_;
-    QMap<int,int> idToStateIndex_;
+    QList<QString> actuatorNames_;
     QString script_;
     QString error_;
-    int statesize_;
 };
+
+QStringList QStringListFromStringMatrix(const QScriptValue &obj);
 
 #endif // BAY_H

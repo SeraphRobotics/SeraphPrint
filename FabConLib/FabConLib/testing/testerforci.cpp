@@ -132,7 +132,7 @@ void testerforci::currentCommand(int cmd){
 
 void testerforci::needMaterialLoaded(int i){
     qDebug("Need Material id:%i %s",i,materials_[i].name.toStdString().c_str());
-    nap(2000);
+//    nap(2000);
     ci->setMaterial(0,1);
     ci->resumePrint();
 }

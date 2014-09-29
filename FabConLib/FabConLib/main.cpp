@@ -11,11 +11,10 @@
 #include "testing/unittests.h"
 
 #include "coreinterface.h"
-#include "testing/testerforci.h"
-#include "testing/jscitest.h"
-#include "comportdetector.h"
+//#include "testing/testerforci.h"
+//#include "testing/jscitest.h"
 
-#include "UV.h"
+
 
 int main(int argc, char *argv[]) {
     printf("\nStarting..");
@@ -55,12 +54,6 @@ int main(int argc, char *argv[]) {
 
 //    JsCiTest *jstester = new JsCiTest();
 //    QTimer::singleShot(0,jstester,SLOT(test()));
-
-//    ComportDetector *cpi = new ComportDetector();
-
-    UV uv;
-    uv.setComPort("COM5");
-    uv.setValue(230);
 
 
     return app.exec();//return 0;

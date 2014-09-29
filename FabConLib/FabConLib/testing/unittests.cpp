@@ -1,35 +1,35 @@
 #include "unittests.h"
 #include "util.h"
 #include <QDebug>
-void testNPaths(VMPrototype *vm) {
-//     DIRECT PATHING
+//void testNPaths(VMPrototype *vm) {
+////     DIRECT PATHING
 
 
-        NPath np(5,false);
+//        NPath np(5,false);
 
 
-        State o(5,-1.0);
-        o[0]=0;
-        np.setOrigin(o);
-        State s1(5,-2.0);
-        s1[0]=1;
-        State s2(5,-1.0);
-        s2[0]=1;
-        State s3(5,0.0);
-        s3[0]=1;
-        np.addState(s1);
-        np.addState(s2);
-        np.addState(s3);
+//        State o(5,-1.0);
+//        o[0]=0;
+//        np.setOrigin(o);
+//        State s1(5,-2.0);
+//        s1[0]=1;
+//        State s2(5,-1.0);
+//        s2[0]=1;
+//        State s3(5,0.0);
+//        s3[0]=1;
+//        np.addState(s1);
+//        np.addState(s2);
+//        np.addState(s3);
 		
-//        np.setOrigin(np.lastAbsolute());
-        bool t = vm->executeNPath(np);
-        qDebug(" printed %s",t ? "true" : "false");
+////        np.setOrigin(np.lastAbsolute());
+//        bool t = vm->executeNPath(np);
+//        qDebug(" printed %s",t ? "true" : "false");
 
 
 
 
 
-}
+//}
 
 void testScripting(VirtualPrinter *vm) {
     //SCRIPTING
@@ -68,8 +68,8 @@ void testVoxels(VMPrototype *vm) {
         vox.y=-20;
         vox.z=0;
 
-        NPath voxpath = vm->bays[0]->onVoxel(vox);
-        vm->executeNPath(voxpath);
+//        NPath voxpath = vm->bays[0]->onVoxel(vox);
+//        vm->executeNPath(voxpath);
 //        voxpath.setOrigin(voxpath.lastAbsolute());
 //        vm->executeNPath(voxpath);
 //        qDebug("");
@@ -83,7 +83,7 @@ void testXDFLPaths(VMPrototype *vm) {
 //    XDFL PATH
         qDebug("testing XDFL paths directly");
         XDFLPath path1;
-        NPath pathed1;
+//        NPath pathed1;
         FabPoint p1,p2,p3;
         p1.x=0;
         p1.y=0;
@@ -109,14 +109,14 @@ void testXDFLPaths(VMPrototype *vm) {
         vm->bays[0]->setMaterial(m);
 
 
-        pathed1 = vm->bays[0]->onPath(path1);
+//        pathed1 = vm->bays[0]->onPath(path1);
 
-//        pathed1 = vm->xyzmotion->pathAlong(path1,30);
-        qDebug("paths calculated");
-        vm->moveTo(p1.x,p1.y,p1.z,30);
-//        vm->moveTo(0,0,-1,10);
-        vm->executeRelativeNPath(pathed1);
-        qDebug("executed paths");
+////        pathed1 = vm->xyzmotion->pathAlong(path1,30);
+//        qDebug("paths calculated");
+//        vm->moveTo(p1.x,p1.y,p1.z,30);
+////        vm->moveTo(0,0,-1,10);
+//        vm->executeRelativeNPath(pathed1);
+//        qDebug("executed paths");
 
     }
 

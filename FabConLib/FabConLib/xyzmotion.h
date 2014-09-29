@@ -49,7 +49,7 @@ public:
     QList<double> buildSpace();
 
 private:
-    QMap < QString, double > axismap_;
+    QMap < QString, axis > axismap_;
 };
 
 #endif // XYZMOTION_H
