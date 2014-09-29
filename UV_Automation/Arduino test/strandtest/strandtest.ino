@@ -30,8 +30,9 @@ void loop() {
                 // read the incoming byte:
                 incomingByte = Serial.read();
                 // say what you got:
-                Serial.print("I received: ");
-                Serial.println(incomingByte);
+                //Serial.print("I received: ");
+                //Serial.println(incomingByte);
+                Serial.print("B");
   }
   
   colorWipe(strip.Color(incomingByte, 0, 0), 50); // Red
