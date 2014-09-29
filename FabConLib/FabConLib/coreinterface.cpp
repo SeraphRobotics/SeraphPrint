@@ -137,6 +137,8 @@ void CoreInterface::setMaterial(int bayid,int materialid){
 }
 void CoreInterface::moveBayMotor(int bayid, double amount, double time){
     if ((state_==NotInitialized) ){return;}//|| (state_==Printing)
+    QStringList sl = vm_->bays[bayid]->jogActuators(amount,time);
+    vm_->runCmds(sl);
     // THIS SUCKS we need to rethink this
 //    qDebug()<<"Ordered Bay to Move";
 //    NPath n = vm_->bays[bayid]->jogActuators(amount,time);
