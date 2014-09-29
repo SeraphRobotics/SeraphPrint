@@ -194,7 +194,7 @@ NPath Bay::onVoxel(XDFLVoxel voxel) {
 }
 
 
-NPath Bay::jogActuators(double amount,double time){
+QStringList Bay::jogActuators(double amount,double time){
     QListIterator<int> i(actuatorIDs_);
     State s(statesize_,0.0);
     s[0] = time;

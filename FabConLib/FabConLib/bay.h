@@ -2,14 +2,13 @@
 #define BAY_H
 
 #include <QObject>
-#include "motor.h"
 //#include "materialcalibration.h"
 #include <QDomNode>
 #include "xdflpath.h"
 #include "xdflvoxel.h"
 #include "material.h"
 #include <QScriptEngine>
-#include "jsnpath.h"
+#include <QStringList>
 
 class Bay : public QObject
 {
@@ -108,19 +107,19 @@ public slots:
      * This returns a relative NPath from a relative path.
      * It uses a script function from the config file
      */
-    NPath onPath(XDFLPath path);
+    QStringList onPath(XDFLPath path);
 
     /**
      * This returns a relative NPath from a relative voxel.
      * It uses a script function from the config file
      */
-    NPath onVoxel(XDFLVoxel voxel);
+    QStringList onVoxel(XDFLVoxel voxel);
 
     /**
      * moves the bays actautors by a given rotation, in a given time
      * this is a hack to work with the current system and should be improved
      */
-    NPath jogActuators(double amount,double time);
+    QStringList jogActuators(double amount,double time);
 
 private:
     QScriptEngine* engine_;

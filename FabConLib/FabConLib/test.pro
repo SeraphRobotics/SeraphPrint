@@ -20,13 +20,9 @@ SOURCES += main.cpp \
     virtualmachines.cpp \
     coreinterface.cpp \
     loadconfigthread.cpp \
-    jsnpath.cpp \
-    jscmotion.cpp \
-    jsxyz.cpp \
     testing/util.cpp \
     testing/unittests.cpp \
     testing/testerforci.cpp \
-    testing/jscitest.cpp
 
 HEADERS += bay.h \
     xdflpath.h \
@@ -37,21 +33,12 @@ HEADERS += bay.h \
     virtualmachines.h \
     coreinterface.h \
     loadconfigthread.h \
-    jsnpath.h \
-    jscmotion.h \
-    jsxyz.h \
     testing/util.h \
     testing/unittests.h \
     testing/testerforci.h \
-    testing/jscitest.h
-
-INCLUDEPATH += ../../JrkerrElectronics/
-include("JrKerr_Electronics.pro")
 
 
-INCLUDEPATH += ../../UV_Automation
-SOURCES += ../../UV_Automation/UV.cpp
-HEADERS += ../../UV_Automation/UV.h
+
 
 OTHER_FILES += \
     media/testxdfl.xdfl \

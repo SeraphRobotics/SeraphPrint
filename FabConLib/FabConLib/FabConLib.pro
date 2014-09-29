@@ -34,16 +34,6 @@ HEADERS += fabconlib.h \
     materialsetting.h \
     tool.h \
     bay.h
-win32: {
-    include("win-src.pro")
-    INCLUDEPATH += ../../Common/Windows/src
-}
-unix:{
- include("posix-src.pro")
- INCLUDEPATH += ../../Common/Posix/JrKerr
- include("qextserial-src.pro")
-}
 
-include("NPath.pro")
 include("shared-math.pro")
 OTHER_FILES += ../../../media/IdealConfig.config
