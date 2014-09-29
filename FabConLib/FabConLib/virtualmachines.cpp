@@ -225,15 +225,19 @@ void TestPrinter::loadConfig(QDomDocument document) {
 
 
 void TestPrinter::runCmds(QStringList sl){
-    totalprintcommands_+=sl;
+//    totalprintcommands_+=sl;
+    foreach(QString s,sl){
+        totalprintcommands_.append(s);
+//        qDebug()<<s;
+    }
 }
 bool TestPrinter::moveTo(double x, double y, double z, double speed){
     QStringList sl = xyzmotion->pathTo(x,y,z,speed);
-    totalprintcommands_+=sl;
+    runCmds(sl);
 }
 bool TestPrinter::move(double x, double y, double z, double speed){
     QStringList sl = xyzmotion->pathTo(x,y,z,speed,true);
-    totalprintcommands_+=sl;
+    runCmds(sl);
 }
 
 bool TestPrinter::forceStop(){}
@@ -245,7 +249,7 @@ void TestPrinter::resetPosition(){
     }
     QStringList sl;
     sl.append(cmd);
-    totalprintcommands_+=sl;
+    runCmds(sl);
 }
 
 void TestPrinter::dumpstates(){
@@ -257,9 +261,10 @@ void TestPrinter::dumpstates(){
         }
         return;
     }
+    qDebug()<<"opened";
     QTextStream out(&f);
     foreach(QString s, totalprintcommands_){
-        out<<s;
+        out<<"\n"<<s;
     }
     f.close();
     qDebug()<<"Wrote cmds";

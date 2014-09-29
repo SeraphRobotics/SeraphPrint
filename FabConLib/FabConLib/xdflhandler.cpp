@@ -310,6 +310,7 @@ void XDFLHandler::  processCommand() {
     if ("path" == commandTag.nodeName().toLower()) {
 
         XDFLPath p = pathFromQDom(commandTag);
+        p.toAbsolute();
 
         if (p.isNull()) { return; }// check to see if the path is valid
 
@@ -326,7 +327,7 @@ void XDFLHandler::  processCommand() {
         }
         new_start_point = p.start();
         if (!pointsEqual(new_start_point,last_end_point_,0.1)) { // ensures that the machine doesn't jump between points
-            FabPoint delta = subtractpoints(new_start_point,last_end_point_);
+            FabPoint delta = new_start_point;//subtractpoints(new_start_point,last_end_point_);
 //            runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
             vm_->runCmds(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
 
@@ -339,9 +340,11 @@ void XDFLHandler::  processCommand() {
             n = vm_->xyzmotion->pathAlong(p,speed);
         } else { // if it is an extrusion path we feed it to the proper bay.
 //             n = material_bay_mapping_[p.materialID]->onPath(p);
-            n = material_bay_mapping_[p.materialID]->onPath(p);
+            n = vm_->xyzmotion->pathAlong(p,speed);
+//            n = material_bay_mapping_[p.materialID]->onPath(p);
         }
 //        runNPath(n);
+//        qDebug()<<"received:"<<n;
         vm_->runCmds(n);
         last_end_point_ = p.end();
 
@@ -359,7 +362,7 @@ void XDFLHandler::  processCommand() {
         new_start_point.z = v.z;
 
         //MAKE RELATIVE VOXEL to send to bay
-        FabPoint delta = subtractpoints(new_start_point,last_end_point_);
+        FabPoint delta = last_end_point_;//subtractpoints(new_start_point,last_end_point_);
         v.x = delta.x;
         v.y = delta.y;
         v.z = delta.z;

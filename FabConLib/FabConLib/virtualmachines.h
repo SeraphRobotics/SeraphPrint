@@ -42,12 +42,12 @@ class VMPrototype:public QObject
          */
         QVector<double> currentPosition();
 
-        void runCmds(QStringList sl);
+        virtual void runCmds(QStringList sl);
 
-        bool moveTo(double x, double y, double z, double speed);
-        bool move(double x, double y, double z, double speed);
+        virtual bool moveTo(double x, double y, double z, double speed);
+        virtual bool move(double x, double y, double z, double speed);
 
-        bool forceStop();
+        virtual bool forceStop();
 
         virtual void resetPosition();
 

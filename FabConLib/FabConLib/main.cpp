@@ -19,34 +19,35 @@
 int main(int argc, char *argv[]) {
     printf("\nStarting..");
     QCoreApplication app(argc,argv);
-//    TestPrinter vm;
+    TestPrinter vm;
 //    VirtualPrinter vm;
 
 //    //load the config file into the DOM document
-//    QString configFilePath="../../../media/JrKerr-Single-deposition.config";
-//    QDomDocument document;
-//    {
-//      QFile configFile(configFilePath);
-//      if (!configFile.open(QFile::ReadOnly)) {
-//          printf("\nFAILED TO OPEN CONFIG FILE\n");
-//          return app.exec();
-//      }
-//      document.setContent(&configFile);
-//      configFile.close();
-//    }
-//    vm.loadConfig(document);// Load the config into the VM to create the electronics
-//        if (vm.isInitialized()){
-//            printf("\nVM initialized");
-//        }
+    QString configFilePath="../../SeraphPrint/media/SeraphScientistDoubleDisplacement.config";
+    QDomDocument document;
+    {
+      QFile configFile(configFilePath);
+      if (!configFile.open(QFile::ReadOnly)) {
+          printf("\nFAILED TO OPEN CONFIG FILE\n");
+          return app.exec();
+      }
+      document.setContent(&configFile);
+      configFile.close();
+    }
+    vm.loadConfig(document);// Load the config into the VM to create the electronics
+    if (vm.isInitialized()){
+        printf("\nVM initialized");
+    }
 //        //testNPaths(&vm);
 //        //testScripting(&vm);
 //        //testVoxels(&vm);
 //        //testXDFLPaths(&vm);
-//        //testXDFLParsing(&vm);
-//        //vm.dumpstates();
+        testXDFLParsing(&vm);
+        QTimer::singleShot(10000,&vm,SLOT(dumpstates()));
+//        vm.dumpstates();
 //        printState("\n CurPos:",vm.currentState());
 //        printf("\nErrors: %s",vm.getErrors().toStdString().c_str());
-//        printf("\nDone\n")*/;
+        printf("\nDone\n");
 
 
 //    testerforci *tester = new testerforci();
@@ -54,6 +55,7 @@ int main(int argc, char *argv[]) {
 
 //    JsCiTest *jstester = new JsCiTest();
 //    QTimer::singleShot(0,jstester,SLOT(test()));
+
 
 
     return app.exec();//return 0;

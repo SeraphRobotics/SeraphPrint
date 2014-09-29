@@ -8,6 +8,7 @@ XDFLPath::XDFLPath(int material_id,bool relative):speed(0),materialID(material_i
 XDFLPath::XDFLPath(const XDFLPath &path) {
     materialID = path.materialID;
     points=QList<FabPoint>(path.points);
+    relative_=path.relative_;
 }
 
 double XDFLPath::length() {
@@ -194,5 +195,6 @@ XDFLPath pathFromQDom(QDomNode node) {
             path.points.append(p);
         }
     }
+    path.toAbsolute();
     return path;
 }

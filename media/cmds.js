@@ -14,7 +14,11 @@ function onVoxel(voxel){
     var time = voxel.volume / material.Q*1000.0;
     var suckbackQ = 1000*60;
     var amount = material.compressionVolume*revolutionsPerVolume;
-    var cmd1 = "G1 X"+voxel.x+" Y"+voxel.y+" Z"+voxel.z+" F"+material.pathspeed;
+	var x = voxel.x-location[0];
+	var y = voxel.y-location[1];
+	var z = voxel.z-location[2];
+	
+    var cmd1 = "G1 X"+x+" Y"+y+" Z"+z+" F"+material.pathspeed;
     var cmd2 = "G1 "+actuatorIDs[0]+amount + " F"+suckbackQ;
     var cmd3 = "G4 P"+time;
     amount = - amount;
@@ -54,7 +58,10 @@ function onPath(path){
         var point = path.points[i]
         var d = delta(lastpoint,point)
         var e = d/speed*revolutionsPerVolume;
-        var cmd = "G1 X"+point.x+" Y"+point.y+" Z"+point.z" "+actuatorIDs[0]+e+" F"+speed;
+		var x = point.x-location[0]
+		var y = point.y-location[1]
+		var z = point.z-location[2]
+        var cmd = "G1 X"+x+" Y"+y+" Z"+z" "+actuatorIDs[0]+e+" F"+speed;
         cmds[cmds.length]=cmd;
     }
 

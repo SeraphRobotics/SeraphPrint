@@ -10,4 +10,6 @@ void testVoxels(VMPrototype *vm);
 void testXDFLPaths(VMPrototype *vm);
 void testXDFLParsing(VMPrototype *vm);
 
+void testNewVM(VMPrototype* vm);
+
 #endif // UNITTESTS_H

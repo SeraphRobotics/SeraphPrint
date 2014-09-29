@@ -36,8 +36,9 @@ QStringList XYZMotion::pathAlong(XDFLPath path,double speed) {
 
     speed = fabs(speed);
 
+
     if(path.relative_){ returnlist.append("G91");} //to relative
-    foreach(FabPoint p, path.getGlobalRelativePoints()){
+    foreach(FabPoint p, path.getPoints()){
         QString s = "G1 X"+QString::number(p.x)+
                       " Y"+QString::number(p.y)+
                       " Z"+QString::number(p.z)+

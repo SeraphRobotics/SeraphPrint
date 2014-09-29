@@ -122,7 +122,7 @@ void testXDFLPaths(VMPrototype *vm) {
 
 void testXDFLParsing(VMPrototype *vm) {
     QDomDocument xdflDom;
-    QString xdflFilePath="../../../media/testxdfl-mid.xdfl";
+    QString xdflFilePath="../../SeraphPrint/media/test.xdfl";
     // load the XDFL file into the DOM document
     {
       QFile xdflFile(xdflFilePath);
@@ -144,8 +144,9 @@ void testXDFLParsing(VMPrototype *vm) {
     vm->bays[0]->setMaterial(testing[1]);
 
     QTimer::singleShot(1,handler,SLOT(start()));
-    QTimer::singleShot(5000, handler, SLOT(pause()));
+//    QTimer::singleShot(10000,vm,SLOT(dumpstates()));
+//    QTimer::singleShot(5000, handler, SLOT(pause()));
 
-    QTimer::singleShot(12000, handler, SLOT(resume()));
+//    QTimer::singleShot(12000, handler, SLOT(resume()));
 
 }

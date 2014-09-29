@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <xdfl>
-   <palette>
-      <material>
-         <id>1</id>
-         <clearance>1</clearance>
-         <depositionRate>0.00085</depositionRate>
-         <name>silicone</name>
-         <pathSpeed>9</pathSpeed>
-         <pathWidth>0.4</pathWidth>
-         <pausePaths>300</pausePaths>
-         <pitch>0.000397</pitch>
-         <pushout>0.11</pushout>
-         <suckback>0.11</suckback>
-         <suckbackDelay>0</suckbackDelay>
-      </material>
-   </palette>
-   <commands>
+<Palette>
+    <material>
+       <name>silicone</name>
+       <id>1</id>
+       <PathWidth>0.8</PathWidth>
+       <PathHeight>0.8</PathHeight>
+       <PathSpeed>30</PathSpeed>
+       <AreaConstant>1</AreaConstant>
+       <CompressionVolume>30</CompressionVolume>
+       <property>
+          <name>conductivity</name>
+          <value>1</value>
+       </property>
+    </material>
+</Palette>
+<commands>
       <path>
          <speed>30</speed>
          <point>

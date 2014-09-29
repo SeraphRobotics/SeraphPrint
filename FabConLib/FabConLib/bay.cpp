@@ -127,7 +127,14 @@ void Bay::setEngine(QScriptEngine* engine) {
     for(int j=0;j<actuatorNames_.length();j++) {
         actuatorlist.setProperty(j,QScriptValue(engine_,actuatorNames_.at(j) ) );
     }
-    engine_->globalObject().setProperty("actuatorNames",actuatorlist);
+    engine_->globalObject().setProperty("actuatorIDs",actuatorlist);
+
+    QScriptValue jsList = engine_->newArray(location_.size());
+    for(int j=0;j<location_.size();j++) {
+        jsList.setProperty(j,QScriptValue(engine_,location_.at(j) ) );
+    }
+    engine_->globalObject().setProperty("location",jsList);
+
     engine_->evaluate(script_);
     qScriptRegisterMetaType(engine_,objFromVoxel, voxelFromObj);
     qScriptRegisterMetaType(engine_,objFromPath, pathFromObj);
