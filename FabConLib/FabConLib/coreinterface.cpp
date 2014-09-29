@@ -218,5 +218,8 @@ void CoreInterface::donePrinting(){
     setState(Connected);
 //    vm_->dumpstates();
     positionTimer_.start();
+#ifdef DEBUGGING
+    vm_->dumpstates();
+#endif
     emit printsComplete();
 }

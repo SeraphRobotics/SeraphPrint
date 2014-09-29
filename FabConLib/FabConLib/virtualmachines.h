@@ -51,6 +51,8 @@ class VMPrototype:public QObject
 
         virtual void resetPosition();
 
+        virtual void dumpstates();
+
     public:
 
         QList<Bay*> bays;

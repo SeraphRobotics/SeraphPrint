@@ -46,6 +46,11 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
         }
     }
 
+#ifdef DEBUGGING
+    portList.append("TEST");
+    ui->portBox->addItem("TEST");
+#endif
+
     if (portList.size() == 1)
     {
         // Only one possible printer found; select it.

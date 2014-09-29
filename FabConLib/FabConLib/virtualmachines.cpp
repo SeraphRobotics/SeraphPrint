@@ -50,6 +50,7 @@ void VMPrototype::resetPosition(){
     return;
 }
 
+void VMPrototype::dumpstates(){}
 
 QScriptEngine* VMPrototype::makeEngine(){
 

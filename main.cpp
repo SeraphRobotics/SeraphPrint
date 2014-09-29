@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     // QSettings setup. These values will carry over in the rest of the application.
     QCoreApplication::setOrganizationName("Seraph");
     QCoreApplication::setOrganizationDomain("seraphrobotics.com");
-    QCoreApplication::setApplicationName("SeraphPrint");
+    QCoreApplication::setApplicationName("SeraphScientistPrint");
     QSettings::setDefaultFormat(QSettings::IniFormat);
     // Default scope is QSettings::UserScope
 

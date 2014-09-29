@@ -8,14 +8,9 @@ SOURCES += \
     FabConLib/FabConLib/virtualmachines.cpp \
     FabConLib/FabConLib/coreinterface.cpp \
     FabConLib/FabConLib/loadconfigthread.cpp \
-    FabConLib/FabConLib/jsnpath.cpp \
-    FabConLib/FabConLib/jscmotion.cpp \
-    FabConLib/FabConLib/jsxyz.cpp \
     FabConLib/FabConLib/testing/util.cpp \
     FabConLib/FabConLib/testing/unittests.cpp \
-    FabConLib/FabConLib/testing/testerforci.cpp \
-    FabConLib/FabConLib/testing/jscitest.cpp \
-    FabConLib/FabConLib/comportdetector.cpp
+    arduinoInterface/arduinoInterface/arduinointerface.cpp
 
 HEADERS += \
     FabConLib/FabConLib/bay.h \
@@ -27,17 +22,10 @@ HEADERS += \
     FabConLib/FabConLib/virtualmachines.h \
     FabConLib/FabConLib/coreinterface.h \
     FabConLib/FabConLib/loadconfigthread.h \
-    FabConLib/FabConLib/jsnpath.h \
-    FabConLib/FabConLib/jscmotion.h \
-    FabConLib/FabConLib/jsxyz.h \
     FabConLib/FabConLib/testing/util.h \
     FabConLib/FabConLib/testing/unittests.h \
-    FabConLib/FabConLib/testing/testerforci.h \
-    FabConLib/FabConLib/testing/jscitest.h \
-    FabConLib/FabConLib/comportdetector.h
+    arduinoInterface/arduinoInterface/arduinointerface.h
 
-INCLUDEPATH += JrkerrElectronics/
-include("JrKerr_Electronics.pro")
 
 OTHER_FILES += \
     media/testxdfl.xdfl \
@@ -49,3 +37,6 @@ OTHER_FILES += \
     media/JrKerr-Single-deposition.config \
     media/JrKerr-Duel-deposition.config
 
+include("../../arduinoInterface/qextserialport-1.2rc/src/qextserialport.pri")
+INCLUDEPATH += arduinoInterface/qextserialport-1.2rc/
+INCLUDEPATH += arduinoInterface/arduinoInterface/
