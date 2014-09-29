@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 //    VirtualPrinter vm;
 
 //    //load the config file into the DOM document
-    QString configFilePath="../../SeraphPrint/media/SeraphScientistDoubleDisplacement.config";
+    QString configFilePath="../../SeraphPrint/media/SeraphScientistSingleDisplacement.config";
     QDomDocument document;
     {
       QFile configFile(configFilePath);

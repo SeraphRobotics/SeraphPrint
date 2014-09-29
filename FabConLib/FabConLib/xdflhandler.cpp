@@ -340,8 +340,8 @@ void XDFLHandler::  processCommand() {
             n = vm_->xyzmotion->pathAlong(p,speed);
         } else { // if it is an extrusion path we feed it to the proper bay.
 //             n = material_bay_mapping_[p.materialID]->onPath(p);
-            n = vm_->xyzmotion->pathAlong(p,speed);
-//            n = material_bay_mapping_[p.materialID]->onPath(p);
+//            n = vm_->xyzmotion->pathAlong(p,speed);
+            n = material_bay_mapping_[p.materialID]->onPath(p);
         }
 //        runNPath(n);
 //        qDebug()<<"received:"<<n;

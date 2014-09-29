@@ -51,6 +51,7 @@ Bay::Bay(const QDomNode& sourceDomNode):engine_() {
                         QDomNode schild = scriptChildren.at(h);
                         if (schild.isCDATASection()) {
                             script_=schild.toCDATASection().data();
+                            qDebug()<<script_;
                         }
                     }
                 }else {
@@ -209,11 +210,17 @@ QStringList Bay::onPath(XDFLPath path) {
     qDebug()<<"Path volume is "<<v;
 
     QScriptValue pathfunction = engine_->globalObject().property("onPath");
-    if(!pathfunction.isValid()) {ss<<"\n onPath: NOT VALID FUNCTION";}
+    if(!pathfunction.isValid()) {
+        ss<<"\n onPath: NOT VALID FUNCTION";
+        qDebug()<<engine_->uncaughtException().toString();;
+
+        return returnlist;
+    }
 
     QScriptValue p = engine_->toScriptValue(path);
     QScriptValue jsStringList = pathfunction.call(QScriptValue(),QScriptValueList()<<p);
-
+//    qDebug()<<jsStringList.property("length").toInt32();
+//    qDebug()<<jsStringList.toString();
     ss<<"\nPath called ";
     if (engine_->hasUncaughtException()) {
         ss<<"\tERROR: %s"<<engine_->uncaughtException().toString();
@@ -275,6 +282,7 @@ QStringList QStringListFromStringMatrix(const QScriptValue &obj) {
     for(int i=0;i<len;i++) {
         QScriptValue scriptvector = obj.property(i);
         slist.append(scriptvector.toString());
+//        qDebug()<<scriptvector.toString();
     }
     return slist;
 }
