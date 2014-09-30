@@ -218,35 +218,35 @@ TestPrinter::TestPrinter():VMPrototype() {
 
 void TestPrinter::loadConfig(QDomDocument document) {
     VMPrototype::loadConfig(document);
-    QDomElement root = document.documentElement();
+//    QDomElement root = document.documentElement();
 
-    // XYZMOTION
-    QDomNode motion = root.namedItem("motion");
-    xyzmotion =new XYZMotion(motion);
+//    // XYZMOTION
+//    QDomNode motion = root.namedItem("motion");
+//    xyzmotion =new XYZMotion(motion);
 
-    //BAYS
-    QDomNode tools = root.namedItem("tool");
-    QDomNodeList toolChildren  = tools.childNodes();
+//    //BAYS
+//    QDomNode tools = root.namedItem("tool");
+//    QDomNodeList toolChildren  = tools.childNodes();
 
-    bays.clear();
-    bays = QList<Bay*>();
+//    bays.clear();
+//    bays = QList<Bay*>();
 
-    for(uint k=0; k<toolChildren.length();k++){
-        if ("bay"==toolChildren.at(k).nodeName().toLower()){
-            bays.append(new Bay(toolChildren.at(k)));
-            bays.last()->setEngine(makeEngine());
-        }
-    }
+//    for(uint k=0; k<toolChildren.length();k++){
+//        if ("bay"==toolChildren.at(k).nodeName().toLower()){
+//            bays.append(new Bay(toolChildren.at(k)));
+//            bays.last()->setEngine(makeEngine());
+//        }
+//    }
 
-    QDomNode system = root.namedItem("system");
-    QDomNodeList systemChildren  = system.childNodes();
-    for (unsigned int k = 0; k < systemChildren.length(); k++) {
-        if ("warmup"==systemChildren.at(k).nodeName().toLower()) {
-            warmup = systemChildren.at(k).toElement().text().split(";");
-        }else if ("cooldown"==systemChildren.at(k).nodeName().toLower()){
-            cooldown = systemChildren.at(k).toElement().text().split(";");
-        }
-    }
+//    QDomNode system = root.namedItem("system");
+//    QDomNodeList systemChildren  = system.childNodes();
+//    for (unsigned int k = 0; k < systemChildren.length(); k++) {
+//        if ("warmup"==systemChildren.at(k).nodeName().toLower()) {
+//            warmup = systemChildren.at(k).toElement().text().split(";");
+//        }else if ("cooldown"==systemChildren.at(k).nodeName().toLower()){
+//            cooldown = systemChildren.at(k).toElement().text().split(";");
+//        }
+//    }
 }
 
 
@@ -256,6 +256,8 @@ void TestPrinter::loadConfig(QDomDocument document) {
 void TestPrinter::runCmds(QStringList sl){
 //    totalprintcommands_+=sl;
     foreach(QString s,sl){
+        s=s.simplified();
+        s=s.remove("\t");
         totalprintcommands_.append(s);
 //        qDebug()<<s;
     }

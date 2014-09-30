@@ -15,10 +15,11 @@ Bay::Bay(const QDomNode& sourceDomNode):engine_() {
         if (bchild.isComment()) {continue;}
 
         if ("id" == bchild.nodeName().toLower()) {
-            id_ = bchild.nodeValue().toInt();
+            id_ = bchild.toElement().text().toInt();
+//            qDebug()<<"id is "<<id_;
 
         } else if ("volume"== bchild.nodeName().toLower()) {
-            max_volume_ = bchild.nodeValue().toDouble();
+            max_volume_ = bchild.toElement().text().toInt();;
 
         } else if ("location"==bchild.nodeName().toLower()) {
             QVector<double> loc(3,0);
