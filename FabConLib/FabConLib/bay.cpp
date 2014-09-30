@@ -51,7 +51,7 @@ Bay::Bay(const QDomNode& sourceDomNode):engine_() {
                         QDomNode schild = scriptChildren.at(h);
                         if (schild.isCDATASection()) {
                             script_=schild.toCDATASection().data();
-                            qDebug()<<script_;
+//                            qDebug()<<script_;
                         }
                     }
                 }else {
@@ -117,6 +117,8 @@ void Bay::setMaterial(Material material) {
 
 void Bay::setEngine(QScriptEngine* engine) {
     engine_ = engine;
+
+    // Set actuator information
     QMapIterator<QString, QString> i(scriptSettings_);
     while (i.hasNext()) {
          i.next();
@@ -130,11 +132,19 @@ void Bay::setEngine(QScriptEngine* engine) {
     }
     engine_->globalObject().setProperty("actuatorIDs",actuatorlist);
 
+
+    // set location information
     QScriptValue jsList = engine_->newArray(location_.size());
     for(int j=0;j<location_.size();j++) {
         jsList.setProperty(j,QScriptValue(engine_,location_.at(j) ) );
     }
     engine_->globalObject().setProperty("location",jsList);
+
+    // set bay information
+    QScriptValue scriptbayvalue(engine_,id_);
+    engine_->globalObject().setProperty("bayid",scriptbayvalue);
+
+
 
     engine_->evaluate(script_);
     qScriptRegisterMetaType(engine_,objFromVoxel, voxelFromObj);
@@ -143,8 +153,33 @@ void Bay::setEngine(QScriptEngine* engine) {
 }
 
 //Actuation
-QStringList Bay::onStartPath(){
+QStringList Bay::onConnect(){
+    QTextStream ss(&error_,QIODevice::WriteOnly);
+    QScriptValue pathfunction = engine_->globalObject().property("onConnect");
+    if(!pathfunction.isValid()) {
+        ss<<"\n onConnect: NOT VALID FUNCTION";
+        qDebug()<<error_;
+        QStringList returnlist;
+        return returnlist;
+    }
+    QScriptValue jsStringList = pathfunction.call(QScriptValue(),QScriptValueList());
+    return QStringListFromStringMatrix(jsStringList);
+}
 
+QStringList Bay::onShutdown(){
+    QTextStream ss(&error_,QIODevice::WriteOnly);
+    QScriptValue pathfunction = engine_->globalObject().property("onShutdown");
+    if(!pathfunction.isValid()) {
+        ss<<"\n onShutdown: NOT VALID FUNCTION";
+        QStringList returnlist;
+        return returnlist;
+    }
+    QScriptValue jsStringList = pathfunction.call(QScriptValue(),QScriptValueList());
+    return QStringListFromStringMatrix(jsStringList);
+}
+
+
+QStringList Bay::onStartPath(){
     QTextStream ss(&error_,QIODevice::WriteOnly);
     QScriptValue pathfunction = engine_->globalObject().property("onStartPath");
     if(!pathfunction.isValid()) {

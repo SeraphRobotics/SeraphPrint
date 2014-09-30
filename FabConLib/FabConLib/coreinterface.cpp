@@ -7,7 +7,22 @@
 #include <QDebug>
 
 CoreInterface::CoreInterface():state_(NotInitialized){
-    vm_ = new TestPrinter();//new VirtualPrinter();
+#ifdef DEBUGGING
+    vm_ = new TestPrinter();
+#else
+    vm_ = new VirtualPrinter();
+#endif
+}
+
+CoreInterface::~CoreInterface(){
+    foreach(Bay* b,vm_->bays){
+        vm_->runCmds(b->onShutdown());
+    }
+    vm_->runCmds(vm_->cooldown);
+#ifdef DEBUGGING
+    vm_->dumpstates();
+#endif
+    delete vm_;
 }
 
 

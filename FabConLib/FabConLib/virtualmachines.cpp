@@ -99,6 +99,16 @@ void VMPrototype::loadConfig(QDomDocument document) {
         }
     }
 
+    QDomNode system = root.namedItem("system");
+    QDomNodeList systemChildren  = system.childNodes();
+    for (unsigned int k = 0; k < systemChildren.length(); k++) {
+        if ("warmup"==systemChildren.at(k).nodeName().toLower()) {
+            warmup = systemChildren.at(k).toElement().text().split(";");
+        }else if ("cooldown"==systemChildren.at(k).nodeName().toLower()){
+            cooldown = systemChildren.at(k).toElement().text().split(";");
+        }
+    }
+
 
 
     initialized_ = true;
@@ -136,6 +146,16 @@ void VirtualPrinter::loadConfig(QDomDocument document) {
         if ("bay"==toolChildren.at(k).nodeName().toLower()){
             bays.append(new Bay(toolChildren.at(k)));
             bays.last()->setEngine(makeEngine());
+        }
+    }
+
+    QDomNode system = root.namedItem("system");
+    QDomNodeList systemChildren  = system.childNodes();
+    for (unsigned int k = 0; k < systemChildren.length(); k++) {
+        if ("warmup"==systemChildren.at(k).nodeName().toLower()) {
+            warmup = systemChildren.at(k).toElement().text().split(";");
+        }else if ("cooldown"==systemChildren.at(k).nodeName().toLower()){
+            cooldown = systemChildren.at(k).toElement().text().split(";");
         }
     }
 
@@ -218,7 +238,15 @@ void TestPrinter::loadConfig(QDomDocument document) {
         }
     }
 
-	
+    QDomNode system = root.namedItem("system");
+    QDomNodeList systemChildren  = system.childNodes();
+    for (unsigned int k = 0; k < systemChildren.length(); k++) {
+        if ("warmup"==systemChildren.at(k).nodeName().toLower()) {
+            warmup = systemChildren.at(k).toElement().text().split(";");
+        }else if ("cooldown"==systemChildren.at(k).nodeName().toLower()){
+            cooldown = systemChildren.at(k).toElement().text().split(";");
+        }
+    }
 }
 
 

@@ -94,6 +94,9 @@ public slots:
     void setMaterial(Material material);
 
     //Actuation
+    QStringList onConnect();
+    QStringList onShutdown();
+
     QStringList onStartPath();
     QStringList onEndPath();
     /**

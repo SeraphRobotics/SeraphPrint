@@ -35,6 +35,11 @@ void LoadConfigThread::run(){
     if (ready_){
         vm_->loadConfig(config_);
         vm_->moveToThread(QApplication::instance()->thread());
+
+        vm_->runCmds(vm_->warmup);
+        foreach(Bay* b, vm_->bays ){
+            vm_->runCmds(b->onConnect());
+        }
         if(vm_->isInitialized()){
             emit loaded();
         }

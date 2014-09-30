@@ -57,11 +57,14 @@ class VMPrototype:public QObject
 
         QList<Bay*> bays;
         XYZMotion* xyzmotion;
+        QStringList warmup;
+        QStringList cooldown;
 
     protected:
         QString comPort_;
         QString error_string_;
         bool initialized_;
+
     };
 
 

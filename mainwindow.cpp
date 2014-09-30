@@ -332,6 +332,7 @@ void MainWindow::setStop()
 
 MainWindow::~MainWindow()
 {
+    delete ci_;
     delete ui;
 }
 

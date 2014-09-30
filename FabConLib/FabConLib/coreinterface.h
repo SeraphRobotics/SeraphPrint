@@ -11,6 +11,7 @@ class CoreInterface : public QObject
 public:
 
     CoreInterface();
+   ~CoreInterface();
 
     enum SystemState {
         NotInitialized,
