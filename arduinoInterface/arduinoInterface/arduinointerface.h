@@ -18,8 +18,6 @@ public:
 
 signals:
     void portNotOpen();
-    void queueLength(int i);
-    void num_outstanding_cmds(int i);
 
 public slots:
     bool connectPort(QString port, BaudRateType baudrate);
@@ -32,16 +30,14 @@ public slots:
 
 private slots:
     void _write(QString s);
-    void _runQueue();
     void onDataAvailable();
 
 private:
     QextSerialPort* port_;
     QVector< QString > queue_;
     int current_line;
-    int num_outstanding_cmds_;
+    QString previous_line;
     bool run_queue_;
-    QTimer* timer_;
 };
 
 #endif // ARDUINOINTERFACE_H

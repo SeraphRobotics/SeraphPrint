@@ -56,8 +56,8 @@ int main(int argc, char *argv[]) {
 //    JsCiTest *jstester = new JsCiTest();
 //    QTimer::singleShot(0,jstester,SLOT(test()));
 
-    ArduinoInterface* ai = new ArduinoInterface("COM3",BAUD115200);
-    //testNewAIWriteTest(ai);
+    ArduinoInterface* ai = new ArduinoInterface("COM4",BAUD115200);
+    testNewAIWriteTest(ai);
 
 
     return app.exec();//return 0;
