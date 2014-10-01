@@ -150,3 +150,27 @@ void testXDFLParsing(VMPrototype *vm) {
 //    QTimer::singleShot(12000, handler, SLOT(resume()));
 
 }
+
+void testNewVM(VMPrototype* vm){}
+
+void testNewAIWriteTest(ArduinoInterface* ai){
+    QStringList cmds;
+    QString gcodeFilePath="dump.gcode";
+    // load the XDFL file into the DOM document
+    {
+      QFile xdflFile(gcodeFilePath);
+      if (!xdflFile.open(QFile::ReadOnly)) {
+          qDebug("FAILED TO OPEN gcode FILE");
+          return;
+      }
+      QTextStream in(&xdflFile);
+      while (!in.atEnd()) {
+          QString line = in.readLine();
+          cmds.append(line);
+      }
+
+      xdflFile.close();
+    }
+
+    ai->writeCommands(cmds);
+}

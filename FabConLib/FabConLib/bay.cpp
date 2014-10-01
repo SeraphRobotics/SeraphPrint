@@ -109,11 +109,23 @@ const Material Bay::getMaterial() const{
     return material_;
 }
 
-void Bay::setMaterial(Material material) {
+QStringList Bay::setMaterial(Material material) {
     qDebug()<<"Set Material to "<< material.name;
     material_ = material;
     QScriptValue v = engine_->toScriptValue(material_);
     engine_->globalObject().setProperty("material",v);
+
+    QTextStream ss(&error_,QIODevice::WriteOnly);
+    QScriptValue pathfunction = engine_->globalObject().property("onLoadMaterial");
+    if(!pathfunction.isValid()) {
+        ss<<"\n onConnect: NOT VALID FUNCTION";
+        qDebug()<<error_;
+        QStringList returnlist;
+        return returnlist;
+    }
+    QScriptValue jsStringList = pathfunction.call(QScriptValue(),QScriptValueList());
+    return QStringListFromStringMatrix(jsStringList);
+
 }
 
 void Bay::setEngine(QScriptEngine* engine) {

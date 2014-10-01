@@ -5,6 +5,7 @@
 #include "qextserialport.h"
 #include <QVector>
 #include <QStringList>
+#include <QTimer>
 
 class ArduinoInterface : public QObject
 {
@@ -39,6 +40,7 @@ private:
     QVector< QString > queue_;
     int num_outstanding_cmds_;
     bool run_queue_;
+    QTimer* timer_;
 };
 
 #endif // ARDUINOINTERFACE_H

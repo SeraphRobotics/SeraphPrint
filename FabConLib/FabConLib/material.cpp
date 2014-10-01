@@ -65,14 +65,24 @@ QScriptValue objFromMat(QScriptEngine *engine, const Material &mat) {
     obj.setProperty("id",mat.id);
     obj.setProperty("name",mat.name);
     obj.setProperty("Q",mat.Q);
-
-    QScriptValue array = engine->newArray(mat.property.size());
     QStringList keys= mat.property.keys();
-    for(int i=0;i<mat.property.size();i++) {
-        array.setProperty(i,keys.at(i));
-        obj.setProperty(keys.at(i),mat.property[keys.at(i)].toDouble());
+    foreach(QString prop,keys){
+        obj.setProperty(prop,mat.property[prop].toDouble());
     }
-    obj.setProperty("keys",array);
+    //    for(int i=0;i<mat.property.size();i++) {
+    //        array.setProperty(i,keys.at(i));
+     //       obj.setProperty(keys.at(i),mat.property[keys.at(i)].toDouble());
+    //    }
+
+
+//    obj.setProperty("pathspeed",mat.property["pathspeed"]);
+//    QScriptValue array = engine->newArray(mat.property.size());
+//    QStringList keys= mat.property.keys();
+//    for(int i=0;i<mat.property.size();i++) {
+//        array.setProperty(i,keys.at(i));
+ //       obj.setProperty(keys.at(i),mat.property[keys.at(i)].toDouble());
+//    }
+//    obj.setProperty("keys",array);
     return obj;
 }
 void matFromObj(const QScriptValue &obj, Material &mat) {

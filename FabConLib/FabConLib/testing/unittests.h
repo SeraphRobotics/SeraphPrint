@@ -11,5 +11,8 @@ void testXDFLPaths(VMPrototype *vm);
 void testXDFLParsing(VMPrototype *vm);
 
 void testNewVM(VMPrototype* vm);
+void testNewAIWriteTest(ArduinoInterface* ai);
+
+
 
 #endif // UNITTESTS_H

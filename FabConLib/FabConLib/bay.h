@@ -91,7 +91,7 @@ public slots:
     /**
      * set the material of the bay
      */
-    void setMaterial(Material material);
+    QStringList setMaterial(Material material);
 
     //Actuation
     QStringList onConnect();

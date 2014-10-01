@@ -144,7 +144,7 @@ void CoreInterface::setMaterial(int bayid,int materialid){
         return;
     }
     Material m = idMaterialMap_[materialid];
-    vm_->bays[bayid]->setMaterial(m);
+    vm_->runCmds(vm_->bays[bayid]->setMaterial(m));
     emit bayMaterial(bayid, materialid);
 
 

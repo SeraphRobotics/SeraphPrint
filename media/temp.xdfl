@@ -10,8 +10,8 @@
        <AreaConstant>1</AreaConstant>
        <CompressionVolume>30</CompressionVolume>
        <property>
-          <name>conductivity</name>
-          <value>1</value>
+          <name>temperature</name>
+          <value>10.0</value>
        </property>
     </material>
 </Palette>

@@ -61,7 +61,7 @@ INCLUDEPATH += ../../arduinoInterface/arduinoInterface/
 
 
 
-
+DEFINES += DEBUGGING
 
 
 
