@@ -38,6 +38,7 @@ private slots:
 private:
     QextSerialPort* port_;
     QVector< QString > queue_;
+    int current_line;
     int num_outstanding_cmds_;
     bool run_queue_;
     QTimer* timer_;

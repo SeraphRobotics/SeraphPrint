@@ -3,7 +3,7 @@
 #include <QDebug>
 
 ArduinoInterface::ArduinoInterface(QObject *parent) :
-    QObject(parent),num_outstanding_cmds_(0),run_queue_(false)
+    QObject(parent),num_outstanding_cmds_(0),run_queue_(false),current_line(100)
 {
     port_ = new QextSerialPort();
     timer_ = new QTimer();
@@ -14,7 +14,7 @@ ArduinoInterface::ArduinoInterface(QObject *parent) :
 }
 
 ArduinoInterface::ArduinoInterface(QString port, BaudRateType baudrate, QObject *parent):
-    QObject(parent),num_outstanding_cmds_(0),run_queue_(false)
+    QObject(parent),num_outstanding_cmds_(0),run_queue_(false),current_line(100)
 {
     port_ = new QextSerialPort(port);//,QextSerialPort::Polling
     port_->setBaudRate( baudrate);
@@ -23,7 +23,7 @@ ArduinoInterface::ArduinoInterface(QString port, BaudRateType baudrate, QObject 
     port_->open(QIODevice::ReadWrite);
     //    port_->set
     connect(port_, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
-
+    _write( QString("M110 ")+QString::number(current_line) );
     timer_ = new QTimer();
     timer_->setInterval(50);
     connect(timer_,SIGNAL(timeout()),this,SLOT(_runQueue()));
@@ -42,6 +42,7 @@ bool ArduinoInterface::connectPort(QString port, BaudRateType baudrate){
     port_->setFlowControl(FLOW_OFF);
     port_->setParity(PAR_NONE);
     port_->open(QIODevice::ReadWrite);
+    _write( QString("M110 ")+QString::number(current_line) );
     qDebug()<<port_->isOpen();
     return port_->isOpen();
 }
@@ -123,12 +124,21 @@ void ArduinoInterface::onDataAvailable(){
 #endif
 
     QString c = QString(data).toLower();
+    c=c.simplified();
+    c=c.remove(' ');
+    c=c.remove("\t");
+
     if("ok" == c){
         num_outstanding_cmds_--;
         emit num_outstanding_cmds(num_outstanding_cmds_);
         if(run_queue_){
             _runQueue();
         }
+    }else if ("start"){
+
+    }else if ("resend"){
+        --current_line;
+        _runQueue();
     }else{
         qDebug()<<c;
     }
