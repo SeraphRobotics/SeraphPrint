@@ -13,6 +13,7 @@ class ArduinoInterface : public QObject
 public:
     explicit ArduinoInterface(QObject *parent = 0);
     ArduinoInterface(QString port, BaudRateType baudrate, QObject *parent = 0);
+    ~ArduinoInterface();
 
     bool isReady();
 

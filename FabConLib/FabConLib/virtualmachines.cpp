@@ -8,7 +8,10 @@
 #include "xdflvoxel.h"
 #include <QFile>
 
-VMPrototype::VMPrototype():initialized_(false){}
+VMPrototype::VMPrototype():initialized_(false){
+    warmup=QStringList();
+    cooldown=QStringList();
+}
 
 bool VMPrototype::isInitialized() {
     return initialized_;
@@ -120,13 +123,20 @@ void VMPrototype::loadConfig(QDomDocument document) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-VirtualPrinter::VirtualPrinter():VMPrototype() {}
+VirtualPrinter::VirtualPrinter():VMPrototype() {
+    ai_ = new ArduinoInterface();
+}
 
 void VirtualPrinter::loadConfig(QDomDocument document) {
 
     QDomElement root = document.documentElement();
-    QDomNode electronics = root.namedItem("electronics");
+//    QDomNode electronics = root.namedItem("electronics");
 
+    delete ai_;
+    ai_ = new ArduinoInterface(comPort_,BAUD115200);
+    if (ai_->isReady()){
+        initialized_ = true;
+    }
     // ELECTRONICS INTERFACE
 //    eInterface.initialize(electronics,comPort_);
 
@@ -189,11 +199,13 @@ void VirtualPrinter::runCmds(QStringList sl){
 
 bool VirtualPrinter::moveTo(double x, double y, double z, double speed){
     QStringList sl = xyzmotion->pathTo(x,y,z,speed);
-    ai_->writeCommands(sl);
+    runCmds(sl);
+    return true;
 }
 bool VirtualPrinter::move(double x, double y, double z, double speed){
     QStringList sl = xyzmotion->pathTo(x,y,z,speed,true);
-    ai_->writeCommands(sl);
+    runCmds(sl);
+    return true;
 }
 
 bool VirtualPrinter::forceStop(){
@@ -209,7 +221,8 @@ void VirtualPrinter::resetPosition(){
     }
     QStringList sl;
     sl.append(cmd);
-    ai_->writeCommands(sl);
+    runCmds(sl);
+//    ai_->writeCommands(sl);
 }
 ///////////////////////////////////////////////////////
 
@@ -265,10 +278,12 @@ void TestPrinter::runCmds(QStringList sl){
 bool TestPrinter::moveTo(double x, double y, double z, double speed){
     QStringList sl = xyzmotion->pathTo(x,y,z,speed);
     runCmds(sl);
+    return true;
 }
 bool TestPrinter::move(double x, double y, double z, double speed){
     QStringList sl = xyzmotion->pathTo(x,y,z,speed,true);
     runCmds(sl);
+    return true;
 }
 
 bool TestPrinter::forceStop(){}

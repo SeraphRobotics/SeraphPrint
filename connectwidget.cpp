@@ -133,9 +133,9 @@ void ConnectWidget::loadFiles()
  **/
 
 void ConnectWidget::deviceAdded(QextPortInfo i){
-    qDebug() << "Device added named: " + i.portName + ". Calling response code.";
+    qDebug() << "Device added named: " +i.friendName+ " on port "+ i.portName + ". Calling response code.";
 
-    bool usb = i.friendName.contains("usb",Qt::CaseInsensitive);
+    bool usb = i.friendName.contains("Arduino Mega",Qt::CaseInsensitive);
 
     if (usb)//!port.friendName.isEmpty())
     {

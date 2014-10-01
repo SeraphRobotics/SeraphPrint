@@ -24,6 +24,11 @@ ArduinoInterface::ArduinoInterface(QString port, BaudRateType baudrate, QObject 
     connect(port_, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
     //_write( QString("M110") );
 }
+ArduinoInterface::~ArduinoInterface(){
+    port_->close();
+    delete port_;
+}
+
 
 bool ArduinoInterface::isReady(){
     return port_->isOpen();
@@ -54,10 +59,17 @@ void ArduinoInterface::addToQueue(QStringList sl){
     startQueue();
 }
 void ArduinoInterface::writeCommands(QStringList sl){
-    foreach(QString s,sl){
-        queue_.prepend(s);
+//    foreach(QString s,sl){
+//        queue_.prepend(s);
+//        qDebug()<<s;
+//    }
+
+    for(int i=sl.size()-1;i>0;i--){
+        queue_.prepend(sl.at(i));
     }
 //    startQueue();
+//    _write(queue_.first());
+//    queue_.pop_front();
 }
 
 void ArduinoInterface::stopQueue(){
@@ -86,7 +98,7 @@ void ArduinoInterface::_write(QString s){
     s = "N" + QString::number(++current_line)+" "+s;
 
 #ifdef DEBUGGING
-    qDebug()<<s;
+    //qDebug()<<s;
 #endif
 
     int cs = 0;
@@ -100,10 +112,10 @@ void ArduinoInterface::_write(QString s){
         }
         cs &= 0xff;
     }
-    qDebug()<<"Cs: "<<cs;
+    //qDebug()<<"Cs: "<<cs;
 
     s+="*"+QString::number(cs)+"\n";
-    qDebug()<<s;
+    qDebug()<<"writing:"<<s;
     QByteArray ba = s.toStdString().c_str();
     port_->write(ba,ba.length());
 
@@ -121,7 +133,7 @@ void ArduinoInterface::onDataAvailable(){
 #ifdef DEBUGGING
     qDebug()<<"received: "<<c;
 #endif
-
+    qDebug()<<"received: "<<c;
 
 //    c=c.simplified();
 //    c=c.remove(' ');
@@ -131,11 +143,11 @@ void ArduinoInterface::onDataAvailable(){
 //        current_line+=20;
         _write("M110 ");
         run_queue_=true;
-    }else if ( c.contains("resend") || c.contains("checksum" || c.contains("error"))){
+    }else if ( c.contains("resend") || c.contains("checksum") || c.contains("error")){
         --current_line;
         _write(previous_line);
     }else if(c.contains("ok")){
-        if(run_queue_ && queue_.size()>0){
+        if(queue_.size()>0){ //run_queue_ &&
             _write(queue_.first());
             queue_.pop_front();
         }

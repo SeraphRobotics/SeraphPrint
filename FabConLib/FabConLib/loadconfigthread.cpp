@@ -32,10 +32,12 @@ void LoadConfigThread::checkReady(){
 
 void LoadConfigThread::run(){
     checkReady();
+    qDebug()<<"ready to load";
     if (ready_){
         vm_->loadConfig(config_);
         vm_->moveToThread(QApplication::instance()->thread());
 
+        qDebug()<<"running cmds"<<vm_->warmup;
         vm_->runCmds(vm_->warmup);
         foreach(Bay* b, vm_->bays ){
             vm_->runCmds(b->onConnect());
