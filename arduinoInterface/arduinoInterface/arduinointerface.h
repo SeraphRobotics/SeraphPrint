@@ -34,11 +34,16 @@ private slots:
     void onDataAvailable();
 
 private:
+    int checksum(QString s);
+
+private:
     QextSerialPort* port_;
-    QVector< QString > queue_;
+    QStringList printqueue_;
+    QStringList priorityqueue;
     int current_line;
     QString previous_line;
     bool run_queue_;
+    QString receivedBuffer;
 };
 
 #endif // ARDUINOINTERFACE_H

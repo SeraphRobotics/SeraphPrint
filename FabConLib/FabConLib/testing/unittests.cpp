@@ -172,5 +172,6 @@ void testNewAIWriteTest(ArduinoInterface* ai){
       xdflFile.close();
     }
 
-    ai->writeCommands(cmds);
+    ai->addToQueue(cmds);
+    ai->startQueue();
 }

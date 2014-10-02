@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 ArduinoInterface::ArduinoInterface(QObject *parent) :
-    QObject(parent),current_line(0), previous_line(""),run_queue_(false)
+    QObject(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer("")
 {
     port_ = new QextSerialPort();
     connect(port_, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
@@ -12,7 +12,7 @@ ArduinoInterface::ArduinoInterface(QObject *parent) :
 }
 
 ArduinoInterface::ArduinoInterface(QString port, BaudRateType baudrate, QObject *parent):
-    QObject(parent),current_line(0), previous_line(""),run_queue_(false)
+    QObject(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer("")
 {
     port_ = new QextSerialPort(port);//,QextSerialPort::Polling
     port_->setBaudRate( baudrate);
@@ -53,38 +53,52 @@ void ArduinoInterface::disconnect(){
 }
 
 void ArduinoInterface::addToQueue(QStringList sl){
+    bool run = printqueue_.isEmpty();
     foreach(QString s,sl){
-        queue_.append(s);
+        printqueue_.append(s);
     }
-    startQueue();
+    if(run){
+        startQueue();
+    }
 }
 void ArduinoInterface::writeCommands(QStringList sl){
-//    foreach(QString s,sl){
-//        queue_.prepend(s);
-//        qDebug()<<s;
-//    }
-
-    for(int i=sl.size()-1;i>0;i--){
-        queue_.prepend(sl.at(i));
+    if(run_queue_){
+        priorityqueue +=sl;
+    }else{
+        foreach(QString s, sl){
+            _write(s);
+        }
     }
-//    startQueue();
-//    _write(queue_.first());
-//    queue_.pop_front();
 }
 
 void ArduinoInterface::stopQueue(){
     run_queue_=false;
 }
 void ArduinoInterface::startQueue(){
-    if(queue_.isEmpty()){return;}
+    if(printqueue_.isEmpty()){return;}
     run_queue_=true;
-    _write(queue_.first());
-    queue_.pop_front();
+    _write(printqueue_.first());
+    printqueue_.pop_front();
 }
 
 void ArduinoInterface::clearQueue(){
-    queue_.clear();
+    printqueue_.clear();
     stopQueue();
+}
+
+int ArduinoInterface::checksum(QString s){
+    int cs = 0;
+    int i = 0;
+    if(s.size()>0){
+        for(i = 0;i<s.size(); i++){
+            if(s.at(i)=='*'){
+                break;
+            }
+           cs = cs ^ s.at(i).toAscii();
+        }
+        cs &= 0xff;
+    }
+    return cs;
 }
 
 void ArduinoInterface::_write(QString s){
@@ -101,20 +115,10 @@ void ArduinoInterface::_write(QString s){
     //qDebug()<<s;
 #endif
 
-    int cs = 0;
-    int i = 0;
-    if(s.size()>0){
-        for(i = 0;i<s.size(); i++){
-            if(s.at(i)=='*'){
-                break;
-            }
-           cs = cs ^ s.at(i).toAscii();
-        }
-        cs &= 0xff;
-    }
+
     //qDebug()<<"Cs: "<<cs;
 
-    s+="*"+QString::number(cs)+"\n";
+    s+="*"+QString::number(checksum(s))+"\n";
     qDebug()<<"writing:"<<s;
     QByteArray ba = s.toStdString().c_str();
     port_->write(ba,ba.length());
@@ -125,6 +129,7 @@ void ArduinoInterface::_write(QString s){
 void ArduinoInterface::onDataAvailable(){
     QByteArray data = port_->readAll();
     QString c = QString(data).toLower();
+    c = receivedBuffer+c;
     c=c.simplified();
 //    c=c.remove(' ');
 //    c=c.remove("\t");
@@ -147,11 +152,12 @@ void ArduinoInterface::onDataAvailable(){
         --current_line;
         _write(previous_line);
     }else if(c.contains("ok")){
-        if(queue_.size()>0){ //run_queue_ &&
-            _write(queue_.first());
-            queue_.pop_front();
+        if(printqueue_.size()>0){ //run_queue_ &&
+            _write(printqueue_.takeFirst());
+
         }
     }else {
+        receivedBuffer.append(c);
 //        qDebug()<<c;
     }
 }
