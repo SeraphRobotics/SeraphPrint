@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 ArduinoInterface::ArduinoInterface(QObject *parent) :
-    QObject(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer("")
+    QObject(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer(""),start_received(false)
 {
     port_ = new QextSerialPort();
     connect(port_, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
@@ -12,7 +12,7 @@ ArduinoInterface::ArduinoInterface(QObject *parent) :
 }
 
 ArduinoInterface::ArduinoInterface(QString port, BaudRateType baudrate, QObject *parent):
-    QObject(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer("")
+    QObject(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer(""),start_received(false)
 {
     port_ = new QextSerialPort(port);//,QextSerialPort::Polling
     port_->setBaudRate( baudrate);
@@ -62,7 +62,7 @@ void ArduinoInterface::addToQueue(QStringList sl){
     }
 }
 void ArduinoInterface::writeCommands(QStringList sl){
-    if(run_queue_){
+    if(run_queue_ || !start_received){
         priorityqueue +=sl;
     }else{
         foreach(QString s, sl){
@@ -100,6 +100,15 @@ int ArduinoInterface::checksum(QString s){
     }
     return cs;
 }
+void ArduinoInterface::_write_next(){
+    if(!priorityqueue.isEmpty()){
+        _write(priorityqueue.takeFirst());
+        qDebug()<<"***************8running from priority********************\n";
+    }else if(!printqueue_.isEmpty()){
+        _write(printqueue_.takeFirst());
+    }
+}
+
 
 void ArduinoInterface::_write(QString s){
     if (!isReady() ){return;}
@@ -131,10 +140,11 @@ void ArduinoInterface::onDataAvailable(){
     QString c = QString(data).toLower();
     c = receivedBuffer+c;
     c=c.simplified();
+    c=c.remove("\n");
 //    c=c.remove(' ');
 //    c=c.remove("\t");
     c = QString(data).toLower();
-    qDebug()<<c;
+//    qDebug()<<c;
 
 //    c=c.simplified();
 //    c=c.remove(' ');
@@ -142,21 +152,24 @@ void ArduinoInterface::onDataAvailable(){
 //    return;
     if (c.contains("start")){
 //        current_line+=20;
+        start_received = true;
         _write("M110 ");
-        run_queue_=true;
+//        run_queue_=true;
         receivedBuffer.clear();
     }else if ( c.contains("resend") || c.contains("checksum") || c.contains("error")){
         --current_line;
         _write(previous_line);
         receivedBuffer.clear();
     }else if(c.contains("ok") || c.contains("wait")){
-        if(printqueue_.size()>0){ //run_queue_ &&
-            _write(printqueue_.takeFirst());
+        _write_next();
+        qDebug()<<c;
+//        if(printqueue_.size()>0){ //run_queue_ &&
+//            _write(printqueue_.takeFirst());
 
-        }
+//        }
         receivedBuffer.clear();
     }else {
         receivedBuffer.append(c);
-        qDebug()<<c;
+//        qDebug()<<c;
     }
 }

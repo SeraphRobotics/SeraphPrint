@@ -181,4 +181,7 @@ void testNewAIWriteTest(ArduinoInterface* ai){
     ai->writeCommands(sl);
     ai->addToQueue(cmds);
     ai->startQueue();
+    ai->stopQueue();
+    ai->writeCommands(sl);
+    ai->startQueue();
 }

@@ -31,6 +31,7 @@ public slots:
 
 private slots:
     void _write(QString s);
+    void _write_next();
     void onDataAvailable();
 
 private:
@@ -44,6 +45,7 @@ private:
     QString previous_line;
     bool run_queue_;
     QString receivedBuffer;
+    bool start_received;
 };
 
 #endif // ARDUINOINTERFACE_H
