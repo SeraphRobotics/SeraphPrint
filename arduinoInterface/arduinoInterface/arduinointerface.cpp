@@ -134,11 +134,7 @@ void ArduinoInterface::onDataAvailable(){
 //    c=c.remove(' ');
 //    c=c.remove("\t");
     c = QString(data).toLower();
-
-#ifdef DEBUGGING
-    qDebug()<<"received: "<<c;
-#endif
-    qDebug()<<"received: "<<c;
+    qDebug()<<c;
 
 //    c=c.simplified();
 //    c=c.remove(' ');
@@ -148,16 +144,19 @@ void ArduinoInterface::onDataAvailable(){
 //        current_line+=20;
         _write("M110 ");
         run_queue_=true;
+        receivedBuffer.clear();
     }else if ( c.contains("resend") || c.contains("checksum") || c.contains("error")){
         --current_line;
         _write(previous_line);
-    }else if(c.contains("ok")){
+        receivedBuffer.clear();
+    }else if(c.contains("ok") || c.contains("wait")){
         if(printqueue_.size()>0){ //run_queue_ &&
             _write(printqueue_.takeFirst());
 
         }
+        receivedBuffer.clear();
     }else {
         receivedBuffer.append(c);
-//        qDebug()<<c;
+        qDebug()<<c;
     }
 }

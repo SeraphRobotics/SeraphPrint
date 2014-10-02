@@ -172,6 +172,13 @@ void testNewAIWriteTest(ArduinoInterface* ai){
       xdflFile.close();
     }
 
+    QStringList sl;
+    sl<<"G91";
+    sl<<"G1 X10 F1800";
+    sl<<"G90";
+    ai->writeCommands(sl);
+    ai->writeCommands(sl);
+    ai->writeCommands(sl);
     ai->addToQueue(cmds);
     ai->startQueue();
 }
