@@ -6,8 +6,9 @@
 #include <QVector>
 #include <QStringList>
 #include <QTimer>
+#include <QThread>
 
-class ArduinoInterface : public QObject
+class ArduinoInterface : public QThread
 {
     Q_OBJECT
 public:
@@ -16,9 +17,11 @@ public:
     ~ArduinoInterface();
 
     bool isReady();
+    int queuesize();
 
 signals:
     void portNotOpen();
+    void queuesize(int s);
 
 public slots:
     bool connectPort(QString port, BaudRateType baudrate);
@@ -29,10 +32,12 @@ public slots:
     void startQueue();
     void clearQueue();
 
+
 private slots:
     void _write(QString s);
     void _write_next();
     void onDataAvailable();
+    void readCheck();
 
 private:
     int checksum(QString s);
@@ -46,6 +51,7 @@ private:
     bool run_queue_;
     QString receivedBuffer;
     bool start_received;
+    QTimer* readTimer;
 };
 
 #endif // ARDUINOINTERFACE_H

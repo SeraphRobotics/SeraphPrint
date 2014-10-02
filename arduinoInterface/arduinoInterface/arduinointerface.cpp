@@ -4,15 +4,18 @@
 #include <stdint.h>
 
 ArduinoInterface::ArduinoInterface(QObject *parent) :
-    QObject(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer(""),start_received(false)
+    QThread(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer(""),start_received(false)
 {
     port_ = new QextSerialPort();
     connect(port_, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
-
+    readTimer = new QTimer();
+    readTimer->setInterval(10);
+    connect(readTimer,SIGNAL(timeout()),this,SLOT(readCheck()));
+    readTimer->start();
 }
 
 ArduinoInterface::ArduinoInterface(QString port, BaudRateType baudrate, QObject *parent):
-    QObject(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer(""),start_received(false)
+    QThread(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer(""),start_received(false)
 {
     port_ = new QextSerialPort(port);//,QextSerialPort::Polling
     port_->setBaudRate( baudrate);
@@ -22,6 +25,10 @@ ArduinoInterface::ArduinoInterface(QString port, BaudRateType baudrate, QObject 
     //    port_->set
     qDebug()<<port_->isOpen();
     connect(port_, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
+    readTimer = new QTimer();
+    readTimer->setInterval(10);
+    connect(readTimer,SIGNAL(timeout()),this,SLOT(readCheck()));
+    readTimer->start();
     //_write( QString("M110") );
 }
 ArduinoInterface::~ArduinoInterface(){
@@ -29,6 +36,10 @@ ArduinoInterface::~ArduinoInterface(){
     delete port_;
 }
 
+
+int ArduinoInterface::queuesize(){
+    return printqueue_.size();
+}
 
 bool ArduinoInterface::isReady(){
     return port_->isOpen();
@@ -53,17 +64,21 @@ void ArduinoInterface::disconnect(){
 }
 
 void ArduinoInterface::addToQueue(QStringList sl){
-    bool run = printqueue_.isEmpty();
+    bool runstart = printqueue_.isEmpty();
     foreach(QString s,sl){
         printqueue_.append(s);
     }
-    if(run){
+    if(runstart){
         startQueue();
     }
+    emit queuesize(printqueue_.size());
 }
 void ArduinoInterface::writeCommands(QStringList sl){
-    if(run_queue_ || !start_received){
+    if(run_queue_ ){//|| !start_received
         priorityqueue +=sl;
+        qDebug()<<"queued"<<sl;
+        qDebug()<<run_queue_;
+        qDebug()<<start_received;
     }else{
         foreach(QString s, sl){
             _write(s);
@@ -84,6 +99,7 @@ void ArduinoInterface::startQueue(){
 void ArduinoInterface::clearQueue(){
     printqueue_.clear();
     stopQueue();
+    emit queuesize(printqueue_.size());
 }
 
 int ArduinoInterface::checksum(QString s){
@@ -103,9 +119,10 @@ int ArduinoInterface::checksum(QString s){
 void ArduinoInterface::_write_next(){
     if(!priorityqueue.isEmpty()){
         _write(priorityqueue.takeFirst());
-        qDebug()<<"***************8running from priority********************\n";
+        qDebug()<<"***************running from priority********************\n";
     }else if(!printqueue_.isEmpty()){
         _write(printqueue_.takeFirst());
+        emit queuesize(printqueue_.size());
     }
 }
 
@@ -135,6 +152,15 @@ void ArduinoInterface::_write(QString s){
 
 }
 
+void ArduinoInterface::readCheck(){
+//    qDebug()<<"checked, found "<<port_->bytesAvailable();
+    if(port_->bytesAvailable()>0){
+        onDataAvailable();
+    }
+
+}
+
+
 void ArduinoInterface::onDataAvailable(){
     QByteArray data = port_->readAll();
     QString c = QString(data).toLower();
@@ -144,7 +170,7 @@ void ArduinoInterface::onDataAvailable(){
 //    c=c.remove(' ');
 //    c=c.remove("\t");
     c = QString(data).toLower();
-//    qDebug()<<c;
+    qDebug()<<c;
 
 //    c=c.simplified();
 //    c=c.remove(' ');

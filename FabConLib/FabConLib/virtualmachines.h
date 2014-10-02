@@ -53,6 +53,12 @@ class VMPrototype:public QObject
 
         virtual void dumpstates();
 
+        virtual void startprint();
+        virtual void cancelprint();
+        virtual void pauseprint();
+        virtual int getBufferSize();
+
+
     public:
 
         QList<Bay*> bays;
@@ -64,6 +70,7 @@ class VMPrototype:public QObject
         QString comPort_;
         QString error_string_;
         bool initialized_;
+        bool printing;
 
     };
 
@@ -86,8 +93,19 @@ public slots:
     bool forceStop();
     void resetPosition();
 
+    void startprint();
+    void cancelprint();
+    void pauseprint();
+    int getBufferSize();
+
+
 public:
     ArduinoInterface* ai_;
+
+private slots:
+    void setbuffsize(int s);
+private:
+    int buffsize;
 
 //public:
 //    ElectronicsInterface eInterface; //TODO: this should be private. Nothing above VM should access it.
@@ -112,6 +130,7 @@ public slots:
     bool move(double x, double y, double z, double speed);
 
     bool forceStop();
+
 
 private:
     QStringList totalprintcommands_;

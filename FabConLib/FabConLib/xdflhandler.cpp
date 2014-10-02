@@ -49,6 +49,7 @@ void XDFLHandler::pause() {
     if (handlerstate_ == XDFLHandler::Running) {
         qDebug()<<"Pausing...";
         handlerstate_ = XDFLHandler::Paused;
+        vm_->pauseprint();
     }
 //    vm_->moveToThread(QApplication::instance()->thread());
     // (mutex automatically released upon locker destruction)
@@ -61,6 +62,7 @@ void XDFLHandler::resume() {
     updateInfo();
     if (handlerstate_ == XDFLHandler::Paused) {
         qDebug()<<"Resuming...";
+        vm_->startprint();
         handlerstate_ = XDFLHandler::Running;
         resumed_.wakeAll();
     }
@@ -72,6 +74,7 @@ void XDFLHandler::cancel() {
     QMutexLocker locker(&mutex_);
 
     qDebug()<<"canceling...";
+    vm_->cancelprint();
     if (handlerstate_ == XDFLHandler::Running) {
         handlerstate_ = XDFLHandler::Stopped;
     }
@@ -252,6 +255,7 @@ void XDFLHandler::run()
 
     qDebug()<<"Initializing the XDFL handler thread.";
 
+    vm_->startprint();
     QMutexLocker locker(&mutex_);
     current_command_ = 0;
     current_material_ = 0;
@@ -271,7 +275,7 @@ void XDFLHandler::run()
         if (handlerstate_ == XDFLHandler::Running) {
             // Allow state changes [pausing/stopping] while processing one path
             locker.unlock();
-            processCommand();
+            if(vm_->getBufferSize()<10){processCommand();}
             locker.relock();
             if (current_command_ == commands_.length()) {
                 // XDFL file completed.

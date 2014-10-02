@@ -8,7 +8,7 @@
 #include "xdflvoxel.h"
 #include <QFile>
 
-VMPrototype::VMPrototype():initialized_(false){
+VMPrototype::VMPrototype():initialized_(false),printing(false){
     warmup=QStringList();
     cooldown=QStringList();
 }
@@ -28,6 +28,17 @@ QString VMPrototype::getErrors() {
 }
 
 
+void VMPrototype::startprint(){
+    printing = true;
+}
+void VMPrototype::cancelprint(){
+    printing = false;
+}
+void VMPrototype::pauseprint(){
+    printing = false;
+}
+
+int VMPrototype::getBufferSize(){return 0;}
 
 QVector<double> VMPrototype::currentPosition(){
     return QVector<double>(3,0.0);
@@ -123,8 +134,10 @@ void VMPrototype::loadConfig(QDomDocument document) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-VirtualPrinter::VirtualPrinter():VMPrototype() {
+VirtualPrinter::VirtualPrinter():VMPrototype(),buffsize(0) {
     ai_ = new ArduinoInterface();
+    ai_->start();
+    connect(ai_,SIGNAL(queuesize(int)),this,SLOT(setbuffsize(int)));
 }
 
 void VirtualPrinter::loadConfig(QDomDocument document) {
@@ -132,8 +145,11 @@ void VirtualPrinter::loadConfig(QDomDocument document) {
     QDomElement root = document.documentElement();
 //    QDomNode electronics = root.namedItem("electronics");
 
-    delete ai_;
-    ai_ = new ArduinoInterface(comPort_,BAUD115200);
+//    delete ai_;
+//    ai_ = new ArduinoInterface(comPort_,BAUD115200);
+//    ai_->start();
+    ai_->connectPort(comPort_,BAUD115200);
+    connect(ai_,SIGNAL(queuesize(int)),this,SLOT(setbuffsize(int)));
     if (ai_->isReady()){
         initialized_ = true;
     }
@@ -194,7 +210,12 @@ QString VirtualPrinter::getErrors(){
 }
 
 void VirtualPrinter::runCmds(QStringList sl){
-    ai_->writeCommands(sl);
+//    qDebug()<<sl;
+    if(printing){
+        ai_->addToQueue(sl);
+    }else{
+        ai_->writeCommands(sl);
+    }
 }
 
 bool VirtualPrinter::moveTo(double x, double y, double z, double speed){
@@ -224,6 +245,31 @@ void VirtualPrinter::resetPosition(){
     runCmds(sl);
 //    ai_->writeCommands(sl);
 }
+
+
+void VirtualPrinter::startprint(){
+    VMPrototype::startprint();
+    ai_->startQueue();
+}
+void VirtualPrinter::cancelprint(){
+    VMPrototype::cancelprint();
+    ai_->stopQueue();
+    ai_->clearQueue();
+}
+void VirtualPrinter::pauseprint(){
+    VMPrototype::pauseprint();
+    ai_->stopQueue();
+}
+
+int VirtualPrinter::getBufferSize(){
+    return buffsize;
+}
+
+void VirtualPrinter::setbuffsize(int s){
+    buffsize = s;
+}
+
+
 ///////////////////////////////////////////////////////
 
 TestPrinter::TestPrinter():VMPrototype() {
