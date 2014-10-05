@@ -35,11 +35,11 @@ void loop() {
                 d2 = Serial.read();
                 wd = ((uint16_t)d2 << 8) | d1;
                 // say what you got:
-                Serial.print("I received: ");
+//                Serial.print("I received: ");
 //                Serial.println(d1);
 //                Serial.println(d2);
                 Serial.println(wd);
-                colorWipe(wd, 0, 0, 100);   // "Red" (depending on your LED wiring)
+                colorWipe(wd, wd, wd, 100);   // "Red" (depending on your LED wiring)
   }
 
 }
