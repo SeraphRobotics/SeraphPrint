@@ -181,7 +181,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Y-</string>
+        <string>X-</string>
        </property>
        <property name="buddy">
         <cstring>leftPushButton</cstring>
@@ -299,7 +299,7 @@ to
         </font>
        </property>
        <property name="text">
-        <string>Y+</string>
+        <string>X+</string>
        </property>
        <property name="buddy">
         <cstring>rightPushButton</cstring>
@@ -419,7 +419,7 @@ to
         </font>
        </property>
        <property name="text">
-        <string>X+</string>
+        <string>Y+</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -438,7 +438,7 @@ to
         </font>
        </property>
        <property name="text">
-        <string>X-</string>
+        <string>Y-</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

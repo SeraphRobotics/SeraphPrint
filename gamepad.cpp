@@ -138,25 +138,25 @@ void GamePad::onPositionChanged(double xPos, double yPos, double zPos) {
 void GamePad::on_upPushButton_clicked()
 {
     //emit moveTo(ui->xPositionSpin->value() - ui->xIncrementSpin->value(), ui->yPositionSpin->value(), ui->zPositionSpin->value());
-    ci_->move(-ui->xIncrementSpin->value(), 0, 0,XVelocity);
+    ci_->move(0,-ui->yIncrementSpin->value(), 0,YVelocity);
 }
 
 void GamePad::on_downPushbutton_clicked()
 {
     //emit moveTo(ui->xPositionSpin->value() + ui->xIncrementSpin->value(), ui->yPositionSpin->value(), ui->zPositionSpin->value());
-    ci_->move(ui->xIncrementSpin->value(), 0, 0,XVelocity);
+    ci_->move(0, ui->yIncrementSpin->value(),0,YVelocity);
 }
 
 void GamePad::on_leftPushButton_clicked()
 {
     //emit moveTo(ui->xPositionSpin->value(), ui->yPositionSpin->value() - ui->yIncrementSpin->value(), ui->zPositionSpin->value());
-    ci_->move(0, - ui->yIncrementSpin->value(), 0, YVelocity);
+    ci_->move(- ui->xIncrementSpin->value(),0, 0, XVelocity);
 }
 
 void GamePad::on_rightPushButton_clicked()
 {
     //emit moveTo(ui->xPositionSpin->value(), ui->yPositionSpin->value() + ui->yIncrementSpin->value(), ui->zPositionSpin->value());
-    ci_->move(0, ui->yIncrementSpin->value(), 0, YVelocity);
+    ci_->move( ui->xIncrementSpin->value(),0, 0, XVelocity);
 }
 void GamePad::on_minusZPushButton_clicked()
 {
