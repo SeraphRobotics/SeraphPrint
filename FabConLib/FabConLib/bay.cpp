@@ -285,7 +285,7 @@ QStringList Bay::onPath(XDFLPath path) {
 QStringList Bay::onVoxel(XDFLVoxel voxel) {
     QStringList returnlist;
     volume_ += voxel.volume;
-    QTextStream ss(&error_,QIODevice::ReadOnly);
+    QTextStream ss(&error_,QIODevice::WriteOnly);
 
 
     QScriptValue voxelfunction = engine_->globalObject().property("onVoxel");
@@ -307,24 +307,42 @@ QStringList Bay::onVoxel(XDFLVoxel voxel) {
 
 QStringList Bay::jogActuators(double amount,double time){
     QStringList returnlist;
-    QListIterator<QString> li(actuatorNames_);
-    float d=0;
+//    QListIterator<QString> li(actuatorNames_);
+//    float d=0;
 
-    returnlist.append("T"+QString::number( getId() ) );
-    while(li.hasNext())
-    {
-        returnlist.append("G92 "+li.next()+QString::number(0));
-        d+=amount;
+//    returnlist.append("T"+QString::number( getId() ) );
+//    while(li.hasNext())
+//    {
+//        returnlist.append("G92 "+li.next()+QString::number(0));
+//        d+=amount;
+//    }
+
+//    li.toFront();
+//    while(li.hasNext()){
+//        QString s="G1";
+//        s.append(" "+li.next()+QString::number(0));
+//        s.append(" F"+QString::number(d/time));
+//        returnlist.append(s);
+//    }
+    QTextStream ss(&error_,QIODevice::WriteOnly);
+    QScriptValue pathfunction = engine_->globalObject().property("onJog");
+    if(!pathfunction.isValid()) {
+        ss<<"\n onJog: NOT VALID FUNCTION";
+        qDebug()<<engine_->uncaughtException().toString();;
+
+        return returnlist;
     }
 
-    li.toFront();
-    while(li.hasNext()){
-        QString s="G1";
-        s.append(" "+li.next()+QString::number(0));
-        s.append(" F"+QString::number(d/time));
-        returnlist.append(s);
+    QScriptValue p = engine_->toScriptValue(amount);
+    QScriptValue jsStringList = pathfunction.call(QScriptValue(),QScriptValueList()<<p);
+//    qDebug()<<jsStringList.property("length").toInt32();
+//    qDebug()<<jsStringList.toString();
+    if (engine_->hasUncaughtException()) {
+        ss<<"\tERROR: %s"<<engine_->uncaughtException().toString();
+        return returnlist;
     }
 
+    returnlist+=QStringListFromStringMatrix(jsStringList);
     return returnlist;
 }
 
