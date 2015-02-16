@@ -18,7 +18,7 @@ GamePad::GamePad(QWidget *parent,CoreInterface* ci) :
     XAcceleration = 100.0;
     YVelocity = 100.0;
     YAcceleration = 100.0;
-    ZVelocity = 100.0;
+    ZVelocity = 5.0;
     ZAcceleration = 100.0;
 
     xOpen = false;

@@ -144,6 +144,8 @@ void ConnectWidget::deviceAdded(QextPortInfo i){
         /**
             TODO: Check for duplicates
         **/
+    }else{
+        qDebug()<<i.friendName<<" connected";
     }
 }
 
