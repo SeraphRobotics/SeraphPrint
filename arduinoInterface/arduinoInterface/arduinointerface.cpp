@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <stdint.h>
+#include <stdio.h>
 
 ArduinoInterface::ArduinoInterface(QObject *parent) :
     QThread(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer(""),start_received(false)
@@ -74,7 +75,7 @@ void ArduinoInterface::addToQueue(QStringList sl){
     emit queuesize(printqueue_.size());
 }
 void ArduinoInterface::writeCommands(QStringList sl){
-    if(run_queue_ ){//|| !start_received
+    if(run_queue_ || !start_received){//
         priorityqueue +=sl;
         qDebug()<<"queued"<<sl;
         qDebug()<<run_queue_;
@@ -171,6 +172,7 @@ void ArduinoInterface::onDataAvailable(){
 //    c=c.remove("\t");
     c = QString(data).toLower();
     qDebug()<<c;
+    //printf(c.toStdString().c_str());
 
 //    c=c.simplified();
 //    c=c.remove(' ');
