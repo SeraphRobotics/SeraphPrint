@@ -25,6 +25,7 @@ public slots:
     void reLoadConfigFiles();
     void deviceAdded(QextPortInfo i);
     void deviceRemoved(QextPortInfo i);
+    void updateSlots();
 
 signals:
     void atemptConnect();
@@ -42,6 +43,8 @@ private:
     QFileInfoList configList;
     QDir configFileDirectory;
     QString default_config_path;
+    QTimer* t_;
+    QList<QextPortInfo> allports;
 
 private slots:
     void on_configButton_clicked();

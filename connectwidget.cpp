@@ -17,6 +17,7 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
 {
     ui->setupUi(this);
     ci_ = ci;
+    t_ = new QTimer();
 
     // Set up default directory
     // Settings for Config file default directory path
@@ -24,38 +25,7 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
     // QSettings constructor values were specified in main.cpp.
     QSettings settings;
     default_config_path = QFileInfo(settings.fileName()).absolutePath();//+ "/Seraph"
-
-    // Populate portList and ui->portBox.
-    foreach(QextPortInfo port, QextSerialEnumerator::getPorts())
-    {
-        // Display the port's FriendName in the GUI portBox;
-        // printer connection uses the PortName (portList values).
-        // Ports which are clearly not printers (empty FriendNames) are ignored.
-
-        // NOTE: Since the selected port name is retrieved by its combobox index
-        //       (because friend name may not be unique), it is important that
-        //       the order of portBox items be maintained.
-        // The selected port name is retrieved by portList.at(ui->portBox->currentIndex()).
-
-        bool usb = port.friendName.contains("usb",Qt::CaseInsensitive);
-
-        if (usb)//!port.friendName.isEmpty())
-        {
-            portList.append(port.portName);
-            ui->portBox->addItem(port.friendName);
-        }
-    }
-
-#ifdef DEBUGGING
-    portList.append("TEST");
-    ui->portBox->addItem("TEST");
-#endif
-
-    if (portList.size() == 1)
-    {
-        // Only one possible printer found; select it.
-        ui->portBox->setCurrentIndex(0);
-    }
+    allports = QList<QextPortInfo>();
 
     // Populate configList and ui->configBox.
     // NOTE: Since the selected file is retrieved by its combobox index
@@ -73,6 +43,11 @@ ConnectWidget::ConnectWidget(QWidget *parent, CoreInterface *ci) : QWidget(paren
     loadFiles();
 
     ui->configBox->setCurrentIndex(settings.value("load config next time index", 0).toInt());
+
+    t_->setInterval(100);
+    connect(t_,SIGNAL(timeout()),this,SLOT(updateSlots()));
+    t_->start(100);
+    //updateSlots();
 
 //SAMPLE getPorts() OUTPUT (MAC OS)
 //Starting /Applications/D:/fab@home/FabPrint/FabPrint-build-desktop/FabPrint.app/Contents/MacOS/FabPrint...
@@ -131,7 +106,60 @@ void ConnectWidget::loadFiles()
  deviceAdded(QextPortInfo) responds to the presence of a newly detected COM port.
  deviceRemoved(QextPortInfo) responds to the removal of a previously detected COM port.
  **/
+void ConnectWidget::updateSlots(){
 
+//    // Populate portList and ui->portBox.
+//    foreach(QextPortInfo port, QextSerialEnumerator::getPorts())
+//    {
+//        // Display the port's FriendName in the GUI portBox;
+//        // printer connection uses the PortName (portList values).
+//        // Ports which are clearly not printers (empty FriendNames) are ignored.
+
+//        // NOTE: Since the selected port name is retrieved by its combobox index
+//        //       (because friend name may not be unique), it is important that
+//        //       the order of portBox items be maintained.
+//        // The selected port name is retrieved by portList.at(ui->portBox->currentIndex()).
+
+//        bool usb = port.friendName.contains("Arduino Mega",Qt::CaseInsensitive);
+
+//        if (usb)//!port.friendName.isEmpty())
+//        {
+//            portList.append(port.portName);
+//            ui->portBox->addItem(port.friendName);
+//        }
+//    }
+
+//#ifdef DEBUGGING
+//    portList.append("TEST");
+//    ui->portBox->addItem("TEST");
+//#endif
+
+//    if (portList.size() == 1)
+//    {
+//        // Only one possible printer found; select it.
+//        ui->portBox->setCurrentIndex(0);
+//    }
+
+    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+
+    if (ports.size()!= allports.size()){
+        portList.clear();
+        foreach(QextPortInfo port,ports )
+        {
+            deviceAdded(port);
+        }
+
+
+        foreach(QextPortInfo port,allports){
+            bool innewlist = false;
+            foreach(QextPortInfo newport,ports ){
+                innewlist = innewlist || newport.physName==port.physName;
+            }
+            if (!innewlist){deviceRemoved(port);}
+        }
+        allports = ports;
+    }
+}
 void ConnectWidget::deviceAdded(QextPortInfo i){
     qDebug() << "Device added named: " +i.friendName+ " on port "+ i.portName + ". Calling response code.";
 
@@ -151,12 +179,12 @@ void ConnectWidget::deviceAdded(QextPortInfo i){
 
 void ConnectWidget::deviceRemoved(QextPortInfo i){
     qDebug()<<"Device removed named: " + i.portName + ". Calling response code.";
-    bool usb = i.friendName.contains("usb",Qt::CaseInsensitive);
+    bool usb = i.friendName.contains("Arduino Mega",Qt::CaseInsensitive);
 
     if (usb)//!port.friendName.isEmpty())
     {
 
-        portList.removeAt(portList.indexOf(i.portName));
+        //portList.removeAt(portList.indexOf(i.portName));
         ui->portBox->removeItem(ui->portBox->findText(i.friendName));
         /**
             TODO: Alert other stages to changes, display warning of some kind.
