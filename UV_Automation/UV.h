@@ -2,7 +2,8 @@
 #define UV_H
 
 #include <QObject>
-#include "../../JrkerrElectronics/Windows/qextserial/qextserialport.h"
+//#include "../../JrkerrElectronics/Windows/qextserial/qextserialport.h"
+#include "../JrkerrElectronics/Windows/qextserial/qextserialport.h"
 #include <QDomNode>
 
 class UV : public QObject
