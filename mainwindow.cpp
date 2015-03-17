@@ -296,13 +296,18 @@ void MainWindow::printerConnected(){
 
 void MainWindow::hideGamePad(){
     this->gamepad_container->hide();
+    this->materialsWidget->hide();
     ui->mainVLayout->removeWidget(this->gamepad_container);
+    ui->mainVLayout->removeWidget(this->materialsWidget);
 }
 
 void MainWindow::showGamePad(){
     this->gamepad_container->show();
+    ui->mainVLayout->addWidget(this->materialsWidget);
+    this->materialsWidget->show();
     ui->mainVLayout->addWidget(this->gamepad_container);
 }
+
 
 void MainWindow::setGo()
 {
