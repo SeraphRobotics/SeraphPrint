@@ -455,8 +455,17 @@ bool XDFLHandler::setMaterial(int id) {
         FabPoint Pold = pointFromQVector(material_bay_mapping_[current_material_]->getLocation());
         FabPoint delta = subtractpoints(Pnew,Pold);
         double speed = material_bay_mapping_[id]->getMaterial().property["pathspeed"].toDouble();
+        speed = speed*60;
         current_material_ = id;
         qDebug()<<"Changing materials.";
+        QStringList cmds;
+        QString cmd1 = "G91";
+        QString cmd2 = "G1 X"+QString::number(delta.x)+" Y"+QString::number(delta.y)+" Z"+QString::number(delta.z)+" F"+QString::number(speed);
+        QString cmd3 = "G90";
+        cmds.append(cmd1);
+        cmds.append(cmd2);
+        cmds.append(cmd3);
+        vm_->runCmds(cmds);
 //        runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
 
     }
