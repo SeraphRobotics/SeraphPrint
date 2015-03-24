@@ -275,9 +275,9 @@ QStringList Bay::onPath(XDFLPath path) {
         return returnlist;
     }
 
-    returnlist+=onStartPath();
+    //returnlist+=onStartPath();
     returnlist+=QStringListFromStringMatrix(jsStringList);
-    returnlist+=onEndPath();
+    //returnlist+=onEndPath();
     return returnlist;
 
 }
@@ -298,9 +298,9 @@ QStringList Bay::onVoxel(XDFLVoxel voxel) {
         return returnlist;
     }
 
-    returnlist+=onStartVoxel();
+    //returnlist+=onStartVoxel();
     returnlist+=QStringListFromStringMatrix(jsStringList);
-    returnlist+=onEndVoxel();
+    //returnlist+=onEndVoxel();
     return returnlist;
 }
 
