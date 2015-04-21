@@ -3,6 +3,7 @@
 #include "motordialog.h"
 #include <stdio.h>
 #include <QKeyEvent>
+#include <algorithm>
 
 // TODO: Replace the Position text boxes with labels, which is really what they should be
 
@@ -107,7 +108,9 @@ void GamePad::onZDialogDes()
 void GamePad::on_toOriginButton_clicked()
 {
     //move to origin
-    double v = sqrt(XVelocity*XVelocity+YVelocity*YVelocity+ZVelocity*ZVelocity);
+    float v = sqrt(XVelocity*XVelocity+YVelocity*YVelocity+ZVelocity*ZVelocity);
+    v = std::min(XVelocity,YVelocity);
+    v = std::min(v,ZVelocity);
     ci_->moveTo(0,0,0,v);
 }
 
