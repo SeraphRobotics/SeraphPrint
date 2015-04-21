@@ -176,7 +176,7 @@ void GamePad::on_urPushButton_clicked()
     //emit moveTo(ui->xPositionSpin->value() - ui->xIncrementSpin->value(),
     //            ui->yPositionSpin->value() + ui->yIncrementSpin->value(), ui->zPositionSpin->value());
     double v = sqrt(XVelocity*XVelocity+YVelocity*YVelocity);
-    ci_->move(- ui->xIncrementSpin->value(), ui->yIncrementSpin->value(),0,v);
+    ci_->move(ui->xIncrementSpin->value(), -ui->yIncrementSpin->value(),0,v);
 }
 
 void GamePad::on_ulPushButton_clicked()
@@ -194,7 +194,7 @@ void GamePad::on_dlPushButton_clicked()
     //emit moveTo(ui->xPositionSpin->value() + ui->xIncrementSpin->value(),
       //          ui->yPositionSpin->value() - ui->yIncrementSpin->value(), ui->zPositionSpin->value());
     double v = sqrt(XVelocity*XVelocity+YVelocity*YVelocity);
-    ci_->move(ui->xIncrementSpin->value(), -ui->yIncrementSpin->value(), 0,v);
+    ci_->move(-ui->xIncrementSpin->value(), ui->yIncrementSpin->value(), 0,v);
 }
 
 void GamePad::on_drpushButton_clicked()
