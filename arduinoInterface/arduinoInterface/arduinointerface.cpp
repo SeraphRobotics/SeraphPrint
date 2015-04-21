@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 ArduinoInterface::ArduinoInterface(QObject *parent) :
-    QThread(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer(""),start_received(false)
+    QObject(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer(""),start_received(false)
 {
     port_ = new QextSerialPort();
     connect(port_, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
@@ -16,7 +16,7 @@ ArduinoInterface::ArduinoInterface(QObject *parent) :
 }
 
 ArduinoInterface::ArduinoInterface(QString port, BaudRateType baudrate, QObject *parent):
-    QThread(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer(""),start_received(false)
+    QObject(parent),current_line(0), previous_line(""),run_queue_(false),receivedBuffer(""),start_received(false)
 {
     port_ = new QextSerialPort(port);//,QextSerialPort::Polling
     port_->setBaudRate( baudrate);
@@ -55,8 +55,9 @@ bool ArduinoInterface::connectPort(QString port, BaudRateType baudrate){
     port_->setFlowControl(FLOW_OFF);
     port_->setParity(PAR_NONE);
     port_->open(QIODevice::ReadWrite);
-    //_write( QString("M110") );
+#ifdef DEBUGGING
     qDebug()<<port_->isOpen();
+#endif
     return port_->isOpen();
 }
 void ArduinoInterface::disconnect(){
@@ -120,7 +121,9 @@ int ArduinoInterface::checksum(QString s){
 void ArduinoInterface::_write_next(){
     if(!priorityqueue.isEmpty()){
         _write(priorityqueue.takeFirst());
+#ifdef DEBUGGING
         qDebug()<<"***************running from priority********************\n";
+#endif
     }else if(!printqueue_.isEmpty()){
         _write(printqueue_.takeFirst());
         emit queuesize(printqueue_.size());
@@ -133,20 +136,11 @@ void ArduinoInterface::_write(QString s){
 
     previous_line = s;
     s=s.simplified();
-//    s=s.remove(' ');
-//    s=s.remove("\t");
-
     s = "N" + QString::number(++current_line)+" "+s;
-
-#ifdef DEBUGGING
-    //qDebug()<<s;
-#endif
-
-
-    //qDebug()<<"Cs: "<<cs;
-
     s+="*"+QString::number(checksum(s))+"\n";
+#ifdef DEBUGGING
     qDebug()<<"writing:"<<s;
+#endif
     QByteArray ba = s.toStdString().c_str();
     port_->write(ba,ba.length());
 
@@ -165,39 +159,45 @@ void ArduinoInterface::readCheck(){
 void ArduinoInterface::onDataAvailable(){
     QByteArray data = port_->readAll();
     QString c = QString(data).toLower();
-    c = receivedBuffer+c;
-    c=c.simplified();
+    c= c.simplified();
+#ifdef DEBUGGING
+    qDebug()<< "received:" <<c;
+    qDebug()<< "buffer:" <<receivedBuffer;
+#endif
+    //c = receivedBuffer.append(c);
+    //c=c.simplified();
     c=c.remove("\n");
-//    c=c.remove(' ');
-//    c=c.remove("\t");
     c = QString(data).toLower();
+#ifdef DEBUGGING
     qDebug()<<c;
-    //printf(c.toStdString().c_str());
+#endif
 
-//    c=c.simplified();
-//    c=c.remove(' ');
-//    c=c.remove("\t");
-//    return;
     if (c.contains("start")){
-//        current_line+=20;
         start_received = true;
         _write("M110 ");
-//        run_queue_=true;
         receivedBuffer.clear();
     }else if ( c.contains("resend") || c.contains("checksum") || c.contains("error")){
         --current_line;
+#ifdef DEBUGGING
+        qDebug()<<c << current_line;
+#endif
         _write(previous_line);
-        receivedBuffer.clear();
-    }else if(c.contains("ok") || c.contains("wait")){
-        _write_next();
-        qDebug()<<c;
-//        if(printqueue_.size()>0){ //run_queue_ &&
-//            _write(printqueue_.takeFirst());
 
-//        }
         receivedBuffer.clear();
+    }else if(c.contains("o")){ // || c.contains("wait")
+        _write_next();
+#ifdef DEBUGGING
+        qDebug()<<c;
+#endif
+        receivedBuffer.clear();
+    }else if( c.contains("w")){
+        _write_next();
+        receivedBuffer.clear();
+//        qDebug()<<"!!!!!w!!!!";
     }else {
-        receivedBuffer.append(c);
-//        qDebug()<<c;
+        //receivedBuffer.append(c);
+#ifdef DEBUGGING
+        qDebug()<<c;
+#endif
     }
 }

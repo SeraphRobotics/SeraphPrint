@@ -8,9 +8,10 @@
 #include <QTimer>
 #include <QThread>
 
-class ArduinoInterface : public QThread
+class ArduinoInterface : public QObject
 {
     Q_OBJECT
+    QThread workerThread;
 public:
     explicit ArduinoInterface(QObject *parent = 0);
     ArduinoInterface(QString port, BaudRateType baudrate, QObject *parent = 0);

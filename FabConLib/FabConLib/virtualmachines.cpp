@@ -136,8 +136,14 @@ void VMPrototype::loadConfig(QDomDocument document) {
 
 VirtualPrinter::VirtualPrinter():VMPrototype(),buffsize(0) {
     ai_ = new ArduinoInterface();
-    ai_->start();
+    ai_->moveToThread(&workerThread);
+    workerThread.start();
     connect(ai_,SIGNAL(queuesize(int)),this,SLOT(setbuffsize(int)));
+}
+
+VirtualPrinter::~VirtualPrinter(){
+    workerThread.quit();
+    workerThread.wait();
 }
 
 void VirtualPrinter::loadConfig(QDomDocument document) {

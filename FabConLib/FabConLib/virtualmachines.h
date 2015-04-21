@@ -79,8 +79,10 @@ class VMPrototype:public QObject
 class VirtualPrinter:public VMPrototype
 {
     Q_OBJECT
+    QThread workerThread;
 public:
     VirtualPrinter();
+    ~VirtualPrinter();
 
 public slots:
     void loadConfig(QDomDocument document);
