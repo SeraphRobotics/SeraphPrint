@@ -7,7 +7,7 @@
 #include <QDebug>
 
 CoreInterface::CoreInterface():state_(NotInitialized){
-#ifdef DEBUGGING
+#ifdef DUMPING
     vm_ = new TestPrinter();
 #else
     vm_ = new VirtualPrinter();
@@ -19,7 +19,7 @@ CoreInterface::~CoreInterface(){
         vm_->runCmds(b->onShutdown());
     }
     vm_->runCmds(vm_->cooldown);
-#ifdef DEBUGGING
+#ifdef DUMPING
     vm_->dumpstates();
 #endif
     delete vm_;
@@ -193,7 +193,7 @@ void CoreInterface::forceStop(){
         vm_->forceStop();
         handler_->forceStop();
         handler_->deleteLater();
-#ifdef DEBUGGING
+#ifdef DUMPING
     vm_ = new TestPrinter();
 #else
     vm_ = new VirtualPrinter();
@@ -237,7 +237,7 @@ void CoreInterface::donePrinting(){
     setState(Connected);
 //    vm_->dumpstates();
     positionTimer_.start();
-#ifdef DEBUGGING
+#ifdef DUMPING
     vm_->dumpstates();
 #endif
     emit printsComplete();

@@ -339,23 +339,22 @@ void XDFLHandler::  processCommand() {
                 if ("path" == nextCommandTag.nodeName().toLower()){
                     XDFLPath next = pathFromQDom(nextCommandTag);
                     int nextMatId = next.materialID;
-                    if(current_bay_!=material_bay_mapping_[nextMatId]->getId()){
-                        Bay* nextBay = material_bay_mapping_[nextMatId];
-                        Bay* currentBay = vm_->bays[current_bay_];
-
-                        p.points.last().x = p.points.last().x-nextBay->location_.at(0);
-                        p.points.last().y = p.points.last().y-nextBay->location_.at(1);
-                        p.points.last().z = p.points.last().z-nextBay->location_.at(2);
-
-                        p.points.first().x = p.points.first().x-currentBay->location_.at(0);
-                        p.points.first().y = p.points.first().y-currentBay->location_.at(1);
-                        p.points.first().z = p.points.first().z-currentBay->location_.at(2);
-
-
+                    Bay* nextBay = vm_->bays[current_bay_];
+                    Bay* currentBay = vm_->bays[current_bay_];
+                    // && (nextMatId !=0)
+                    if(current_bay_!=material_bay_mapping_[nextMatId]->getId() && (nextMatId !=0) ){
+                        nextBay = material_bay_mapping_[nextMatId];
+                        currentBay = vm_->bays[current_bay_];
                     }
+                    p.points.last().x = p.points.last().x-nextBay->location_.at(0);
+                    p.points.last().y = p.points.last().y-nextBay->location_.at(1);
+                    p.points.last().z = p.points.last().z-nextBay->location_.at(2);
+
+                    p.points.first().x = p.points.first().x-currentBay->location_.at(0);
+                    p.points.first().y = p.points.first().y-currentBay->location_.at(1);
+                    p.points.first().z = p.points.first().z-currentBay->location_.at(2);
                 }
             }
-
             n = vm_->xyzmotion->pathAlong(p,speed);
         } else { // if it is an extrusion path we feed it to the proper bay.
 
