@@ -32,6 +32,7 @@ public slots:
     void stopQueue();
     void startQueue();
     void clearQueue();
+    void estop();
 
 
 private slots:

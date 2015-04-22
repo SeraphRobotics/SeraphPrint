@@ -90,10 +90,18 @@ void MainWindow::forwardClicked(){
         current_state++;
         updateState();
     }
+    if(current_state==2){
+        current_state++;
+        updateState();
+    }
 }
 
 void MainWindow::backClicked(){
     if (current_state > 0){
+        current_state--;
+        updateState();
+    }
+    if(current_state==2){
         current_state--;
         updateState();
     }

@@ -236,6 +236,7 @@ bool VirtualPrinter::move(double x, double y, double z, double speed){
 }
 
 bool VirtualPrinter::forceStop(){
+    ai_->estop();
     ai_->disconnect();
     initialized_ = false;
     return true;

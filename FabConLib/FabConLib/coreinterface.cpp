@@ -188,9 +188,9 @@ void CoreInterface::cancelPrint(){
 }
 
 void CoreInterface::forceStop(){
-
+    vm_->forceStop();
     if(vm_->isInitialized()){
-        vm_->forceStop();
+
         handler_->forceStop();
         handler_->deleteLater();
 #ifdef DUMPING

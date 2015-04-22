@@ -98,6 +98,14 @@ void ArduinoInterface::startQueue(){
     printqueue_.pop_front();
 }
 
+void ArduinoInterface::estop(){
+    _write("M112");
+    //port_->close();
+    //port_->open(QIODevice::ReadWrite);
+    connectPort(port_->portName(),port_->baudRate());
+
+}
+
 void ArduinoInterface::clearQueue(){
     printqueue_.clear();
     stopQueue();

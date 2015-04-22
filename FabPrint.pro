@@ -54,7 +54,7 @@ INCLUDEPATH += FabConLib
 include(FabConLib/FabConLib/include.pro)
 
 #DEFINES += DEBUGGING
-DEFINES += DUMPING
+#DEFINES += DUMPING
 
 
 RESOURCES += fabprint.qrc
