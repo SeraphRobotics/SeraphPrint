@@ -122,6 +122,7 @@ public slots:
 
 public:
     QList<QString> actuatorNames_;
+    QVector<double> location_; //The bay systems point of contact
 
 private:
     QScriptEngine* engine_;
@@ -132,7 +133,7 @@ private:
 
     int id_;
 
-    QVector<double> location_; //The bay systems point of contact
+
     Material material_;
     QMap<QString,QString> scriptSettings_;
 //    QList<QString> actuatorNames_;

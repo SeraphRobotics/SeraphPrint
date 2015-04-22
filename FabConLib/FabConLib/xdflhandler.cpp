@@ -312,7 +312,9 @@ void XDFLHandler::  processCommand() {
     QDomElement commandTag = commands_.at(current_command_).toElement();
 
     if ("path" == commandTag.nodeName().toLower()) {
+#ifdef DEBUGGING
         qDebug()<<"PATH:"<<current_command_;
+#endif
         XDFLPath p = pathFromQDom(commandTag);
         p.toAbsolute();
 
@@ -329,19 +331,34 @@ void XDFLHandler::  processCommand() {
         } else {
             speed = mat_map[p.materialID].property["pathspeed"].toDouble();
         }
-//        new_start_point = p.start();
-//        if (!pointsEqual(new_start_point,last_end_point_,0.1)) { // ensures that the machine doesn't jump between points
-//            FabPoint delta = new_start_point;//subtractpoints(new_start_point,last_end_point_);
-//            runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
-//            vm_->runCmds(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
-//        }
-//        NPath n(vm_->nstatesize(),false);
         QStringList n;
-        if (p.materialID == 0 && p.speed != 0) { // if the path is not an extrusion path we move along it
+        if (p.materialID == 0 && p.speed != 0) {
+            // if the path is not an extrusion path we move along it
+            if (commands_.length()>(current_command_+1)){
+                QDomElement nextCommandTag = commands_.at(current_command_+1).toElement();
+                if ("path" == nextCommandTag.nodeName().toLower()){
+                    XDFLPath next = pathFromQDom(nextCommandTag);
+                    int nextMatId = next.materialID;
+                    if(current_bay_!=material_bay_mapping_[nextMatId]->getId()){
+                        Bay* nextBay = material_bay_mapping_[nextMatId];
+                        Bay* currentBay = vm_->bays[current_bay_];
+
+                        p.points.last().x = p.points.last().x-nextBay->location_.at(0);
+                        p.points.last().y = p.points.last().y-nextBay->location_.at(1);
+                        p.points.last().z = p.points.last().z-nextBay->location_.at(2);
+
+                        p.points.first().x = p.points.first().x-currentBay->location_.at(0);
+                        p.points.first().y = p.points.first().y-currentBay->location_.at(1);
+                        p.points.first().z = p.points.first().z-currentBay->location_.at(2);
+
+
+                    }
+                }
+            }
+
             n = vm_->xyzmotion->pathAlong(p,speed);
         } else { // if it is an extrusion path we feed it to the proper bay.
-//             n = material_bay_mapping_[p.materialID]->onPath(p);
-//            n = vm_->xyzmotion->pathAlong(p,speed);
+
             if(current_bay_!=material_bay_mapping_[p.materialID]->getId()){
                 current_bay_ = material_bay_mapping_[p.materialID]->getId();
                 QStringList sl;
@@ -350,8 +367,7 @@ void XDFLHandler::  processCommand() {
             }
             n = material_bay_mapping_[p.materialID]->onPath(p);
         }
-//        runNPath(n);
-//        qDebug()<<"received:"<<n;
+
         vm_->runCmds(n);
         last_end_point_ = p.end();
 
@@ -449,24 +465,24 @@ bool XDFLHandler::setMaterial(int id) {
         return true;
     }else{
         // THIS MAY BE A PROBLEMATIC WAY OF HANDELING SHIFTING OF THE TOOL BAYS
-        FabPoint Pnew = pointFromQVector(material_bay_mapping_[id]->getLocation());
-        FabPoint Pold = pointFromQVector(material_bay_mapping_[current_material_]->getLocation());
-        FabPoint delta = subtractpoints(Pnew,Pold);
-        double speed = material_bay_mapping_[id]->getMaterial().property["pathspeed"].toDouble();
-        current_material_ = id;
-        qDebug()<<"Changing materials.";
-        QStringList cmds;
-        QString rel = "G91";
-        QString abs = "G90";
-        QString move = "G1 X"+QString::number(delta.x)+
-                         " Y"+QString::number(delta.y)+
-                         " Z"+QString::number(delta.z)+
-                         " F"+QString::number(speed*60);
-        cmds.append(rel);
-        cmds.append(move);
-        cmds.append(abs);
+//        FabPoint Pnew = pointFromQVector(material_bay_mapping_[id]->getLocation());
+//        FabPoint Pold = pointFromQVector(material_bay_mapping_[current_material_]->getLocation());
+//        FabPoint delta = subtractpoints(Pnew,Pold);
+//        double speed = material_bay_mapping_[id]->getMaterial().property["pathspeed"].toDouble();
+//        current_material_ = id;
+//        qDebug()<<"Changing materials.";
+//        QStringList cmds;
+//        QString rel = "G91";
+//        QString abs = "G90";
+//        QString move = "G1 X"+QString::number(delta.x)+
+//                         " Y"+QString::number(delta.y)+
+//                         " Z"+QString::number(delta.z)+
+//                         " F"+QString::number(speed*60);
+//        cmds.append(rel);
+//        cmds.append(move);
+//        cmds.append(abs);
         //vm_->runCmds(cmds);
-        qDebug()<<"move switch: "<<move;
+        //qDebug()<<"move switch: "<<move;
 
 //        runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
 

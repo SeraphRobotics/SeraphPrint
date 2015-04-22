@@ -193,7 +193,11 @@ void CoreInterface::forceStop(){
         vm_->forceStop();
         handler_->forceStop();
         handler_->deleteLater();
-        vm_ = new TestPrinter();//new VirtualPrinter();
+#ifdef DEBUGGING
+    vm_ = new TestPrinter();
+#else
+    vm_ = new VirtualPrinter();
+#endif
         setConfig(config_,comport_);
 //        positionTimer_.disconnect();
 //        setState(NotInitialized);

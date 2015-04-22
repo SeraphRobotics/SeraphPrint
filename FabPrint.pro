@@ -53,7 +53,7 @@ FORMS += \
 INCLUDEPATH += FabConLib
 include(FabConLib/FabConLib/include.pro)
 
-#DEFINES += DEBUGGING
+DEFINES += DEBUGGING
 
 
 RESOURCES += fabprint.qrc

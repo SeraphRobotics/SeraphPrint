@@ -27,12 +27,12 @@ Bay::Bay(const QDomNode& sourceDomNode):engine_() {
             for (unsigned int j = 0; j < locChildren.length(); j++) {
 
                 QDomNode lchild = locChildren.at(j);
-                if ("x"==lchild.nodeName()) {
-                    loc[0] = lchild.nodeValue().toDouble();
-                } else if ("y"==lchild.nodeName()) {
-                    loc[1] = lchild.nodeValue().toDouble();
-                } else if ("z"==lchild.nodeName()) {
-                    loc[2] = lchild.nodeValue().toDouble();
+                if ("x"==lchild.nodeName().toLower()) {
+                    loc[0] = lchild.toElement().text().toDouble();
+                } else if ("y"==lchild.nodeName().toLower()) {
+                    loc[1] = lchild.toElement().text().toDouble();
+                } else if ("z"==lchild.nodeName().toLower()) {
+                    loc[2] = lchild.toElement().text().toDouble();
                 }
             location_ = loc;
             }
