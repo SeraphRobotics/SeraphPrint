@@ -168,7 +168,7 @@ void ConnectWidget::deviceAdded(QextPortInfo i){
     if (usb)//!port.friendName.isEmpty())
     {
         portList.append(i.portName);
-        ui->portBox->addItem(i.friendName);
+        ui->portBox->addItem(i.friendName.replace("Arduino Mega 2560","Scientist"));
         /**
             TODO: Check for duplicates
         **/

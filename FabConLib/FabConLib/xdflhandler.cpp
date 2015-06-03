@@ -482,7 +482,6 @@ bool XDFLHandler::setMaterial(int id) {
 //        cmds.append(abs);
         //vm_->runCmds(cmds);
         //qDebug()<<"move switch: "<<move;
-
 //        runNPath(vm_->xyzmotion->pathTo(delta.x,delta.y,delta.z,speed));
 
     }
