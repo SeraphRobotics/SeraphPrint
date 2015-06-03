@@ -76,6 +76,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setUpConnections();
     this->enumerator->setUpNotifications();
+
+    loadBaysOnConnect = (settings.value("loadBaysOnConnect", false)).toBool();
 }
 
 
@@ -90,7 +92,7 @@ void MainWindow::forwardClicked(){
         current_state++;
         updateState();
     }
-    if(current_state==2){
+    if(current_state==2 && loadBaysOnConnect){
         current_state++;
         updateState();
     }
@@ -101,7 +103,7 @@ void MainWindow::backClicked(){
         current_state--;
         updateState();
     }
-    if(current_state==2){
+    if(current_state==2 && loadBaysOnConnect){
         current_state--;
         updateState();
     }
@@ -193,6 +195,7 @@ void MainWindow::updateState()
         break;
     }
     ui->stackedWidget->setCurrentIndex(current_state);
+    if (loadBaysOnConnect){showMaterialsWidget();}
     showGamePad();
 }
 
@@ -288,6 +291,7 @@ void MainWindow::printerConnected(){
     if (ci_->vm_->isInitialized())
     {
         qDebug()<<"Config file loaded successfully";
+        if (loadBaysOnConnect){showMaterialsWidget();}
         showGamePad();
         ui->forwardButton->setEnabled(true);
         isConnected = true;
@@ -301,18 +305,24 @@ void MainWindow::printerConnected(){
 
 }
 
+void MainWindow::hideMaterialsWidget(){
+    this->materialsWidget->hide();
+    ui->mainVLayout->removeWidget(this->materialsWidget);
+}
+
+void MainWindow::showMaterialsWidget(){
+    ui->mainVLayout->addWidget(this->materialsWidget);
+    this->materialsWidget->show();
+}
+
 
 void MainWindow::hideGamePad(){
     this->gamepad_container->hide();
-    this->materialsWidget->hide();
     ui->mainVLayout->removeWidget(this->gamepad_container);
-    ui->mainVLayout->removeWidget(this->materialsWidget);
 }
 
 void MainWindow::showGamePad(){
     this->gamepad_container->show();
-    ui->mainVLayout->addWidget(this->materialsWidget);
-    this->materialsWidget->show();
     ui->mainVLayout->addWidget(this->gamepad_container);
 }
 
@@ -321,6 +331,7 @@ void MainWindow::setGo()
 {
     // TODO: Use current/total path display (not implemented in Interface)
     // This will eventually require periodically polling the current path.
+    if (loadBaysOnConnect){hideMaterialsWidget();}
     hideGamePad();
 }
 
@@ -339,8 +350,8 @@ void MainWindow::setResume()
 void MainWindow::setStop()
 {
     showGamePad();
-    ui->mainVLayout->removeWidget(this->materialsWidget);
-    this->materialsWidget->hide();
+    if (loadBaysOnConnect){showMaterialsWidget();}
+
 }
 
 MainWindow::~MainWindow()
@@ -378,4 +389,12 @@ void MainWindow::on_actionAbout_FabPrint_triggered()
 void MainWindow::on_actionVisit_FabAtHome_org_triggered()
 {
     QDesktopServices::openUrl(QUrl("http://www.seraphrobotics.com/"));
+}
+
+void MainWindow::on_actionLoad_Bays_on_Connect_triggered(){
+    QSettings settings;
+    loadBaysOnConnect = !loadBaysOnConnect;
+    settings.setValue("loadBaysOnConnect", loadBaysOnConnect);
+
+
 }

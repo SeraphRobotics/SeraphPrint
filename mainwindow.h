@@ -63,6 +63,12 @@ private slots:
 
     void on_actionVisit_FabAtHome_org_triggered();
 
+    void on_actionLoad_Bays_on_Connect_triggered();
+
+
+    void hideMaterialsWidget();
+    void showMaterialsWidget();
+
     void hideGamePad();
     void showGamePad();
 
@@ -94,6 +100,8 @@ private:
     bool isConnected;
     bool materialsInitialized;
     int machineState;
+
+    bool loadBaysOnConnect;
 
     CoreInterface* ci_;
 

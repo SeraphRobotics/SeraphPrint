@@ -299,6 +299,7 @@
      <bool>true</bool>
     </property>
     <addaction name="actionChange_Directory"/>
+    <addaction name="actionLoad_Bays_on_Connect"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -309,11 +310,6 @@
    <addaction name="menuOptions"/>
    <addaction name="menuHelp"/>
   </widget>
-  <action name="actionBlah">
-   <property name="text">
-    <string>blah</string>
-   </property>
-  </action>
   <action name="actionChange_Directory">
    <property name="text">
     <string>Change Directory</string>
@@ -342,6 +338,14 @@
    </property>
    <property name="shortcut">
     <string>V</string>
+   </property>
+  </action>
+  <action name="actionLoad_Bays_on_Connect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Load Bays on Connect</string>
    </property>
   </action>
  </widget>
