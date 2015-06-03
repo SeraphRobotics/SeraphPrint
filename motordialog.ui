@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>227</width>
+    <width>228</width>
     <height>280</height>
    </rect>
   </property>
@@ -56,6 +56,9 @@
            <height>40</height>
           </size>
          </property>
+         <property name="maximum">
+          <number>200</number>
+         </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -71,6 +74,12 @@
          </property>
          <property name="suffix">
           <string> mm/s</string>
+         </property>
+         <property name="minimum">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>200.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -121,6 +130,9 @@
            <height>40</height>
           </size>
          </property>
+         <property name="maximum">
+          <number>200</number>
+         </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -136,6 +148,12 @@
          </property>
          <property name="suffix">
           <string notr="true"> mm/s^2</string>
+         </property>
+         <property name="minimum">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>200.000000000000000</double>
          </property>
         </widget>
        </item>
