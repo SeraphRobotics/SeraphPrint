@@ -14,6 +14,7 @@ XDFLHandler::XDFLHandler(VMPrototype* vm, QDomDocument xdfl) {
     XDFLHandler();
     setVM(vm);
     loadFromDom(xdfl);
+    current_bay_=0;
 }
 
 void XDFLHandler::updateState(){
@@ -334,6 +335,7 @@ void XDFLHandler::  processCommand() {
         QStringList n;
         if (p.materialID == 0 && p.speed != 0) {
             // if the path is not an extrusion path we move along it
+            if(current_bay_<0){current_bay_=0;}
             if (commands_.length()>(current_command_+1)){
                 QDomElement nextCommandTag = commands_.at(current_command_+1).toElement();
                 if ("path" == nextCommandTag.nodeName().toLower()){
