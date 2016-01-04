@@ -8,7 +8,8 @@ QT += \
     core \
     gui \
     xml \
-    script
+    script\
+    widgets
 
 TARGET = SeraphPrint
 TEMPLATE = app
