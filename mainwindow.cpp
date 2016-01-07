@@ -31,14 +31,14 @@ MainWindow::MainWindow(QWidget *parent) :
     machineState(0)
 {
 
-    QDateTime curdt = QDateTime::currentDateTime();
-    QDateTime settime = QDateTime(QDate::fromString("1:01:2016", "d':'MM':'yyyy"),QTime(0,0));
+//    QDateTime curdt = QDateTime::currentDateTime();
+//    QDateTime settime = QDateTime(QDate::fromString("1:08:2016", "d':'MM':'yyyy"),QTime(0,0));
 
 
-    if (curdt>settime){
-      QMessageBox::information(this->centralWidget(),"info","Your version has expired. please contact Seraph Robotics");
-      QTimer::singleShot(0,this,SLOT(close()));
-    }
+//    if (curdt>settime){
+//      QMessageBox::information(this->centralWidget(),"info","Your version has expired. please contact Seraph Robotics");
+//      QTimer::singleShot(0,this,SLOT(close()));
+//    }
 
 
     // Setup Internal States
