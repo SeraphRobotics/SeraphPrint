@@ -338,25 +338,41 @@ void XDFLHandler::  processCommand() {
             if(current_bay_<0){current_bay_=0;}
             if (commands_.length()>(current_command_+1)){
                 QDomElement nextCommandTag = commands_.at(current_command_+1).toElement();
+
+                //get the default bay for the offset
+                Bay* nextBay = vm_->bays[current_bay_];
+                Bay* currentBay = vm_->bays[current_bay_];
+                int nextMatId = 0;
+
+
+                // Change nextBay if swapping from one bay to another
+                // get next material ID
                 if ("path" == nextCommandTag.nodeName().toLower()){
                     XDFLPath next = pathFromQDom(nextCommandTag);
-                    int nextMatId = next.materialID;
-                    Bay* nextBay = vm_->bays[current_bay_];
-                    Bay* currentBay = vm_->bays[current_bay_];
-                    if(nextMatId !=0){
-                        if(current_bay_!=material_bay_mapping_[nextMatId]->getId()){
-                            nextBay = material_bay_mapping_[nextMatId];
-                            //currentBay = vm_->bays[current_bay_];
-                        }
-                    }
-                    p.points.last().x = p.points.last().x-nextBay->location_.at(0);
-                    p.points.last().y = p.points.last().y-nextBay->location_.at(1);
-                    p.points.last().z = p.points.last().z-nextBay->location_.at(2);
-
-                    p.points.first().x = p.points.first().x-currentBay->location_.at(0);
-                    p.points.first().y = p.points.first().y-currentBay->location_.at(1);
-                    p.points.first().z = p.points.first().z-currentBay->location_.at(2);
+                    nextMatId = next.materialID;
+                }else if ("voxel" == nextCommandTag.nodeName().toLower()){
+                    XDFLVoxel v = voxFromQDom(commandTag);
+                    nextMatId = v.id;
                 }
+
+                if(nextMatId !=0){
+                    if(current_bay_!=material_bay_mapping_[nextMatId]->getId()){
+                        nextBay = material_bay_mapping_[nextMatId];
+                    }
+                }
+
+
+                //Modify path based on current bay and next bay
+                //TODO: this should be based on half of the path, not last points
+                p.points.last().x = p.points.last().x-nextBay->location_.at(0);
+                p.points.last().y = p.points.last().y-nextBay->location_.at(1);
+                p.points.last().z = p.points.last().z-nextBay->location_.at(2);
+
+                p.points.first().x = p.points.first().x-currentBay->location_.at(0);
+                p.points.first().y = p.points.first().y-currentBay->location_.at(1);
+                p.points.first().z = p.points.first().z-currentBay->location_.at(2);
+
+
             }
             n = vm_->xyzmotion->pathAlong(p,speed);
         } else { // if it is an extrusion path we feed it to the proper bay.
