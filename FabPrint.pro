@@ -9,6 +9,12 @@ QT += \
     gui \
     xml \
     script
+DEFINES += DEBUGGING
+
+greaterThan(QT_MAJOR_VERSION, 4) {
+    QT += widgets
+    DEFINES += GREATERQT
+}
 
 TARGET = SeraphPrint
 TEMPLATE = app
