@@ -120,7 +120,7 @@ int ArduinoInterface::checksum(QString s){
             if(s.at(i)=='*'){
                 break;
             }
-           cs = cs ^ s.at(i).toAscii();
+           cs = cs ^ s.at(i).toLatin1();
         }
         cs &= 0xff;
     }

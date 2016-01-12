@@ -276,7 +276,7 @@ void XDFLHandler::run()
         if (handlerstate_ == XDFLHandler::Running) {
             // Allow state changes [pausing/stopping] while processing one path
             locker.unlock();
-            if(vm_->getBufferSize()<10){processCommand();}
+            if(vm_->getBufferSize()<1){processCommand();}
             locker.relock();
             if (current_command_ == commands_.length()) {
                 // XDFL file completed.

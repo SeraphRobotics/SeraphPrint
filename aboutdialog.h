@@ -1,7 +1,13 @@
 #ifndef ABOUTDIALOG_H
 #define ABOUTDIALOG_H
 
+
+#ifdef GREATERQT
+#include <QDialog>
+#else
 #include <QtGui/QDialog>
+#endif
+
 
 namespace Ui {
     class AboutDialog;
