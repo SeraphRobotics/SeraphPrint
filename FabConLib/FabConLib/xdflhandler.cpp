@@ -411,10 +411,10 @@ void XDFLHandler::  processCommand() {
         //run NPATH from bay
 //        runNPath(material_bay_mapping_[v.id]->onVoxel(v));
         if(current_bay_!=material_bay_mapping_[v.id]->getId()){
-            //current_bay_ = material_bay_mapping_[v.id]->getId();
-            //QStringList sl;
-            //sl.append("T"+QString::number(current_bay_));
-            //vm_->runCmds(sl);
+            current_bay_ = material_bay_mapping_[v.id]->getId();
+            QStringList sl;
+            sl.append("T"+QString::number(current_bay_));
+            vm_->runCmds(sl);
         }
         vm_->runCmds(material_bay_mapping_[v.id]->onVoxel(v));
 
