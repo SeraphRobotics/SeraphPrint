@@ -343,10 +343,11 @@ void XDFLHandler::  processCommand() {
                     int nextMatId = next.materialID;
                     Bay* nextBay = vm_->bays[current_bay_];
                     Bay* currentBay = vm_->bays[current_bay_];
-                    // && (nextMatId !=0)
-                    if(current_bay_!=material_bay_mapping_[nextMatId]->getId() && (nextMatId !=0) ){
-                        nextBay = material_bay_mapping_[nextMatId];
-                        currentBay = vm_->bays[current_bay_];
+                    if(nextMatId !=0){
+                        if(current_bay_!=material_bay_mapping_[nextMatId]->getId()){
+                            nextBay = material_bay_mapping_[nextMatId];
+                            //currentBay = vm_->bays[current_bay_];
+                        }
                     }
                     p.points.last().x = p.points.last().x-nextBay->location_.at(0);
                     p.points.last().y = p.points.last().y-nextBay->location_.at(1);
