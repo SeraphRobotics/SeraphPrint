@@ -1,4 +1,8 @@
+#ifdef GREATERQT
 #include <QApplication>
+#else
+#include <QtGui/QApplication>
+#endif
 #include "mainwindow.h"
 //#include "Interface.h"
 #include <stdio.h>
