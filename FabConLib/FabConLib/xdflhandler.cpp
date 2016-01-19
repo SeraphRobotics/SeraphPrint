@@ -427,6 +427,7 @@ void XDFLHandler::  processCommand() {
                 for(int index=0;index<clearance_paths.size();index++){
                     XDFLPath path = clearance_paths[index];
                     float speed = path.speed;
+                    qDebug()<<"SPEED:"<<path.speed;
                     n = n+vm_->xyzmotion->pathAlong(path,speed);
                 }
                 current_command_+=num_cmds;
