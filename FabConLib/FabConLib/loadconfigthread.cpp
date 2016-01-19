@@ -42,6 +42,11 @@ void LoadConfigThread::run(){
         foreach(Bay* b, vm_->bays ){
             vm_->runCmds(b->onConnect());
         }
+
+        QStringList s;
+        s.append("T0");
+        vm_->runCmds(s);
+
         if(vm_->isInitialized()){
             emit loaded();
         }

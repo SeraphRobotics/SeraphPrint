@@ -337,52 +337,109 @@ void XDFLHandler::  processCommand() {
             // if the path is not an extrusion path we move along it
             if(current_bay_<0){current_bay_=0;}
             if (commands_.length()>(current_command_+1)){
-                QDomElement nextCommandTag = commands_.at(current_command_+1).toElement();
+                //QDomElement nextCommandTag = commands_.at(current_command_+1).toElement();
 
                 //get the default bay for the offset
                 Bay* nextBay = vm_->bays[current_bay_];
                 Bay* currentBay = vm_->bays[current_bay_];
+
+
+                // we get all of the following paths that are clerance paths to process together
+                // We stop collecting if we run out of paths, or we reach an extrusion or voxel command
+
                 int nextMatId = 0;
-
-
-                // Change nextBay if swapping from one bay to another
-                // get next material ID
-                if ("path" == nextCommandTag.nodeName().toLower()){
-                    XDFLPath next = pathFromQDom(nextCommandTag);
-                    nextMatId = next.materialID;
-                }else if ("voxel" == nextCommandTag.nodeName().toLower()){
-                    XDFLVoxel v = voxFromQDom(commandTag);
-                    nextMatId = v.id;
-                }
-
-                if(nextMatId !=0){
-                    if(current_bay_!=material_bay_mapping_[nextMatId]->getId()){
-                        nextBay = material_bay_mapping_[nextMatId];
+                bool process_next_cmd = true;
+                int num_cmds=0;
+                QVector<XDFLPath> clearance_paths = QVector<XDFLPath>();
+                clearance_paths.append(p);
+                while(process_next_cmd == false && num_cmds<(commands_.length()-current_command_) && num_cmds<100  ){
+                    num_cmds++;
+                    QDomElement nextCommandTag = commands_.at(current_command_+num_cmds).toElement();
+                    // Change nextBay if swapping from one bay to another
+                    // get next material ID
+                    if ("path" == nextCommandTag.nodeName().toLower()){
+                        XDFLPath next = pathFromQDom(nextCommandTag);
+                        nextMatId = next.materialID;
+                        if(nextMatId !=0){
+                            process_next_cmd = false;
+                        }else{
+                            process_next_cmd = true;
+                            clearance_paths.append(XDFLPath(next));
+                        }
+                    }else if ("voxel" == nextCommandTag.nodeName().toLower()){
+                        XDFLVoxel v = voxFromQDom(commandTag);
+                        nextMatId = v.id;
+                        process_next_cmd = false;
+                    }else{
+                        nextMatId = 0;
+                        process_next_cmd = false;
+                    }
+                    // if we are stoping, find the next bay
+                    if(nextMatId !=0){
+                        process_next_cmd = false;
+                        if(current_bay_!=material_bay_mapping_[nextMatId]->getId()){
+                            nextBay = material_bay_mapping_[nextMatId];
+                        }
                     }
                 }
 
+                // Now that the bay is found and the paths are set, process the first half of hte paths to run on the old bay and the second half to run on the new bay
+                // if there are odd number of commands, then split the middle path between the bays
 
-                //Modify path based on current bay and next bay
-                //TODO: this should be based on half of the path, not last points
-                p.points.last().x = p.points.last().x-nextBay->location_.at(0);
-                p.points.last().y = p.points.last().y-nextBay->location_.at(1);
-                p.points.last().z = p.points.last().z-nextBay->location_.at(2);
-
-                p.points.first().x = p.points.first().x-currentBay->location_.at(0);
-                p.points.first().y = p.points.first().y-currentBay->location_.at(1);
-                p.points.first().z = p.points.first().z-currentBay->location_.at(2);
+                int num_paths = clearance_paths.size();
+                int cuttoff = num_paths/2.0;
+                if(num_paths%2>0){cuttoff = num_paths-cuttoff;}
 
 
+                for(int index=0;index<clearance_paths.size();index++){
+                    if (index<cuttoff){
+                        XDFLPath path = clearance_paths[index];
+                        for(int pt_index=0;pt_index<path.points.size();pt_index++ ){
+                            path.points[pt_index].x = path.points[pt_index].x - currentBay->location_.at(0);
+                            path.points[pt_index].y = path.points[pt_index].y - currentBay->location_.at(1);
+                            path.points[pt_index].z = path.points[pt_index].z - currentBay->location_.at(2);
+                        }
+                    }else if (num_paths%2>0 and index == cuttoff){
+                        XDFLPath path = clearance_paths[index];
+                        int mid = path.points.size()/2.0;
+                        for(int pt_index=0;pt_index<path.points.size();pt_index++ ){
+                            if (pt_index<mid){
+                                path.points[pt_index].x = path.points[pt_index].x - currentBay->location_.at(0);
+                                path.points[pt_index].y = path.points[pt_index].y - currentBay->location_.at(1);
+                                path.points[pt_index].z = path.points[pt_index].z - currentBay->location_.at(2);
+                            }else{
+                                path.points[pt_index].x = path.points[pt_index].x - nextBay->location_.at(0);
+                                path.points[pt_index].y = path.points[pt_index].y - nextBay->location_.at(1);
+                                path.points[pt_index].z = path.points[pt_index].z - nextBay->location_.at(2);
+                            }
+                        }
+                    }else{
+                        XDFLPath path = clearance_paths[index];
+                        for(int pt_index=0;pt_index<path.points.size();pt_index++ ){
+                            path.points[pt_index].x = path.points[pt_index].x - nextBay->location_.at(0);
+                            path.points[pt_index].y = path.points[pt_index].y - nextBay->location_.at(1);
+                            path.points[pt_index].z = path.points[pt_index].z - nextBay->location_.at(2);
+                        }
+                    }
+                }
+
+                //Write out all of the commands
+                for(int index=0;index<clearance_paths.size();index++){
+                    XDFLPath path = clearance_paths[index];
+                    float speed = path.speed;
+                    n = n+vm_->xyzmotion->pathAlong(path,speed);
+                }
+                current_command_+=num_cmds;
             }
-            n = vm_->xyzmotion->pathAlong(p,speed);
+
         } else { // if it is an extrusion path we feed it to the proper bay.
 
-            if(current_bay_!=material_bay_mapping_[p.materialID]->getId()){
-                current_bay_ = material_bay_mapping_[p.materialID]->getId();
-                QStringList sl;
-                sl.append("T"+QString::number(current_bay_));
-                vm_->runCmds(sl);
-            }
+//            if(current_bay_!=material_bay_mapping_[p.materialID]->getId()){
+//                current_bay_ = material_bay_mapping_[p.materialID]->getId();
+//                QStringList sl;
+//                sl.append("T"+QString::number(current_bay_));
+//                vm_->runCmds(sl);
+//            }
             n = material_bay_mapping_[p.materialID]->onPath(p);
         }
 
@@ -410,12 +467,12 @@ void XDFLHandler::  processCommand() {
 
         //run NPATH from bay
 //        runNPath(material_bay_mapping_[v.id]->onVoxel(v));
-        if(current_bay_!=material_bay_mapping_[v.id]->getId()){
-            current_bay_ = material_bay_mapping_[v.id]->getId();
-            QStringList sl;
-            sl.append("T"+QString::number(current_bay_));
-            vm_->runCmds(sl);
-        }
+//        if(current_bay_!=material_bay_mapping_[v.id]->getId()){
+//            current_bay_ = material_bay_mapping_[v.id]->getId();
+//            QStringList sl;
+//            sl.append("T"+QString::number(current_bay_));
+//            vm_->runCmds(sl);
+//        }
         vm_->runCmds(material_bay_mapping_[v.id]->onVoxel(v));
 
         //SET LAST_END_POINT to location of voxel in ABS coordinates

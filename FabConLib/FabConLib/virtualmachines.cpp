@@ -216,7 +216,7 @@ QString VirtualPrinter::getErrors(){
 }
 
 void VirtualPrinter::runCmds(QStringList sl){
-//    qDebug()<<sl;
+    qDebug()<<sl;
     if(printing){
         ai_->addToQueue(sl);
     }else{
