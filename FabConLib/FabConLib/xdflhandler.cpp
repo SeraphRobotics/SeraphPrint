@@ -352,7 +352,7 @@ void XDFLHandler::  processCommand() {
                 int num_cmds=0;
                 QVector<XDFLPath> clearance_paths = QVector<XDFLPath>();
                 clearance_paths.append(p);
-                while(process_next_cmd == false && num_cmds<(commands_.length()-current_command_) && num_cmds<100  ){
+                while(process_next_cmd != false && num_cmds<(commands_.length()-current_command_) && num_cmds<100  ){
                     num_cmds++;
                     QDomElement nextCommandTag = commands_.at(current_command_+num_cmds).toElement();
                     // Change nextBay if swapping from one bay to another
@@ -388,19 +388,19 @@ void XDFLHandler::  processCommand() {
 
                 int num_paths = clearance_paths.size();
                 int cuttoff = num_paths/2.0;
-                if(num_paths%2>0){cuttoff = num_paths-cuttoff;}
+
 
 
                 for(int index=0;index<clearance_paths.size();index++){
+                    XDFLPath path = clearance_paths[index];
                     if (index<cuttoff){
-                        XDFLPath path = clearance_paths[index];
+
                         for(int pt_index=0;pt_index<path.points.size();pt_index++ ){
                             path.points[pt_index].x = path.points[pt_index].x - currentBay->location_.at(0);
                             path.points[pt_index].y = path.points[pt_index].y - currentBay->location_.at(1);
                             path.points[pt_index].z = path.points[pt_index].z - currentBay->location_.at(2);
                         }
-                    }else if (num_paths%2>0 and index == cuttoff){
-                        XDFLPath path = clearance_paths[index];
+                    }else if (num_paths%2>0 && index == cuttoff){;
                         int mid = path.points.size()/2.0;
                         for(int pt_index=0;pt_index<path.points.size();pt_index++ ){
                             if (pt_index<mid){
@@ -414,23 +414,22 @@ void XDFLHandler::  processCommand() {
                             }
                         }
                     }else{
-                        XDFLPath path = clearance_paths[index];
                         for(int pt_index=0;pt_index<path.points.size();pt_index++ ){
                             path.points[pt_index].x = path.points[pt_index].x - nextBay->location_.at(0);
                             path.points[pt_index].y = path.points[pt_index].y - nextBay->location_.at(1);
                             path.points[pt_index].z = path.points[pt_index].z - nextBay->location_.at(2);
                         }
                     }
+                    clearance_paths[index]=path;
                 }
 
                 //Write out all of the commands
                 for(int index=0;index<clearance_paths.size();index++){
                     XDFLPath path = clearance_paths[index];
                     float speed = path.speed;
-                    qDebug()<<"SPEED:"<<path.speed;
                     n = n+vm_->xyzmotion->pathAlong(path,speed);
                 }
-                current_command_+=num_cmds;
+                current_command_+=(num_cmds-1);
             }
 
         } else { // if it is an extrusion path we feed it to the proper bay.
