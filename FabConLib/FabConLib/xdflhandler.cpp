@@ -379,6 +379,7 @@ void XDFLHandler::  processCommand() {
                         process_next_cmd = false;
                         if(current_bay_!=material_bay_mapping_[nextMatId]->getId()){
                             nextBay = material_bay_mapping_[nextMatId];
+                            current_bay_ =material_bay_mapping_[nextMatId]->getId();
                         }
                     }
                 }

@@ -74,9 +74,31 @@ class VMPrototype:public QObject
 
     };
 
+class TestPrinter:public VMPrototype
+{
+    Q_OBJECT
+public:
+    TestPrinter();
 
 
-class VirtualPrinter:public VMPrototype
+public slots:
+    void loadConfig(QDomDocument document);
+
+    void dumpstates();
+    void resetPosition();
+    void runCmds(QStringList sl);
+    bool moveTo(double x, double y, double z, double speed);
+    bool move(double x, double y, double z, double speed);
+
+    bool forceStop();
+
+
+private:
+    QStringList totalprintcommands_;
+};
+
+
+class VirtualPrinter:public TestPrinter
 {
     Q_OBJECT
     QThread workerThread;
@@ -115,28 +137,6 @@ private:
 
 
 
-class TestPrinter:public VMPrototype
-{
-    Q_OBJECT
-public:
-    TestPrinter();
-
-
-public slots:
-    void loadConfig(QDomDocument document);
-
-    void dumpstates();
-    void resetPosition();
-    void runCmds(QStringList sl);
-    bool moveTo(double x, double y, double z, double speed);
-    bool move(double x, double y, double z, double speed);
-
-    bool forceStop();
-
-
-private:
-    QStringList totalprintcommands_;
-};
 
 
 /**

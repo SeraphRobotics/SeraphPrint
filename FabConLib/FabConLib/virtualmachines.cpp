@@ -134,7 +134,7 @@ void VMPrototype::loadConfig(QDomDocument document) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-VirtualPrinter::VirtualPrinter():VMPrototype(),buffsize(0) {
+VirtualPrinter::VirtualPrinter():TestPrinter(),buffsize(0) {
     ai_ = new ArduinoInterface();
     ai_->moveToThread(&workerThread);
     workerThread.start();
@@ -217,7 +217,9 @@ QString VirtualPrinter::getErrors(){
 
 void VirtualPrinter::runCmds(QStringList sl){
     qDebug()<<sl;
+
     if(printing){
+        TestPrinter::runCmds(sl);
         ai_->addToQueue(sl);
     }else{
         ai_->writeCommands(sl);
@@ -239,6 +241,7 @@ bool VirtualPrinter::forceStop(){
     ai_->estop();
     ai_->disconnect();
     initialized_ = false;
+    TestPrinter::dumpstates();
     return true;
 }
 void VirtualPrinter::resetPosition(){
@@ -260,6 +263,7 @@ void VirtualPrinter::startprint(){
 }
 void VirtualPrinter::cancelprint(){
     VMPrototype::cancelprint();
+    TestPrinter::dumpstates();
     ai_->stopQueue();
     ai_->clearQueue();
 }
@@ -352,7 +356,7 @@ void TestPrinter::resetPosition(){
 }
 
 void TestPrinter::dumpstates(){
-    QFile f("dump.gcode");
+    QFile f("Print.gcode");
     if(!f.open(QIODevice::WriteOnly | QIODevice::Text)){
         qDebug()<<"could not open file";
         foreach(QString s, totalprintcommands_){
